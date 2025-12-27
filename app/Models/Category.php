@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -26,20 +22,55 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Category extends Model
 {
-	protected $table = 'categories';
+    protected $table = 'categories';
 
-	protected $casts = [
-		'is_active' => 'bool'
-	];
+    protected $casts = [
+        'is_active' => 'bool'
+    ];
 
-	protected $fillable = [
-		'name',
-		'description',
-		'is_active'
-	];
+    protected $fillable = [
+        'name',
+        'description',
+        'is_active'
+    ];
 
-	public function products()
-	{
-		return $this->hasMany(Product::class);
-	}
+    // Relationships
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    // Helper Methods
+    public function getActiveProductsCount()
+    {
+        return $this->products()->active()->count();
+    }
+
+    public function hasProducts()
+    {
+        return $this->products()->exists();
+    }
+
+    public function activate()
+    {
+        $this->update(['is_active' => true]);
+    }
+
+    public function deactivate()
+    {
+        $this->update(['is_active' => false]);
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeWithActiveProducts($query)
+    {
+        return $query->whereHas('products', function ($q) {
+            $q->active();
+        });
+    }
 }

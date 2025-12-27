@@ -1,14 +1,11 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class User
@@ -21,6 +18,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $role
  * @property bool $is_active
  * @property Carbon|null $last_login
+ * @property Carbon|null $email_verified_at
+ * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * 
@@ -34,61 +33,121 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class User extends Model
+class User extends Authenticatable
 {
-	protected $table = 'users';
+    use Notifiable;
 
-	protected $casts = [
-		'is_active' => 'bool',
-		'last_login' => 'datetime'
-	];
+    protected $table = 'users';
 
-	protected $hidden = [
-		'password'
-	];
+    protected $casts = [
+        'is_active' => 'bool',
+        'last_login' => 'datetime'
+    ];
 
-	protected $fillable = [
-		'name',
-		'email',
-		'password',
-		'phone',
-		'role',
-		'is_active',
-		'last_login'
-	];
+    protected $hidden = [
+        'password'
+    ];
 
-	public function admin_logs()
-	{
-		return $this->hasMany(AdminLog::class, 'admin_id');
-	}
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'phone',
+        'role',
+        'is_active',
+        'last_login'
+    ];
 
-	public function carts()
-	{
-		return $this->hasMany(Cart::class);
-	}
+    // Relationships
+    public function admin_logs()
+    {
+        return $this->hasMany(AdminLog::class, 'admin_id');
+    }
 
-	public function complaints()
-	{
-		return $this->hasMany(Complaint::class);
-	}
+    public function carts()
+    {
+        return $this->hasMany(Cart::class);
+    }
 
-	public function notifications()
-	{
-		return $this->hasMany(Notification::class);
-	}
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
+    }
 
-	public function orders()
-	{
-		return $this->hasMany(Order::class);
-	}
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 
-	public function user_addresses()
-	{
-		return $this->hasMany(UserAddress::class);
-	}
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
-	public function user_settings()
-	{
-		return $this->hasMany(UserSetting::class);
-	}
+    public function user_addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
+    public function user_settings()
+    {
+        return $this->hasMany(UserSetting::class);
+    }
+
+    // Helper Methods
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->role === 'super_admin';
+    }
+
+    public function isUser()
+    {
+        return $this->role === 'user';
+    }
+
+    public function hasAdminAccess()
+    {
+        return in_array($this->role, ['admin', 'super_admin']);
+    }
+
+    public function isActive()
+    {
+        return $this->is_active;
+    }
+
+    public function getDefaultAddress()
+    {
+        return $this->user_addresses()->where('is_default', true)->first();
+    }
+
+    public function updateLastLogin()
+    {
+        $this->update(['last_login' => now()]);
+    }
+
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeAdmins($query)
+    {
+        return $query->where('role', 'admin');
+    }
+
+    public function scopeSuperAdmins($query)
+    {
+        return $query->where('role', 'super_admin');
+    }
+
+    public function scopeUsers($query)
+    {
+        return $query->where('role', 'user');
+    }
 }
