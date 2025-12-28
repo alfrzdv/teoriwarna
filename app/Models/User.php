@@ -41,6 +41,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'is_active' => 'bool',
+        'is_banned' => 'bool',
         'last_login' => 'datetime'
     ];
 
@@ -55,6 +56,7 @@ class User extends Authenticatable
         'phone',
         'role',
         'is_active',
+        'is_banned',
         'last_login',
         'profile_picture'
     ];
