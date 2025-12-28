@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $totalUsers = User::where('role', 'user')->count();
         $totalProducts = Product::count();
         $totalOrders = Order::count();
-        $totalRevenue = Order::where('status', 'completed')->sum('total_price');
+        $totalRevenue = Order::where('status', 'completed')->sum('total_amount');
         
         $pendingOrders = Order::pending()->count();
         $openComplaints = Complaint::open()->count();
