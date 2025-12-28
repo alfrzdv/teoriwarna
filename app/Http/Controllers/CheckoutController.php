@@ -50,6 +50,7 @@ class CheckoutController extends Controller
             'shipping_address' => 'required|string',
             'shipping_city' => 'required|string|max:255',
             'shipping_postal_code' => 'required|string|max:10',
+            'shipping_method' => 'required|in:regular,express,same_day',
             'payment_method' => 'required|in:bank_transfer,e_wallet,cod',
             'notes' => 'nullable|string|max:500',
         ]);
@@ -77,7 +78,15 @@ class CheckoutController extends Controller
             $subtotal = $cartItems->sum(function ($item) {
                 return $item->quantity * $item->price;
             });
-            $shipping_cost = 15000; // Fixed shipping cost for now
+
+            // Calculate shipping cost based on method
+            $shipping_cost = match($validated['shipping_method']) {
+                'regular' => 15000,
+                'express' => 30000,
+                'same_day' => 50000,
+                default => 15000
+            };
+
             $total = $subtotal + $shipping_cost;
 
             // Create order
@@ -85,6 +94,8 @@ class CheckoutController extends Controller
                 'user_id' => Auth::id(),
                 'order_number' => $this->generateOrderNumber(),
                 'total_amount' => $total,
+                'shipping_cost' => $shipping_cost,
+                'shipping_method' => $validated['shipping_method'],
                 'status' => 'pending',
                 'shipping_name' => $validated['shipping_name'],
                 'shipping_phone' => $validated['shipping_phone'],

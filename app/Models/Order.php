@@ -38,8 +38,20 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'address_id',
-        'order_code',
-        'total_price',
+        'order_number',
+        'order_code', // Keep for backward compatibility
+        'total_amount',
+        'total_price', // Keep for backward compatibility
+        'shipping_name',
+        'shipping_phone',
+        'shipping_address',
+        'shipping_city',
+        'shipping_postal_code',
+        'shipping_cost',
+        'shipping_method',
+        'tracking_number',
+        'shipping_courier',
+        'notes',
         'status'
     ];
 

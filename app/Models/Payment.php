@@ -32,10 +32,13 @@ class Payment extends Model
 
     protected $fillable = [
         'order_id',
-        'method',
+        'payment_method',
+        'method', // Keep for backward compatibility
+        'amount',
         'status',
         'payment_date',
-        'proof'
+        'proof_of_payment',
+        'proof' // Keep for backward compatibility
     ];
 
     // Relationships

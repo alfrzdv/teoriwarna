@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\CheckAdmin::class,
         ]);
+
+        // Add CheckBanned to web middleware group
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckBanned::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

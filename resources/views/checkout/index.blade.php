@@ -71,6 +71,41 @@
                         </div>
                     </div>
 
+                    <!-- Shipping Method -->
+                    <div class="form-section">
+                        <h3 class="section-title">Shipping Method</h3>
+
+                        <div class="payment-methods">
+                            <label class="payment-option">
+                                <input type="radio" name="shipping_method" value="regular" checked required>
+                                <div>
+                                    <strong>Regular (3-5 hari)</strong>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Rp 15.000</p>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="shipping_method" value="express" required>
+                                <div>
+                                    <strong>Express (1-2 hari)</strong>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Rp 30.000</p>
+                                </div>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="shipping_method" value="same_day" required>
+                                <div>
+                                    <strong>Same Day</strong>
+                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Rp 50.000</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        @error('shipping_method')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Payment Method -->
                     <div class="form-section">
                         <h3 class="section-title">Payment Method</h3>
