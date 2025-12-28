@@ -51,6 +51,7 @@ class CartController extends Controller
 
             $cartItem->update([
                 'quantity' => $newQuantity,
+                'subtotal' => $cartItem->price * $newQuantity,
             ]);
 
             return back()->with('success', 'Jumlah produk di keranjang berhasil diupdate.');
@@ -61,6 +62,7 @@ class CartController extends Controller
                 'product_id' => $product->id,
                 'quantity' => $validated['quantity'],
                 'price' => $product->price,
+                'subtotal' => $product->price * $validated['quantity'],
             ]);
 
             return back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
@@ -84,6 +86,7 @@ class CartController extends Controller
 
         $cartItem->update([
             'quantity' => $validated['quantity'],
+            'subtotal' => $cartItem->price * $validated['quantity'],
         ]);
 
         return back()->with('success', 'Keranjang berhasil diupdate.');

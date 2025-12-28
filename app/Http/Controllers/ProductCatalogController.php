@@ -39,7 +39,7 @@ class ProductCatalogController extends Controller
                 $query->latest();
         }
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(15);
         $categories = Category::where('is_active', true)->withCount('products')->get();
 
         return view('catalog.index', compact('products', 'categories'));

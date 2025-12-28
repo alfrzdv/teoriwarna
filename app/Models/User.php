@@ -55,7 +55,8 @@ class User extends Authenticatable
         'phone',
         'role',
         'is_active',
-        'last_login'
+        'last_login',
+        'profile_picture'
     ];
 
     // Relationships
@@ -128,6 +129,19 @@ class User extends Authenticatable
     public function updateLastLogin()
     {
         $this->update(['last_login' => now()]);
+    }
+
+    public function getProfilePictureUrl()
+    {
+        if ($this->profile_picture) {
+            return asset('storage/' . $this->profile_picture);
+        }
+        return null;
+    }
+
+    public function getInitials()
+    {
+        return strtoupper(substr($this->name, 0, 1));
     }
 
     // Scopes
