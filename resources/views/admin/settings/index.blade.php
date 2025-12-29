@@ -202,6 +202,165 @@
                             </div>
                         </div>
 
+                        <!-- Payment Gateway Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold mb-4 border-b pb-2">Pengaturan Payment Gateway</h3>
+
+                            <div class="space-y-4">
+                                <!-- Midtrans -->
+                                <div class="border rounded-lg p-4">
+                                    <div class="flex items-center mb-3">
+                                        <input type="checkbox" name="midtrans_enabled" id="midtrans_enabled"
+                                            {{ old('midtrans_enabled', $settings->midtrans_enabled ?? false) ? 'checked' : '' }}
+                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200">
+                                        <label for="midtrans_enabled" class="ml-2 font-semibold text-gray-700">Aktifkan Midtrans (E-Wallet)</label>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Server Key</label>
+                                            <input type="text" name="midtrans_server_key" value="{{ old('midtrans_server_key', $settings->midtrans_server_key) }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                placeholder="SB-Mid-server-xxxxx">
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Client Key</label>
+                                            <input type="text" name="midtrans_client_key" value="{{ old('midtrans_client_key', $settings->midtrans_client_key) }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                placeholder="SB-Mid-client-xxxxx">
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3 flex items-center">
+                                        <input type="checkbox" name="midtrans_is_production" id="midtrans_is_production"
+                                            {{ old('midtrans_is_production', $settings->midtrans_is_production ?? false) ? 'checked' : '' }}
+                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200">
+                                        <label for="midtrans_is_production" class="ml-2 text-sm text-gray-700">Mode Production (uncheck untuk Sandbox)</label>
+                                    </div>
+                                </div>
+
+                                <!-- Payment Methods -->
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" name="bank_transfer_enabled" id="bank_transfer_enabled"
+                                                {{ old('bank_transfer_enabled', $settings->bank_transfer_enabled ?? true) ? 'checked' : '' }}
+                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200">
+                                            <label for="bank_transfer_enabled" class="ml-2 font-medium text-gray-700">Bank Transfer</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" name="e_wallet_enabled" id="e_wallet_enabled"
+                                                {{ old('e_wallet_enabled', $settings->e_wallet_enabled ?? false) ? 'checked' : '' }}
+                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200">
+                                            <label for="e_wallet_enabled" class="ml-2 font-medium text-gray-700">E-Wallet</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" name="cod_enabled" id="cod_enabled"
+                                                {{ old('cod_enabled', $settings->cod_enabled ?? true) ? 'checked' : '' }}
+                                                class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200">
+                                            <label for="cod_enabled" class="ml-2 font-medium text-gray-700">COD (Bayar di Tempat)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Settings -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold mb-4 border-b pb-2">Pengaturan Pengiriman</h3>
+
+                            <div class="space-y-4">
+                                <!-- Regular Shipping -->
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3">Regular Shipping</h4>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                                            <input type="text" name="shipping_regular_name" value="{{ old('shipping_regular_name', $settings->shipping_regular_name ?? 'Regular') }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Biaya (Rp)</label>
+                                            <input type="number" name="shipping_regular_cost" value="{{ old('shipping_regular_cost', $settings->shipping_regular_cost ?? 15000) }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" min="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi</label>
+                                            <input type="text" name="shipping_regular_estimation" value="{{ old('shipping_regular_estimation', $settings->shipping_regular_estimation ?? '3-5 hari') }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Express Shipping -->
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3">Express Shipping</h4>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                                            <input type="text" name="shipping_express_name" value="{{ old('shipping_express_name', $settings->shipping_express_name ?? 'Express') }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Biaya (Rp)</label>
+                                            <input type="number" name="shipping_express_cost" value="{{ old('shipping_express_cost', $settings->shipping_express_cost ?? 30000) }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" min="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi</label>
+                                            <input type="text" name="shipping_express_estimation" value="{{ old('shipping_express_estimation', $settings->shipping_express_estimation ?? '1-2 hari') }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Same Day Shipping -->
+                                <div class="border rounded-lg p-4">
+                                    <h4 class="font-semibold text-gray-700 mb-3">Same Day Shipping</h4>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama</label>
+                                            <input type="text" name="shipping_sameday_name" value="{{ old('shipping_sameday_name', $settings->shipping_sameday_name ?? 'Same Day') }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Biaya (Rp)</label>
+                                            <input type="number" name="shipping_sameday_cost" value="{{ old('shipping_sameday_cost', $settings->shipping_sameday_cost ?? 50000) }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" min="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Estimasi</label>
+                                            <input type="text" name="shipping_sameday_estimation" value="{{ old('shipping_sameday_estimation', $settings->shipping_sameday_estimation ?? '1 hari') }}"
+                                                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Free Shipping -->
+                                <div class="border rounded-lg p-4 bg-green-50">
+                                    <div class="flex items-center mb-3">
+                                        <input type="checkbox" name="free_shipping_enabled" id="free_shipping_enabled"
+                                            {{ old('free_shipping_enabled', $settings->free_shipping_enabled ?? false) ? 'checked' : '' }}
+                                            class="rounded border-gray-300 text-green-600 shadow-sm focus:border-green-300 focus:ring focus:ring-green-200">
+                                        <label for="free_shipping_enabled" class="ml-2 font-semibold text-gray-700">Aktifkan Gratis Ongkir</label>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Pembelian (Rp)</label>
+                                        <input type="number" name="free_shipping_minimum" value="{{ old('free_shipping_minimum', $settings->free_shipping_minimum ?? 500000) }}"
+                                            class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" min="0">
+                                        <p class="text-xs text-gray-500 mt-1">Customer akan dapat gratis ongkir jika total belanja mencapai nominal ini</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="flex justify-end">
                             <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
                                 Simpan Pengaturan

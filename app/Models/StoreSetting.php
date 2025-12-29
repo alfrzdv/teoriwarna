@@ -38,7 +38,40 @@ class StoreSetting extends Model
         'bank_account_name',
         'business_hours',
         'meta_keywords',
-        'meta_description'
+        'meta_description',
+        // Payment Gateway
+        'midtrans_enabled',
+        'midtrans_server_key',
+        'midtrans_client_key',
+        'midtrans_is_production',
+        'bank_transfer_enabled',
+        'e_wallet_enabled',
+        'cod_enabled',
+        // Shipping
+        'shipping_regular_cost',
+        'shipping_regular_name',
+        'shipping_regular_estimation',
+        'shipping_express_cost',
+        'shipping_express_name',
+        'shipping_express_estimation',
+        'shipping_sameday_cost',
+        'shipping_sameday_name',
+        'shipping_sameday_estimation',
+        'free_shipping_enabled',
+        'free_shipping_minimum'
+    ];
+
+    protected $casts = [
+        'midtrans_enabled' => 'boolean',
+        'midtrans_is_production' => 'boolean',
+        'bank_transfer_enabled' => 'boolean',
+        'e_wallet_enabled' => 'boolean',
+        'cod_enabled' => 'boolean',
+        'free_shipping_enabled' => 'boolean',
+        'shipping_regular_cost' => 'integer',
+        'shipping_express_cost' => 'integer',
+        'shipping_sameday_cost' => 'integer',
+        'free_shipping_minimum' => 'integer',
     ];
 
     // Helper Methods

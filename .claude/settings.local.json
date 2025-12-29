@@ -4,7 +4,12 @@
       "Bash(php artisan:*)",
       "Bash(composer install:*)",
       "Bash(php:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(find:*)",
+      "Bash(git fetch:*)",
+      "Bash(git worktree:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
     ]
   }
 }

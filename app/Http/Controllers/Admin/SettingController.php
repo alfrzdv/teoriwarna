@@ -42,7 +42,29 @@ class SettingController extends Controller
             'business_hours' => 'nullable|string|max:255',
             'meta_keywords' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+
+            // Payment Gateway Settings
+            'midtrans_enabled' => 'nullable|boolean',
+            'midtrans_server_key' => 'nullable|string|max:255',
+            'midtrans_client_key' => 'nullable|string|max:255',
+            'midtrans_is_production' => 'nullable|boolean',
+            'bank_transfer_enabled' => 'nullable|boolean',
+            'e_wallet_enabled' => 'nullable|boolean',
+            'cod_enabled' => 'nullable|boolean',
+
+            // Shipping Settings
+            'shipping_regular_cost' => 'nullable|integer|min:0',
+            'shipping_regular_name' => 'nullable|string|max:255',
+            'shipping_regular_estimation' => 'nullable|string|max:255',
+            'shipping_express_cost' => 'nullable|integer|min:0',
+            'shipping_express_name' => 'nullable|string|max:255',
+            'shipping_express_estimation' => 'nullable|string|max:255',
+            'shipping_sameday_cost' => 'nullable|integer|min:0',
+            'shipping_sameday_name' => 'nullable|string|max:255',
+            'shipping_sameday_estimation' => 'nullable|string|max:255',
+            'free_shipping_enabled' => 'nullable|boolean',
+            'free_shipping_minimum' => 'nullable|integer|min:0',
         ]);
 
         $settings = StoreSetting::first();
@@ -61,6 +83,14 @@ class SettingController extends Controller
             $logoPath = $request->file('logo')->store('settings', 'public');
             $validated['logo'] = $logoPath;
         }
+
+        // Convert checkbox values to boolean
+        $validated['midtrans_enabled'] = $request->has('midtrans_enabled');
+        $validated['midtrans_is_production'] = $request->has('midtrans_is_production');
+        $validated['bank_transfer_enabled'] = $request->has('bank_transfer_enabled');
+        $validated['e_wallet_enabled'] = $request->has('e_wallet_enabled');
+        $validated['cod_enabled'] = $request->has('cod_enabled');
+        $validated['free_shipping_enabled'] = $request->has('free_shipping_enabled');
 
         $settings->fill($validated);
         $settings->save();
