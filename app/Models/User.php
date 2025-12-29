@@ -141,6 +141,14 @@ class User extends Authenticatable
         return null;
     }
 
+    public function getProfilePictureThumbnailUrl()
+    {
+        if ($this->profile_picture) {
+            return \App\Helpers\ImageHelper::getThumbnailUrl($this->profile_picture);
+        }
+        return null;
+    }
+
     public function getInitials()
     {
         return strtoupper(substr($this->name, 0, 1));

@@ -23,9 +23,8 @@
             </div>
 
             <div class="flex-1">
-                <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-4">
+                <form id="profilePictureForm" method="post" action="{{ route('profile.picture.update') }}" enctype="multipart/form-data" class="space-y-4">
                     @csrf
-                    @method('patch')
 
                     <x-image-cropper
                         inputName="profile_picture"
@@ -39,16 +38,18 @@
                     <x-input-error class="mt-2" :messages="$errors->get('profile_picture')" />
 
                     <div class="flex items-center gap-4">
-                        <x-primary-button>{{ __('Upload') }}</x-primary-button>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                            {{ __('Upload') }}
+                        </button>
 
-                        @if (session('status') === 'profile-updated')
+                        @if (session('status') === 'profile-picture-updated')
                             <p
                                 x-data="{ show: true }"
                                 x-show="show"
                                 x-transition
                                 x-init="setTimeout(() => show = false, 2000)"
                                 class="text-sm text-gray-600"
-                            >{{ __('Saved.') }}</p>
+                            >{{ __('Profile picture updated!') }}</p>
                         @endif
                     </div>
                 </form>
@@ -66,4 +67,37 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Profile form: DOM loaded');
+
+        const form = document.getElementById('profilePictureForm');
+        if (form) {
+            console.log('Profile form found');
+            form.addEventListener('submit', function(e) {
+                console.log('Profile form submit triggered');
+
+                // Debug: Check form data
+                const formData = new FormData(form);
+                console.log('Form data:');
+                for (let [key, value] of formData.entries()) {
+                    if (key === 'profile_picture') {
+                        console.log(key + ':', value ? value.substring(0, 100) + '...' : 'EMPTY');
+                    } else {
+                        console.log(key + ':', value);
+                    }
+                }
+
+                const profilePictureInput = form.querySelector('input[name="profile_picture"]');
+                console.log('Profile picture input found:', !!profilePictureInput);
+                console.log('Profile picture value length:', profilePictureInput ? profilePictureInput.value.length : 0);
+
+                return true; // Allow submit
+            });
+        } else {
+            console.error('Profile form NOT found!');
+        }
+    });
+    </script>
 </section>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Helpers\ImageHelper;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,13 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        \Log::info('Profile update request data:', [
+            'has_profile_picture' => $request->has('profile_picture'),
+            'filled_profile_picture' => $request->filled('profile_picture'),
+            'profile_picture_data' => $request->profile_picture ? substr($request->profile_picture, 0, 100) : null,
+            'all_keys' => array_keys($request->all())
+        ]);
+
         $user = $request->user();
         $user->fill($request->validated());
 
@@ -36,21 +44,118 @@ class ProfileController extends Controller
             $user->email_verified_at = null;
         }
 
-        // Handle profile picture upload
-        if ($request->hasFile('profile_picture')) {
-            // Delete old profile picture if exists
+        // Handle profile picture upload (base64 from cropper or regular file)
+        if ($request->filled('profile_picture')) {
+            \Log::info('Processing profile picture upload');
+
+            // Delete old profile picture and thumbnail if exists
             if ($user->profile_picture) {
-                Storage::disk('public')->delete($user->profile_picture);
+                ImageHelper::deleteWithThumbnail($user->profile_picture);
             }
 
-            // Store new profile picture
-            $path = $request->file('profile_picture')->store('profile-pictures', 'public');
-            $user->profile_picture = $path;
+            $profilePictureData = $request->input('profile_picture');
+
+            // Check if it's base64 data from cropper
+            if (preg_match('/^data:image\/(\w+);base64,/', $profilePictureData, $matches)) {
+                \Log::info('Processing base64 image');
+
+                // Extract base64 string
+                $base64Image = substr($profilePictureData, strpos($profilePictureData, ',') + 1);
+                $imageData = base64_decode($base64Image);
+
+                // Generate filename
+                $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+                $filename = 'profile_' . uniqid() . '.' . $extension;
+                $path = 'profile-pictures/' . $filename;
+
+                // Store the image
+                Storage::disk('public')->put($path, $imageData);
+
+                // Create thumbnail
+                try {
+                    $thumbnailPath = ImageHelper::createThumbnail($path, 150, 150);
+                } catch (\Exception $e) {
+                    \Log::warning('Thumbnail generation failed: ' . $e->getMessage());
+                }
+
+                $user->profile_picture = $path;
+            } elseif ($request->hasFile('profile_picture')) {
+                \Log::info('Processing file upload');
+
+                // Handle regular file upload (fallback)
+                $result = ImageHelper::uploadWithThumbnail(
+                    $request->file('profile_picture'),
+                    'profile-pictures',
+                    150,
+                    150
+                );
+                $user->profile_picture = $result['original'];
+            }
         }
 
         $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update the user's profile picture only.
+     */
+    public function updateProfilePicture(Request $request): RedirectResponse
+    {
+        \Log::info('Profile picture update request:', [
+            'has_profile_picture' => $request->has('profile_picture'),
+            'filled_profile_picture' => $request->filled('profile_picture'),
+            'profile_picture_length' => $request->profile_picture ? strlen($request->profile_picture) : 0,
+        ]);
+
+        $request->validate([
+            'profile_picture' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+
+        // Delete old profile picture and thumbnail if exists
+        if ($user->profile_picture) {
+            ImageHelper::deleteWithThumbnail($user->profile_picture);
+        }
+
+        $profilePictureData = $request->input('profile_picture');
+
+        // Check if it's base64 data from cropper
+        if (preg_match('/^data:image\/(\w+);base64,/', $profilePictureData, $matches)) {
+            \Log::info('Processing base64 profile picture');
+
+            // Extract base64 string
+            $base64Image = substr($profilePictureData, strpos($profilePictureData, ',') + 1);
+            $imageData = base64_decode($base64Image);
+
+            // Generate filename
+            $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+            $filename = 'profile_' . uniqid() . '.' . $extension;
+            $path = 'profile-pictures/' . $filename;
+
+            // Store the image
+            Storage::disk('public')->put($path, $imageData);
+
+            // Create thumbnail
+            try {
+                $thumbnailPath = ImageHelper::createThumbnail($path, 150, 150);
+                \Log::info('Thumbnail created: ' . $thumbnailPath);
+            } catch (\Exception $e) {
+                \Log::warning('Thumbnail generation failed: ' . $e->getMessage());
+            }
+
+            $user->profile_picture = $path;
+            $user->save();
+
+            \Log::info('Profile picture updated successfully');
+
+            return Redirect::route('profile.edit')->with('status', 'profile-picture-updated');
+        }
+
+        \Log::error('Invalid profile picture format');
+        return Redirect::route('profile.edit')->withErrors(['profile_picture' => 'Invalid image format']);
     }
 
     /**
@@ -61,7 +166,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($user->profile_picture) {
-            Storage::disk('public')->delete($user->profile_picture);
+            ImageHelper::deleteWithThumbnail($user->profile_picture);
             $user->profile_picture = null;
             $user->save();
         }

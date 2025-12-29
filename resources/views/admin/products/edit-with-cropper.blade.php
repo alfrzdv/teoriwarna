@@ -18,7 +18,7 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form id="updateProductForm" action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('admin.products.update', $product) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -119,16 +119,22 @@
 
                                             <div class="gallery-actions">
                                                 @if(!$image->is_primary)
-                                                    <button type="button" class="gallery-btn gallery-btn-primary"
-                                                        onclick="setPrimaryImage('{{ route('admin.products.set-primary-image', $image) }}')">
-                                                        Set Primary
-                                                    </button>
+                                                    <form action="{{ route('admin.products.set-primary-image', $image) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="gallery-btn gallery-btn-primary">
+                                                            Set Primary
+                                                        </button>
+                                                    </form>
                                                 @endif
 
-                                                <button type="button" class="gallery-btn gallery-btn-delete"
-                                                    onclick="deleteImage('{{ route('admin.products.delete-image', $image) }}')">
-                                                    Delete
-                                                </button>
+                                                <form action="{{ route('admin.products.delete-image', $image) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="gallery-btn gallery-btn-delete"
+                                                        onclick="return confirm('Are you sure you want to delete this image?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     @endforeach
@@ -142,7 +148,7 @@
                                 Add More Images
                             </label>
 
-                            <div x-data="productImagesEdit()" class="space-y-4">
+                            <div x-data="productImages()" class="space-y-4">
                                 <!-- Image Cropper Component -->
                                 <x-image-cropper
                                     id="product-image-cropper-edit"
@@ -189,7 +195,7 @@
 
                         @push('scripts')
                         <script>
-                        function productImagesEdit() {
+                        function productImages() {
                             return {
                                 images: [],
                                 addImage() {
@@ -220,80 +226,12 @@
                                 class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
                                 Cancel
                             </a>
-                            <button type="submit" onclick="console.log('Submit button clicked'); return true;"
+                            <button type="submit"
                                 class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
                                 Update Product
                             </button>
                         </div>
                     </form>
-
-                    <script>
-                    // Delete image function
-                    function deleteImage(url) {
-                        if (!confirm('Are you sure you want to delete this image?')) {
-                            return;
-                        }
-
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = url;
-
-                        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                        const csrfInput = document.createElement('input');
-                        csrfInput.type = 'hidden';
-                        csrfInput.name = '_token';
-                        csrfInput.value = csrfToken;
-                        form.appendChild(csrfInput);
-
-                        const methodInput = document.createElement('input');
-                        methodInput.type = 'hidden';
-                        methodInput.name = '_method';
-                        methodInput.value = 'DELETE';
-                        form.appendChild(methodInput);
-
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
-
-                    // Set primary image function
-                    function setPrimaryImage(url) {
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = url;
-
-                        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                        const csrfInput = document.createElement('input');
-                        csrfInput.type = 'hidden';
-                        csrfInput.name = '_token';
-                        csrfInput.value = csrfToken;
-                        form.appendChild(csrfInput);
-
-                        document.body.appendChild(form);
-                        form.submit();
-                    }
-
-                    // Debug: Check if form submission is working
-                    document.addEventListener('DOMContentLoaded', function() {
-                        console.log('DOM loaded');
-                        console.log('Alpine available:', typeof window.Alpine !== 'undefined');
-
-                        const form = document.getElementById('updateProductForm');
-                        if (form) {
-                            console.log('Form found');
-                            form.addEventListener('submit', function(e) {
-                                console.log('Form submit event triggered');
-                                return true; // Allow form to submit
-                            });
-                        } else {
-                            console.error('Form not found!');
-                        }
-                    });
-
-                    // Fallback: if button click doesn't trigger form submit
-                    window.addEventListener('load', function() {
-                        console.log('Window fully loaded');
-                    });
-                    </script>
                 </div>
             </div>
         </div>

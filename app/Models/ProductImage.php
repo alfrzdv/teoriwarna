@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ProductImage
- * 
+ *
  * @property int $id
  * @property int $product_id
- * @property string $image_url
+ * @property string $image_path
  * @property bool $is_primary
  * @property Carbon|null $created_at
- * 
+ *
  * @property Product $product
  *
  * @package App\Models
@@ -36,7 +36,7 @@ class ProductImage extends Model
 
     protected $fillable = [
         'product_id',
-        'image_url',
+        'image_path',
         'is_primary'
     ];
 
@@ -50,23 +50,28 @@ class ProductImage extends Model
     public function getUrl()
     {
         // If it's a full URL, return as is
-        if (filter_var($this->image_url, FILTER_VALIDATE_URL)) {
-            return $this->image_url;
+        if (filter_var($this->image_path, FILTER_VALIDATE_URL)) {
+            return $this->image_path;
         }
-        
+
         // Otherwise, return storage URL
-        return Storage::url($this->image_url);
+        return Storage::url($this->image_path);
+    }
+
+    public function getThumbnailUrl()
+    {
+        return \App\Helpers\ImageHelper::getThumbnailUrl($this->image_path);
     }
 
     public function getFullPath()
     {
-        return storage_path('app/public/' . $this->image_url);
+        return storage_path('app/public/' . $this->image_path);
     }
 
     public function deleteFile()
     {
-        if (Storage::exists($this->image_url)) {
-            Storage::delete($this->image_url);
+        if (Storage::exists($this->image_path)) {
+            Storage::delete($this->image_path);
         }
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\ImageHelper;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\AdminLog;
@@ -52,7 +53,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive,archived',
             'stock_quantity' => 'nullable|integer|min:0',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|string', // Can be base64 from cropper
         ]);
 
         $product = Product::create([
@@ -68,15 +69,48 @@ class ProductController extends Controller
             $product->addStock($request->stock_quantity, 'Initial stock');
         }
 
-        // Handle image uploads
-        if ($request->hasFile('images')) {
+        // Handle image uploads (base64 from cropper or file upload)
+        if ($request->has('images') && is_array($request->images)) {
+            foreach ($request->images as $index => $imageData) {
+                if (empty($imageData)) continue;
+
+                // Check if it's base64 data from cropper
+                if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $matches)) {
+                    // Extract base64 string
+                    $base64Image = substr($imageData, strpos($imageData, ',') + 1);
+                    $decodedImage = base64_decode($base64Image);
+
+                    // Generate filename
+                    $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+                    $filename = 'product_' . uniqid() . '.' . $extension;
+                    $path = 'products/' . $filename;
+
+                    // Store the image
+                    Storage::disk('public')->put($path, $decodedImage);
+
+                    // Create thumbnail
+                    try {
+                        $thumbnailPath = ImageHelper::createThumbnail($path, 400, 400);
+                    } catch (\Exception $e) {
+                        \Log::warning('Thumbnail generation failed: ' . $e->getMessage());
+                    }
+
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $path,
+                        'is_primary' => $index === 0,
+                    ]);
+                }
+            }
+        } elseif ($request->hasFile('images')) {
+            // Fallback: handle regular file uploads
             foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('products', 'public');
+                $result = ImageHelper::uploadWithThumbnail($image, 'products', 400, 400);
 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => $path,
-                    'is_primary' => $index === 0, // First image is primary
+                    'image_path' => $result['original'],
+                    'is_primary' => $index === 0,
                 ]);
             }
         }
@@ -106,13 +140,19 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
+        \Log::info('Update product request data:', [
+            'has_images' => $request->has('images'),
+            'images_count' => is_array($request->images) ? count($request->images) : 0,
+            'images_data' => $request->images ? array_map(fn($img) => substr($img ?? '', 0, 50), $request->images) : null
+        ]);
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive,archived',
-            'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images.*' => 'nullable|string', // Can be base64 from cropper
         ]);
 
         $product->update([
@@ -123,24 +163,65 @@ class ProductController extends Controller
             'status' => $validated['status'],
         ]);
 
-        // Handle new image uploads
-        if ($request->hasFile('images')) {
+        // Handle new image uploads (base64 from cropper or file upload)
+        if ($request->has('images') && is_array($request->images) && count($request->images) > 0) {
             $existingImagesCount = $product->product_images()->count();
+            $addedCount = 0;
+
+            foreach ($request->images as $index => $imageData) {
+                if (empty($imageData)) continue;
+
+                // Check if it's base64 data from cropper
+                if (preg_match('/^data:image\/(\w+);base64,/', $imageData, $matches)) {
+                    // Extract base64 string
+                    $base64Image = substr($imageData, strpos($imageData, ',') + 1);
+                    $decodedImage = base64_decode($base64Image);
+
+                    // Generate filename
+                    $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
+                    $filename = 'product_' . uniqid() . '.' . $extension;
+                    $path = 'products/' . $filename;
+
+                    // Store the image
+                    Storage::disk('public')->put($path, $decodedImage);
+
+                    // Create thumbnail
+                    try {
+                        $thumbnailPath = ImageHelper::createThumbnail($path, 400, 400);
+                    } catch (\Exception $e) {
+                        \Log::warning('Thumbnail generation failed: ' . $e->getMessage());
+                    }
+
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $path,
+                        'is_primary' => $existingImagesCount === 0 && $addedCount === 0,
+                    ]);
+
+                    $addedCount++;
+                }
+            }
+        } elseif ($request->hasFile('images')) {
+            // Fallback: handle regular file uploads
+            $existingImagesCount = $product->product_images()->count();
+            $addedCount = 0;
 
             foreach ($request->file('images') as $index => $image) {
-                $path = $image->store('products', 'public');
+                $result = ImageHelper::uploadWithThumbnail($image, 'products', 400, 400);
 
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => $path,
-                    'is_primary' => $existingImagesCount === 0 && $index === 0,
+                    'image_path' => $result['original'],
+                    'is_primary' => $existingImagesCount === 0 && $addedCount === 0,
                 ]);
+
+                $addedCount++;
             }
         }
 
         AdminLog::log('update_product', "Updated product: {$product->name}");
 
-        return redirect()->route('admin.products.index')
+        return redirect()->route('admin.products.edit', $product)
             ->with('success', 'Produk berhasil diupdate.');
     }
 
@@ -168,7 +249,8 @@ class ProductController extends Controller
 
     public function deleteImage(ProductImage $image)
     {
-        Storage::disk('public')->delete($image->image_path);
+        // Delete image and thumbnail
+        ImageHelper::deleteWithThumbnail($image->image_path);
 
         $wasPrimary = $image->is_primary;
         $productId = $image->product_id;

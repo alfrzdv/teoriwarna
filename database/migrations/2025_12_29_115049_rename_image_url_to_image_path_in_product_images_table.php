@@ -11,14 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_images', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->string('image_path');
-            $table->boolean('is_primary')->default(false);
-            $table->timestamp('created_at')->useCurrent();
+        Schema::table('product_images', function (Blueprint $table) {
+            $table->renameColumn('image_url', 'image_path');
         });
-
     }
 
     /**
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('product_images', function (Blueprint $table) {
+            $table->renameColumn('image_path', 'image_url');
+        });
     }
 };
