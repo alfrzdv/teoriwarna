@@ -36,7 +36,17 @@ class Complaint extends Model
         'order_id',
         'reason',
         'description',
-        'status'
+        'status',
+        'admin_reply',
+        'admin_id',
+        'resolved_at',
+    ];
+
+    protected $casts = [
+        'user_id' => 'int',
+        'order_id' => 'int',
+        'admin_id' => 'int',
+        'resolved_at' => 'datetime',
     ];
 
     // Relationships
@@ -48,6 +58,11 @@ class Complaint extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     // Helper Methods
@@ -78,12 +93,29 @@ class Complaint extends Model
 
     public function markAsResolved()
     {
-        $this->update(['status' => 'resolved']);
+        $this->update([
+            'status' => 'resolved',
+            'resolved_at' => now(),
+        ]);
     }
 
     public function markAsRejected()
     {
         $this->update(['status' => 'rejected']);
+    }
+
+    public function replyByAdmin($adminId, $reply)
+    {
+        $this->update([
+            'admin_id' => $adminId,
+            'admin_reply' => $reply,
+            'status' => 'in_review',
+        ]);
+    }
+
+    public function hasReply()
+    {
+        return !empty($this->admin_reply);
     }
 
     // Scopes

@@ -15,6 +15,11 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -51,8 +56,34 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    // Complaints
+    Route::get('/complaints', [ComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('/complaints/create', [ComplaintController::class, 'create'])->name('complaints.create');
+    Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaints.store');
+    Route::get('/complaints/{complaint}', [ComplaintController::class, 'show'])->name('complaints.show');
+
+    // Reviews
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/create/{orderItem}', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/reviews/{orderItem}', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('/reviews/{review}/helpful', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
+});
+
+// Routes that require verified email
+Route::middleware(['auth', 'verified'])->group(function () {
     // Checkout
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/apply-coupon', [CheckoutController::class, 'applyCoupon'])->name('checkout.apply-coupon');
+    Route::post('/checkout/remove-coupon', [CheckoutController::class, 'removeCoupon'])->name('checkout.remove-coupon');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 
     // Buy Now
@@ -66,12 +97,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/upload-payment', [OrderController::class, 'uploadPaymentProof'])->name('orders.upload-payment');
     Route::post('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete');
-
-    // Notifications
-    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
-    Route::delete('/notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
 
 // Admin Routes
@@ -110,9 +135,34 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Reports
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/sales', [AdminReportController::class, 'sales'])->name('reports.sales');
+    Route::get('/reports/sales/pdf', [AdminReportController::class, 'exportSalesPDF'])->name('reports.sales.pdf');
+    Route::get('/reports/sales/excel', [AdminReportController::class, 'exportSalesExcel'])->name('reports.sales.excel');
     Route::get('/reports/products', [AdminReportController::class, 'products'])->name('reports.products');
+    Route::get('/reports/products/pdf', [AdminReportController::class, 'exportProductsPDF'])->name('reports.products.pdf');
+    Route::get('/reports/products/excel', [AdminReportController::class, 'exportProductsExcel'])->name('reports.products.excel');
     Route::get('/reports/transactions', [AdminReportController::class, 'transactions'])->name('reports.transactions');
+    Route::get('/reports/transactions/pdf', [AdminReportController::class, 'exportTransactionsPDF'])->name('reports.transactions.pdf');
+    Route::get('/reports/transactions/excel', [AdminReportController::class, 'exportTransactionsExcel'])->name('reports.transactions.excel');
     Route::get('/reports/users', [AdminReportController::class, 'users'])->name('reports.users');
+
+    // Complaints
+    Route::get('/complaints', [AdminComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('/complaints/{complaint}', [AdminComplaintController::class, 'show'])->name('complaints.show');
+    Route::post('/complaints/{complaint}/reply', [AdminComplaintController::class, 'reply'])->name('complaints.reply');
+    Route::post('/complaints/{complaint}/update-status', [AdminComplaintController::class, 'updateStatus'])->name('complaints.update-status');
+
+    // Coupons
+    Route::resource('coupons', AdminCouponController::class);
+    Route::post('/coupons/{coupon}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+
+    // Reviews
+    Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::get('/reviews/{review}', [AdminReviewController::class, 'show'])->name('reviews.show');
+    Route::post('/reviews/{review}/approve', [AdminReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/reviews/{review}/reject', [AdminReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('/reviews/bulk-approve', [AdminReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
+    Route::post('/reviews/bulk-reject', [AdminReviewController::class, 'bulkReject'])->name('reviews.bulk-reject');
 });
         
 
