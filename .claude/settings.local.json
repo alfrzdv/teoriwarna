@@ -9,7 +9,10 @@
       "Bash(git fetch:*)",
       "Bash(git worktree:*)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(composer require:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }

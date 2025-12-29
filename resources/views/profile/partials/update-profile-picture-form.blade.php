@@ -27,12 +27,16 @@
                     @csrf
                     @method('patch')
 
-                    <div>
-                        <x-input-label for="profile_picture" :value="__('Choose New Picture')" />
-                        <input id="profile_picture" name="profile_picture" type="file" accept="image/*" class="mt-1 block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" />
-                        <p class="mt-1 text-sm text-gray-500">PNG, JPG, GIF up to 2MB</p>
-                        <x-input-error class="mt-2" :messages="$errors->get('profile_picture')" />
-                    </div>
+                    <x-image-cropper
+                        inputName="profile_picture"
+                        :aspectRatio="1"
+                        :previewWidth="150"
+                        :previewHeight="150"
+                        label="Choose New Picture"
+                        :currentImage="$user->profile_picture ? $user->getProfilePictureUrl() : null"
+                    />
+                    <p class="mt-1 text-sm text-gray-500">PNG, JPG, GIF up to 2MB. You can crop and rotate before uploading.</p>
+                    <x-input-error class="mt-2" :messages="$errors->get('profile_picture')" />
 
                     <div class="flex items-center gap-4">
                         <x-primary-button>{{ __('Upload') }}</x-primary-button>
