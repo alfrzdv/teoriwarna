@@ -25,9 +25,20 @@ class StoreSetting extends Model
 
     protected $fillable = [
         'store_name',
+        'logo',
+        'description',
         'address',
         'email',
-        'phone'
+        'phone',
+        'whatsapp',
+        'instagram',
+        'facebook',
+        'bank_name',
+        'bank_account_number',
+        'bank_account_name',
+        'business_hours',
+        'meta_keywords',
+        'meta_description'
     ];
 
     // Helper Methods

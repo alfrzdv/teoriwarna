@@ -11,25 +11,52 @@
                 <div class="p-6 text-gray-900">
                     <!-- Filters -->
                     <div class="mb-6">
-                        <form method="GET" action="{{ route('admin.orders.index') }}" class="flex gap-4">
-                            <!-- Search -->
-                            <input type="text" name="search" value="{{ request('search') }}"
-                                   placeholder="Cari order number atau nama customer..."
-                                   class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <form method="GET" action="{{ route('admin.orders.index') }}" class="space-y-4">
+                            <div class="flex gap-4">
+                                <!-- Search -->
+                                <input type="text" name="search" value="{{ request('search') }}"
+                                       placeholder="Cari order number atau nama customer..."
+                                       class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
 
-                            <!-- Status Filter -->
-                            <select name="status" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="all">Semua Status</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Processing</option>
-                                <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
-                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
-                            </select>
+                                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                    Filter
+                                </button>
 
-                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-                                Filter
-                            </button>
+                                @if(request()->hasAny(['search', 'status', 'payment_status', 'payment_method']))
+                                    <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                                        Clear
+                                    </a>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-4">
+                                <!-- Order Status Filter -->
+                                <select name="status" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="all">Order Status: All</option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="processing" {{ request('status') == 'processing' ? 'selected' : '' }}>Processing</option>
+                                    <option value="shipped" {{ request('status') == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                </select>
+
+                                <!-- Payment Status Filter -->
+                                <select name="payment_status" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="all">Payment Status: All</option>
+                                    <option value="pending" {{ request('payment_status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="pending_verification" {{ request('payment_status') == 'pending_verification' ? 'selected' : '' }}>Pending Verification</option>
+                                    <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>Paid</option>
+                                    <option value="cancelled" {{ request('payment_status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                </select>
+
+                                <!-- Payment Method Filter -->
+                                <select name="payment_method" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="all">Payment Method: All</option>
+                                    <option value="bank_transfer" {{ request('payment_method') == 'bank_transfer' ? 'selected' : '' }}>Bank Transfer</option>
+                                    <option value="e_wallet" {{ request('payment_method') == 'e_wallet' ? 'selected' : '' }}>E-Wallet</option>
+                                    <option value="cod" {{ request('payment_method') == 'cod' ? 'selected' : '' }}>COD</option>
+                                </select>
+                            </div>
                         </form>
                     </div>
 

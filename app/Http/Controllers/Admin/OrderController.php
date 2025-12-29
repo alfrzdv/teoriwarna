@@ -20,6 +20,20 @@ class OrderController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filter by payment status
+        if ($request->has('payment_status') && $request->payment_status !== 'all') {
+            $query->whereHas('payment', function($q) use ($request) {
+                $q->where('status', $request->payment_status);
+            });
+        }
+
+        // Filter by payment method
+        if ($request->has('payment_method') && $request->payment_method !== 'all') {
+            $query->whereHas('payment', function($q) use ($request) {
+                $q->where('payment_method', $request->payment_method);
+            });
+        }
+
         // Search by order number or user name
         if ($request->has('search') && $request->search) {
             $query->where(function($q) use ($request) {
@@ -30,7 +44,7 @@ class OrderController extends Controller
             });
         }
 
-        $orders = $query->paginate(20);
+        $orders = $query->paginate(20)->withQueryString();
 
         return view('admin.orders.index', compact('orders'));
     }
