@@ -144,17 +144,81 @@
 
                         <!-- Add New Images -->
                         <div class="mb-6">
-                            <label for="images" class="block text-sm font-medium text-gray-700 mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Add More Images
                             </label>
-                            <input type="file" name="images[]" id="images"
-                                multiple accept="image/*"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('images.*') border-red-500 @enderror">
+
+                            <div x-data="productImages()" class="space-y-4">
+                                <!-- Image Cropper Component -->
+                                <x-image-cropper
+                                    id="product-image-cropper-edit"
+                                    inputName="temp_image"
+                                    :aspectRatio="1"
+                                    :previewWidth="400"
+                                    :previewHeight="400"
+                                    label="Add Product Image"
+                                />
+
+                                <!-- Add Image Button -->
+                                <button type="button" @click="addImage()"
+                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                                    Add This Image
+                                </button>
+
+                                <!-- Preview of Added Images -->
+                                <div x-show="images.length > 0" class="mt-4">
+                                    <p class="text-sm font-medium text-gray-700 mb-2">New Images to Add:</p>
+                                    <div class="grid grid-cols-4 gap-4">
+                                        <template x-for="(img, index) in images" :key="index">
+                                            <div class="relative">
+                                                <img :src="img" class="w-full h-32 object-cover rounded border">
+                                                <button type="button" @click="removeImage(index)"
+                                                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600">
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <!-- Hidden inputs for each image -->
+                                <template x-for="(img, index) in images" :key="index">
+                                    <input type="hidden" :name="'images[' + index + ']'" :value="img">
+                                </template>
+                            </div>
+
                             @error('images.*')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
-                            <p class="text-xs text-gray-500 mt-1">You can select multiple images to add.</p>
+                            <p class="text-xs text-gray-500 mt-1">Crop and add multiple images.</p>
                         </div>
+
+                        @push('scripts')
+                        <script>
+                        function productImages() {
+                            return {
+                                images: [],
+                                addImage() {
+                                    // Get the cropped image data from the image-cropper component
+                                    const cropperData = document.querySelector('input[name="temp_image"]').value;
+                                    if (cropperData) {
+                                        this.images.push(cropperData);
+                                        // Reset the cropper by clearing the input
+                                        document.querySelector('input[name="temp_image"]').value = '';
+                                        // Trigger reset event
+                                        const event = new Event('reset-cropper');
+                                        document.dispatchEvent(event);
+                                    } else {
+                                        alert('Please crop an image first');
+                                    }
+                                },
+                                removeImage(index) {
+                                    this.images.splice(index, 1);
+                                }
+                            }
+                        }
+                        </script>
+                        @endpush
 
                         <!-- Buttons -->
                         <div class="flex items-center justify-end space-x-3">
