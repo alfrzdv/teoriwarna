@@ -66,25 +66,36 @@
 
                 @if($stock > 0)
                     @auth
-                        <form action="{{ route('cart.add', $product) }}" method="POST" id="addToCartForm">
-                            @csrf
-                            <div class="quantity-selector">
-                                <label class="quantity-label">Quantity</label>
-                                <div class="quantity-input-group">
-                                    <button type="button" class="quantity-button" onclick="decrementQuantity()">−</button>
-                                    <input type="number" name="quantity" id="quantityInput" value="1"
-                                        min="1" max="{{ $stock }}" class="quantity-input" readonly>
-                                    <button type="button" class="quantity-button" onclick="incrementQuantity({{ $stock }})">+</button>
-                                </div>
+                        <div class="quantity-selector">
+                            <label class="quantity-label">Quantity</label>
+                            <div class="quantity-input-group">
+                                <button type="button" class="quantity-button" onclick="decrementQuantity()">−</button>
+                                <input type="number" name="quantity" id="quantityInput" value="1"
+                                    min="1" max="{{ $stock }}" class="quantity-input" readonly>
+                                <button type="button" class="quantity-button" onclick="incrementQuantity({{ $stock }})">+</button>
                             </div>
+                        </div>
 
-                            <button type="submit" class="add-to-cart-button">
-                                Add to Cart
-                            </button>
-                        </form>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+                            <form action="{{ route('cart.add', $product) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="quantity" id="addToCartQuantity" value="1">
+                                <button type="submit" class="add-to-cart-button" style="background-color: #6b7280; width: 100%;">
+                                    Add to Cart
+                                </button>
+                            </form>
+
+                            <form action="{{ route('buy-now', $product) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
+                                <button type="submit" class="add-to-cart-button" style="width: 100%;">
+                                    Buy Now
+                                </button>
+                            </form>
+                        </div>
                     @else
                         <a href="{{ route('login') }}" class="add-to-cart-button" style="text-decoration: none;">
-                            Login to Add to Cart
+                            Login to Purchase
                         </a>
                     @endauth
                 @else
@@ -184,6 +195,7 @@
             const currentValue = parseInt(input.value);
             if (currentValue < maxStock) {
                 input.value = currentValue + 1;
+                syncQuantity(currentValue + 1);
             }
         }
 
@@ -192,7 +204,15 @@
             const currentValue = parseInt(input.value);
             if (currentValue > 1) {
                 input.value = currentValue - 1;
+                syncQuantity(currentValue - 1);
             }
+        }
+
+        function syncQuantity(value) {
+            const addToCartQty = document.getElementById('addToCartQuantity');
+            const buyNowQty = document.getElementById('buyNowQuantity');
+            if (addToCartQty) addToCartQty.value = value;
+            if (buyNowQty) buyNowQty.value = value;
         }
     </script>
 </x-app-layout>

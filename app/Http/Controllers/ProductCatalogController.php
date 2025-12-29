@@ -23,6 +23,14 @@ class ProductCatalogController extends Controller
             $query->search($request->search);
         }
 
+        // Price range filter
+        if ($request->filled('min_price')) {
+            $query->where('price', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price', '<=', $request->max_price);
+        }
+
         // Sort
         $sortBy = $request->get('sort', 'latest');
         switch ($sortBy) {
@@ -39,7 +47,7 @@ class ProductCatalogController extends Controller
                 $query->latest();
         }
 
-        $products = $query->paginate(15);
+        $products = $query->paginate(15)->withQueryString();
         $categories = Category::where('is_active', true)->withCount('products')->get();
 
         return view('catalog.index', compact('products', 'categories'));

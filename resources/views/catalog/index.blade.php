@@ -31,6 +31,18 @@
                     </div>
 
                     <div class="filter-group">
+                        <label class="filter-label">Min Price</label>
+                        <input type="number" name="min_price" value="{{ request('min_price') }}"
+                            placeholder="Min price..." class="filter-input" min="0" step="1000">
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Max Price</label>
+                        <input type="number" name="max_price" value="{{ request('max_price') }}"
+                            placeholder="Max price..." class="filter-input" min="0" step="1000">
+                    </div>
+
+                    <div class="filter-group">
                         <label class="filter-label">Sort By</label>
                         <select name="sort" class="filter-select">
                             <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest</option>
@@ -42,6 +54,9 @@
 
                     <div class="filter-group">
                         <button type="submit" class="filter-button">Apply Filters</button>
+                        @if(request()->hasAny(['search', 'category', 'min_price', 'max_price', 'sort']))
+                            <a href="{{ route('products.index') }}" class="filter-button" style="background-color: #6b7280; text-align: center; display: block; margin-top: 0.5rem;">Clear Filters</a>
+                        @endif
                     </div>
                 </div>
             </form>
