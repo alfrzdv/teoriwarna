@@ -139,4 +139,73 @@ class OrderController extends Controller
 
         return back()->with('success', 'Pembayaran berhasil diverifikasi.');
     }
+
+    // Reject payment
+    public function rejectPayment(Request $request, Order $order)
+    {
+        if (!$order->payment) {
+            return back()->with('error', 'Pembayaran tidak ditemukan.');
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:500',
+        ]);
+
+        $order->payment->update([
+            'status' => 'rejected',
+            'rejection_reason' => $validated['rejection_reason']
+        ]);
+
+        // Create notification for user
+        Notification::create([
+            'user_id' => $order->user_id,
+            'type' => 'payment_rejected',
+            'title' => 'Pembayaran Ditolak',
+            'message' => "Bukti pembayaran untuk pesanan #{$order->order_number} ditolak. Alasan: {$validated['rejection_reason']}. Silakan upload ulang bukti pembayaran yang benar.",
+            'data' => json_encode([
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'reason' => $validated['rejection_reason']
+            ])
+        ]);
+
+        return back()->with('success', 'Pembayaran berhasil ditolak.');
+    }
+
+    // Bulk update order status
+    public function bulkUpdateStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'order_ids' => 'required|array',
+            'order_ids.*' => 'exists:orders,id',
+            'status' => 'required|in:pending,processing,shipped,completed,cancelled'
+        ]);
+
+        $updated = 0;
+        foreach ($validated['order_ids'] as $orderId) {
+            $order = Order::find($orderId);
+            if ($order) {
+                $oldStatus = $order->status;
+                $order->update(['status' => $validated['status']]);
+
+                // Create notification for user
+                Notification::create([
+                    'user_id' => $order->user_id,
+                    'type' => 'order_status',
+                    'title' => 'Status Pesanan Diupdate',
+                    'message' => "Pesanan #{$order->order_number} telah diupdate dari {$oldStatus} menjadi {$validated['status']}",
+                    'data' => json_encode([
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'old_status' => $oldStatus,
+                        'new_status' => $validated['status']
+                    ])
+                ]);
+
+                $updated++;
+            }
+        }
+
+        return back()->with('success', "{$updated} pesanan berhasil diupdate.");
+    }
 }

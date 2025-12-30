@@ -38,7 +38,8 @@ class Payment extends Model
         'status',
         'payment_date',
         'proof_of_payment',
-        'proof' // Keep for backward compatibility
+        'proof', // Keep for backward compatibility
+        'rejection_reason'
     ];
 
     // Relationships

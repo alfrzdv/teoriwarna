@@ -76,6 +76,11 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
+    public function refund()
+    {
+        return $this->hasOne(Refund::class);
+    }
+
     // Helper Methods
     public function isPending()
     {
@@ -110,6 +115,18 @@ class Order extends Model
     public function canBeCancelled()
     {
         return in_array($this->status, ['pending', 'paid']);
+    }
+
+    public function canRequestRefund()
+    {
+        // Can request refund if order is completed, shipped, or processing and no existing refund
+        return in_array($this->status, ['completed', 'shipped', 'processing'])
+            && !$this->refund;
+    }
+
+    public function hasRefund()
+    {
+        return $this->refund !== null;
     }
 
     public function getTotalItems()

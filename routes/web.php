@@ -20,6 +20,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\ComplaintController as AdminComplaintController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\RefundController as AdminRefundController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -99,6 +100,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/upload-payment', [OrderController::class, 'uploadPaymentProof'])->name('orders.upload-payment');
     Route::post('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete');
+    Route::post('/orders/{order}/request-refund', [OrderController::class, 'requestRefund'])->name('orders.request-refund');
+    Route::get('/orders/{order}/refund', [OrderController::class, 'viewRefund'])->name('orders.refund');
 });
 
 // Admin Routes
@@ -121,6 +124,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/orders/{order}/update-status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::post('/orders/{order}/add-tracking', [AdminOrderController::class, 'addTracking'])->name('orders.add-tracking');
     Route::post('/orders/{order}/verify-payment', [AdminOrderController::class, 'verifyPayment'])->name('orders.verify-payment');
+    Route::post('/orders/{order}/reject-payment', [AdminOrderController::class, 'rejectPayment'])->name('orders.reject-payment');
+    Route::post('/orders/bulk-update-status', [AdminOrderController::class, 'bulkUpdateStatus'])->name('orders.bulk-update-status');
+
+    // Refunds
+    Route::get('/refunds', [AdminRefundController::class, 'index'])->name('refunds.index');
+    Route::get('/refunds/{refund}', [AdminRefundController::class, 'show'])->name('refunds.show');
+    Route::post('/refunds/{refund}/approve', [AdminRefundController::class, 'approve'])->name('refunds.approve');
+    Route::post('/refunds/{refund}/reject', [AdminRefundController::class, 'reject'])->name('refunds.reject');
+    Route::post('/refunds/{refund}/processing', [AdminRefundController::class, 'markAsProcessing'])->name('refunds.processing');
+    Route::post('/refunds/{refund}/complete', [AdminRefundController::class, 'markAsCompleted'])->name('refunds.complete');
 
     // Users
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
