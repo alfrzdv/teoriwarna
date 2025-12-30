@@ -12,8 +12,29 @@ class CartController extends Controller
 {
     public function index()
     {
-        $cart = $this->getOrCreateCart();
-        $cartItems = $cart->cart_items()->with(['product.product_images', 'product.category'])->get();
+        if (Auth::check()) {
+            $cart = $this->getOrCreateCart();
+            $cartItems = $cart->cart_items()->with(['product.product_images', 'product.category'])->get();
+        } else {
+            // Guest cart from session
+            $sessionCart = session()->get('cart', []);
+            $cartItems = collect();
+
+            foreach ($sessionCart as $productId => $item) {
+                $product = Product::with(['product_images', 'category'])->find($productId);
+                if ($product) {
+                    $cartItem = (object) [
+                        'id' => $productId,
+                        'product' => $product,
+                        'product_id' => $productId,
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price'],
+                        'subtotal' => $item['price'] * $item['quantity'],
+                    ];
+                    $cartItems->push($cartItem);
+                }
+            }
+        }
 
         $subtotal = $cartItems->sum(function ($item) {
             return $item->quantity * $item->price;
@@ -36,36 +57,64 @@ class CartController extends Controller
             return back()->with('error', 'Stok tidak mencukupi.');
         }
 
-        $cart = $this->getOrCreateCart();
+        if (Auth::check()) {
+            // Authenticated user - save to database
+            $cart = $this->getOrCreateCart();
 
-        // Check if product already in cart
-        $cartItem = $cart->cart_items()->where('product_id', $product->id)->first();
+            // Check if product already in cart
+            $cartItem = $cart->cart_items()->where('product_id', $product->id)->first();
 
-        if ($cartItem) {
-            // Update quantity
-            $newQuantity = $cartItem->quantity + $validated['quantity'];
+            if ($cartItem) {
+                // Update quantity
+                $newQuantity = $cartItem->quantity + $validated['quantity'];
 
-            if (!$product->hasEnoughStock($newQuantity)) {
-                return back()->with('error', 'Stok tidak mencukupi untuk jumlah yang diminta.');
+                if (!$product->hasEnoughStock($newQuantity)) {
+                    return back()->with('error', 'Stok tidak mencukupi untuk jumlah yang diminta.');
+                }
+
+                $cartItem->update([
+                    'quantity' => $newQuantity,
+                    'subtotal' => $cartItem->price * $newQuantity,
+                ]);
+
+                return back()->with('success', 'Jumlah produk di keranjang berhasil diupdate.');
+            } else {
+                // Add new item to cart
+                CartItem::create([
+                    'cart_id' => $cart->id,
+                    'product_id' => $product->id,
+                    'quantity' => $validated['quantity'],
+                    'price' => $product->price,
+                    'subtotal' => $product->price * $validated['quantity'],
+                ]);
+
+                return back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
             }
-
-            $cartItem->update([
-                'quantity' => $newQuantity,
-                'subtotal' => $cartItem->price * $newQuantity,
-            ]);
-
-            return back()->with('success', 'Jumlah produk di keranjang berhasil diupdate.');
         } else {
-            // Add new item to cart
-            CartItem::create([
-                'cart_id' => $cart->id,
-                'product_id' => $product->id,
-                'quantity' => $validated['quantity'],
-                'price' => $product->price,
-                'subtotal' => $product->price * $validated['quantity'],
-            ]);
+            // Guest user - save to session
+            $cart = session()->get('cart', []);
 
-            return back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+            if (isset($cart[$product->id])) {
+                $newQuantity = $cart[$product->id]['quantity'] + $validated['quantity'];
+
+                if (!$product->hasEnoughStock($newQuantity)) {
+                    return back()->with('error', 'Stok tidak mencukupi untuk jumlah yang diminta.');
+                }
+
+                $cart[$product->id]['quantity'] = $newQuantity;
+                session()->put('cart', $cart);
+
+                return back()->with('success', 'Jumlah produk di keranjang berhasil diupdate.');
+            } else {
+                $cart[$product->id] = [
+                    'product_id' => $product->id,
+                    'quantity' => $validated['quantity'],
+                    'price' => $product->price,
+                ];
+                session()->put('cart', $cart);
+
+                return back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+            }
         }
     }
 

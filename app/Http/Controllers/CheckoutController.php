@@ -23,6 +23,13 @@ class CheckoutController extends Controller
 {
     public function index()
     {
+        // Check if user is logged in
+        if (!Auth::check()) {
+            return redirect()->route('login')
+                ->with('warning', 'Silakan login terlebih dahulu untuk melanjutkan checkout.')
+                ->with('intended', route('checkout.index'));
+        }
+
         $cart = Cart::where('user_id', Auth::id())->first();
 
         if (!$cart || $cart->cart_items()->count() === 0) {

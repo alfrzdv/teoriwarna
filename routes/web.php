@@ -30,7 +30,16 @@ Route::get('/', function () {
 Route::get('/products', [ProductCatalogController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
 
+// Cart (Public - can be used by guest)
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+
 Route::middleware('auth')->group(function () {
+    // Cart (Auth only)
+    Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -47,13 +56,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
     Route::post('/addresses/{address}/set-primary', [AddressController::class, 'setPrimary'])->name('addresses.set-primary');
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
-
-    // Cart
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::patch('/cart/{cartItem}', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
-    Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
