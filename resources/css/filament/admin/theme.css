@@ -1,0 +1,184 @@
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+@config '../../../../tailwind.config.js';
+
+/* Import bold font */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+
+/* Bold, brutalist design - Superheroes style */
+
+/* Thick black borders everywhere */
+.fi-ta-table,
+.fi-fo-field-wrp,
+.fi-card,
+.fi-section,
+.fi-modal-window {
+    @apply border-4 border-black rounded-2xl !important;
+}
+
+/* Bold typography */
+.fi-header-heading,
+.fi-ta-header-cell,
+.fi-section-header-heading,
+.fi-modal-heading {
+    @apply font-black text-xl !important;
+}
+
+/* Page titles */
+.fi-header-heading {
+    @apply text-3xl font-black !important;
+}
+
+/* Table headers */
+.fi-ta-header-cell {
+    @apply font-bold text-base bg-gradient-to-r from-yellow-100 to-yellow-200 !important;
+}
+
+/* Sidebar styling - bold gradient */
+.fi-sidebar {
+    @apply bg-gradient-to-b from-blue-600 via-purple-600 to-pink-600 !important;
+}
+
+.fi-sidebar-nav-item {
+    @apply font-bold text-white hover:bg-white/20 !important;
+}
+
+.fi-sidebar-nav-item-active {
+    @apply bg-white/30 border-l-4 border-yellow-400 !important;
+}
+
+/* Topbar/Header - bold yellow */
+.fi-topbar {
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-500 border-b-4 border-black !important;
+}
+
+/* Cards - white bg with brutalist shadow */
+.fi-card {
+    @apply bg-white !important;
+    box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.fi-card:hover {
+    box-shadow: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(-2px, -2px);
+    transition: all 0.2s ease;
+}
+
+/* Tables - alternating bold colors */
+.fi-ta-row:nth-child(odd) {
+    @apply bg-blue-50 !important;
+}
+
+.fi-ta-row:nth-child(even) {
+    @apply bg-pink-50 !important;
+}
+
+.fi-ta-row:hover {
+    @apply bg-yellow-100 !important;
+}
+
+/* Buttons - bold style with thick borders */
+.fi-btn {
+    @apply border-2 border-black rounded-full font-bold shadow-lg !important;
+}
+
+.fi-btn-primary {
+    @apply bg-yellow-400 hover:bg-yellow-500 text-black !important;
+    box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.fi-btn-primary:hover {
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+    transform: translate(-1px, -1px);
+}
+
+.fi-btn-danger {
+    @apply bg-red-500 hover:bg-red-600 text-white !important;
+}
+
+.fi-btn-success {
+    @apply bg-green-500 hover:bg-green-600 text-white !important;
+}
+
+/* Form inputs - thick borders */
+.fi-input,
+.fi-select,
+.fi-textarea {
+    @apply border-2 border-black rounded-lg font-semibold !important;
+}
+
+.fi-input:focus,
+.fi-select:focus,
+.fi-textarea:focus {
+    @apply border-yellow-400 ring-4 ring-yellow-200 !important;
+}
+
+/* Badges - bold colors */
+.fi-badge {
+    @apply font-bold border-2 border-black px-3 py-1 !important;
+}
+
+.fi-badge-success {
+    @apply bg-green-400 text-black !important;
+}
+
+.fi-badge-warning {
+    @apply bg-yellow-400 text-black !important;
+}
+
+.fi-badge-danger {
+    @apply bg-red-400 text-white !important;
+}
+
+.fi-badge-info {
+    @apply bg-blue-400 text-white !important;
+}
+
+/* Stats/Widgets - bold and colorful */
+.fi-wi-stats-overview-stat {
+    @apply border-4 border-black rounded-2xl !important;
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.fi-wi-stats-overview-stat-value {
+    @apply text-4xl font-black !important;
+}
+
+/* Modals - thick borders */
+.fi-modal-window {
+    box-shadow: 12px 12px 0px 0px rgba(0, 0, 0, 1);
+}
+
+/* Pagination - bold style */
+.fi-pagination-item {
+    @apply border-2 border-black font-bold !important;
+}
+
+.fi-pagination-item-active {
+    @apply bg-yellow-400 text-black !important;
+}
+
+/* Notifications/Toasts - bold */
+.fi-no-notification {
+    @apply border-4 border-black rounded-xl !important;
+    box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+}
+
+/* Brand logo area */
+.fi-logo {
+    @apply font-black text-2xl !important;
+}
+
+/* Section headers */
+.fi-section-header {
+    @apply bg-gradient-to-r from-yellow-100 to-pink-100 border-b-4 border-black !important;
+}
+
+/* Tabs - bold style */
+.fi-tabs-item {
+    @apply border-2 border-black font-bold !important;
+}
+
+.fi-tabs-item-active {
+    @apply bg-yellow-400 !important;
+}
