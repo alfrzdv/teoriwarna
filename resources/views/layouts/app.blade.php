@@ -36,6 +36,9 @@
             </main>
         </div>
 
+        <!-- Toast Notification -->
+        <x-toast />
+
         <!-- Additional Scripts -->
         @stack('scripts')
     </body>
