@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payments', function (Blueprint $table) {
-            $table->text('rejection_reason')->nullable()->after('proof_of_payment');
+            $table->text('rejection_reason')->nullable()->after('proof');
         });
     }
 
