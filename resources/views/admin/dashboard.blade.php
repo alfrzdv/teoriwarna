@@ -61,13 +61,13 @@
                                 @forelse($recentOrders as $order)
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {{ $order->order_code }}
+                                        {{ $order->order_number }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {{ $order->user->name }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        Rp {{ number_format($order->total_price, 0, ',', '.') }}
+                                        Rp {{ number_format($order->total_amount, 0, ',', '.') }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 

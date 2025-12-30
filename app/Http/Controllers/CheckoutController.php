@@ -21,7 +21,7 @@ use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Check if user is logged in
         if (!Auth::check()) {
@@ -36,7 +36,22 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong.');
         }
 
-        $cartItems = $cart->cart_items()->with(['product.product_images'])->get();
+        // Get selected items from request
+        $selectedItems = $request->input('selected_items', []);
+
+        if (empty($selectedItems)) {
+            return redirect()->route('cart.index')->with('error', 'Silakan pilih minimal satu item untuk checkout.');
+        }
+
+        // Get only selected cart items
+        $cartItems = $cart->cart_items()
+            ->with(['product.product_images'])
+            ->whereIn('id', $selectedItems)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Item yang dipilih tidak valid.');
+        }
 
         // Check stock availability
         foreach ($cartItems as $item) {
@@ -51,6 +66,9 @@ class CheckoutController extends Controller
         });
 
         $addresses = UserAddress::where('user_id', Auth::id())->get();
+
+        // Store selected items in session for processing
+        session(['selected_cart_items' => $selectedItems]);
 
         return view('checkout.index', compact('cartItems', 'subtotal', 'addresses'));
     }
@@ -175,14 +193,21 @@ class CheckoutController extends Controller
                 'product_id' => $product->id,
                 'quantity' => $buyNowData['quantity'],
                 'price' => $buyNowData['price'],
+                'subtotal' => $buyNowData['quantity'] * $buyNowData['price'],
             ]);
 
             $product->reduceStock($buyNowData['quantity'], "Order #{$order->order_number}");
 
+            // Map payment method values
+            $paymentMethodMap = [
+                'bank_transfer' => 'transfer',
+                'e_wallet' => 'ewallet',
+                'cod' => 'cod'
+            ];
+
             Payment::create([
                 'order_id' => $order->id,
-                'payment_method' => $validated['payment_method'],
-                'amount' => $total,
+                'method' => $paymentMethodMap[$validated['payment_method']] ?? 'transfer',
                 'status' => 'pending',
             ]);
 
@@ -226,19 +251,37 @@ class CheckoutController extends Controller
         $coupon = Coupon::where('code', $validated['coupon_code'])->first();
 
         if (!$coupon) {
-            return back()->with('error', 'Kode kupon tidak valid.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode kupon tidak valid.'
+            ]);
         }
 
         if (!$coupon->isValid()) {
-            return back()->with('error', 'Kupon tidak berlaku atau sudah kadaluarsa.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Kupon tidak berlaku atau sudah kadaluarsa.'
+            ]);
         }
 
         if (!$coupon->canBeUsedBy(Auth::id())) {
-            return back()->with('error', 'Anda sudah mencapai batas penggunaan kupon ini.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda sudah mencapai batas penggunaan kupon ini.'
+            ]);
         }
 
         $cart = Cart::where('user_id', Auth::id())->first();
-        $cartItems = $cart->cart_items()->with(['product'])->get();
+
+        // Get selected items or all items
+        $selectedItems = session('selected_cart_items', []);
+        $query = $cart->cart_items()->with(['product']);
+
+        if (!empty($selectedItems)) {
+            $query->whereIn('id', $selectedItems);
+        }
+
+        $cartItems = $query->get();
 
         $subtotal = $cartItems->sum(function ($item) {
             return $item->quantity * $item->price;
@@ -247,7 +290,10 @@ class CheckoutController extends Controller
         $discount = $coupon->calculateDiscount($subtotal);
 
         if ($discount == 0) {
-            return back()->with('error', "Minimal pembelian untuk kupon ini adalah Rp " . number_format($coupon->min_purchase, 0, ',', '.'));
+            return response()->json([
+                'success' => false,
+                'message' => "Minimal pembelian untuk kupon ini adalah Rp " . number_format($coupon->min_purchase, 0, ',', '.')
+            ]);
         }
 
         session(['applied_coupon' => [
@@ -256,7 +302,10 @@ class CheckoutController extends Controller
             'coupon_id' => $coupon->id,
         ]]);
 
-        return back()->with('success', "Kupon berhasil diterapkan! Diskon: Rp " . number_format($discount, 0, ',', '.'));
+        return response()->json([
+            'success' => true,
+            'message' => "Kupon {$coupon->code} berhasil diterapkan! Anda mendapat diskon Rp " . number_format($discount, 0, ',', '.')
+        ]);
     }
 
     public function removeCoupon()
@@ -285,7 +334,22 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong.');
         }
 
-        $cartItems = $cart->cart_items()->with(['product'])->get();
+        // Get selected items from session
+        $selectedItems = session('selected_cart_items', []);
+
+        if (empty($selectedItems)) {
+            return redirect()->route('cart.index')->with('error', 'Tidak ada item yang dipilih untuk checkout.');
+        }
+
+        // Get only selected cart items
+        $cartItems = $cart->cart_items()
+            ->with(['product'])
+            ->whereIn('id', $selectedItems)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Item yang dipilih tidak valid.');
+        }
 
         // Check stock availability again
         foreach ($cartItems as $item) {
@@ -356,6 +420,7 @@ class CheckoutController extends Controller
                     'product_id' => $cartItem->product_id,
                     'quantity' => $cartItem->quantity,
                     'price' => $cartItem->price,
+                    'subtotal' => $cartItem->quantity * $cartItem->price,
                 ]);
 
                 // Reduce stock
@@ -363,10 +428,16 @@ class CheckoutController extends Controller
             }
 
             // Create payment record
+            // Map payment method values
+            $paymentMethodMap = [
+                'bank_transfer' => 'transfer',
+                'e_wallet' => 'ewallet',
+                'cod' => 'cod'
+            ];
+
             Payment::create([
                 'order_id' => $order->id,
-                'payment_method' => $validated['payment_method'],
-                'amount' => $total,
+                'method' => $paymentMethodMap[$validated['payment_method']] ?? 'transfer',
                 'status' => 'pending',
             ]);
 
@@ -383,8 +454,11 @@ class CheckoutController extends Controller
                 session()->forget('applied_coupon');
             }
 
-            // Clear cart
-            $cart->cart_items()->delete();
+            // Clear only selected cart items
+            $cart->cart_items()->whereIn('id', $selectedItems)->delete();
+
+            // Clear selected items from session
+            session()->forget('selected_cart_items');
 
             DB::commit();
 

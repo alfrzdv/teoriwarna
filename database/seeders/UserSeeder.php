@@ -12,28 +12,12 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Super Admin
-        $superAdmin = User::create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@teoriwarna.com',
-            'password' => Hash::make('password'),
-            'phone' => '081234567890',
-            'role' => 'super_admin',
-            'is_active' => true,
-        ]);
-
-        UserSetting::create([
-            'user_id' => $superAdmin->id,
-            'notification_enabled' => true,
-            'promo_enabled' => true,
-        ]);
-
         // Admin
         $admin = User::create([
             'name' => 'Admin',
             'email' => 'admin@teoriwarna.com',
             'password' => Hash::make('password'),
-            'phone' => '081234567891',
+            'phone' => '081234567890',
             'role' => 'admin',
             'is_active' => true,
         ]);

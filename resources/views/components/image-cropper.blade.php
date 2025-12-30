@@ -9,14 +9,6 @@
 ])
 
 <div x-data="imageCropper('{{ $id }}', {{ $aspectRatio }}, {{ $previewWidth }}, {{ $previewHeight }})" x-init="init()" class="space-y-4">
-    <!-- Current Image Preview (if exists) -->
-    @if($currentImage)
-    <div class="mb-4">
-        <p class="text-sm font-medium text-gray-700 mb-2">Current Image:</p>
-        <img src="{{ $currentImage }}" alt="Current" class="rounded-lg border border-gray-300" style="max-width: 200px;">
-    </div>
-    @endif
-
     <!-- Upload Button -->
     <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">{{ $label }}</label>
@@ -83,13 +75,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Preview of Cropped Image -->
-    <div x-show="croppedImageUrl" class="space-y-2">
-        <p class="text-sm font-medium text-gray-700">Preview:</p>
-        <img :src="croppedImageUrl" alt="Preview" class="rounded-lg border border-gray-300 shadow-sm"
-            :style="`width: ${previewWidth}px; height: ${previewHeight}px; object-fit: cover;`">
     </div>
 
     <!-- Hidden input with cropped image data -->

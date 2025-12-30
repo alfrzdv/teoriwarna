@@ -147,37 +147,6 @@
                         </div>
                     </div>
 
-                    <!-- Upload Payment Proof -->
-                    @if($order->payment && in_array($order->payment->payment_method, ['bank_transfer', 'e_wallet']) && $order->payment->status == 'pending')
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6">
-                                <h3 class="text-lg font-semibold mb-4">Upload Bukti Pembayaran</h3>
-                                <form action="{{ route('orders.upload-payment', $order) }}" method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <input type="file" name="payment_proof" accept="image/*" required
-                                           class="w-full mb-3 text-sm">
-                                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                                        Upload Bukti Bayar
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @endif
-
-                    <!-- Payment Proof -->
-                    @if($order->payment && $order->payment->proof_of_payment)
-                        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                            <div class="p-6">
-                                <h3 class="text-lg font-semibold mb-4">Bukti Pembayaran</h3>
-                                <img src="{{ asset('storage/' . $order->payment->proof_of_payment) }}"
-                                     alt="Payment Proof" class="w-full border rounded">
-                                @if($order->payment->status == 'pending_verification')
-                                    <p class="text-sm text-orange-600 mt-2">Menunggu verifikasi admin</p>
-                                @endif
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Tracking Info -->
                     @if($order->tracking_number)
                         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">

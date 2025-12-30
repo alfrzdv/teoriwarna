@@ -122,50 +122,6 @@ class OrderController extends Controller
         }
     }
 
-    // Upload payment proof
-    public function uploadPaymentProof(Request $request, Order $order)
-    {
-        // Ensure order belongs to current user
-        if ($order->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $request->validate([
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048'
-        ]);
-
-        if (!$order->payment) {
-            return back()->with('error', 'Payment record not found.');
-        }
-
-        // Delete old payment proof if exists
-        if ($order->payment->proof_of_payment) {
-            Storage::disk('public')->delete($order->payment->proof_of_payment);
-        }
-
-        // Upload new payment proof
-        $path = $request->file('payment_proof')->store('payment-proofs', 'public');
-
-        $order->payment->update([
-            'proof_of_payment' => $path,
-            'status' => 'pending_verification'
-        ]);
-
-        // Create notification for admin
-        Notification::create([
-            'user_id' => null, // For all admins
-            'type' => 'payment_uploaded',
-            'title' => 'Bukti Pembayaran Diunggah',
-            'message' => "Pengguna {$order->user->name} telah mengunggah bukti pembayaran untuk pesanan #{$order->order_number}",
-            'data' => json_encode([
-                'order_id' => $order->id,
-                'order_number' => $order->order_number
-            ])
-        ]);
-
-        return back()->with('success', 'Bukti pembayaran berhasil diunggah. Menunggu verifikasi admin.');
-    }
-
     // Complete order (confirm received)
     public function complete(Order $order)
     {

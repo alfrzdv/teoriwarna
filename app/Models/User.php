@@ -103,11 +103,6 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isSuperAdmin()
-    {
-        return $this->role === 'super_admin';
-    }
-
     public function isUser()
     {
         return $this->role === 'user';
@@ -115,7 +110,7 @@ class User extends Authenticatable
 
     public function hasAdminAccess()
     {
-        return in_array($this->role, ['admin', 'super_admin']);
+        return $this->role === 'admin';
     }
 
     public function isActive()
@@ -163,11 +158,6 @@ class User extends Authenticatable
     public function scopeAdmins($query)
     {
         return $query->where('role', 'admin');
-    }
-
-    public function scopeSuperAdmins($query)
-    {
-        return $query->where('role', 'super_admin');
     }
 
     public function scopeUsers($query)

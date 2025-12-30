@@ -1,4 +1,4 @@
-<x-admin-layout>
+<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Buat Kupon Baru</h2>
     </x-slot>
@@ -118,4 +118,4 @@
             }
         }
     </script>
-</x-admin-layout>
+</x-app-layout>

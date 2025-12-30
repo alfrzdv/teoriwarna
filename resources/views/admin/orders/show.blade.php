@@ -101,17 +101,6 @@
                                             {{ ucfirst($order->payment->status) }}
                                         </span>
                                     </div>
-
-                                    @if($order->payment->proof_of_payment)
-                                        <div>
-                                            <span class="font-semibold">Bukti Pembayaran:</span>
-                                            <div class="mt-2">
-                                                <img src="{{ asset('storage/' . $order->payment->proof_of_payment) }}"
-                                                     alt="Payment Proof"
-                                                     class="max-w-md border rounded">
-                                            </div>
-                                        </div>
-                                    @endif
                                 </div>
                             </div>
                         </div>

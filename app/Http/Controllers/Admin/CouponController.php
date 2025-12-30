@@ -59,6 +59,10 @@ class CouponController extends Controller
             return back()->withErrors(['value' => 'Percentage value cannot exceed 100%'])->withInput();
         }
 
+        // Set default values for nullable fields
+        $validated['min_purchase'] = $validated['min_purchase'] ?? 0;
+        $validated['max_discount'] = $validated['max_discount'] ?? 0;
+        $validated['usage_limit'] = $validated['usage_limit'] ?? null;
         $validated['used_count'] = 0;
 
         Coupon::create($validated);
@@ -98,6 +102,11 @@ class CouponController extends Controller
         if ($validated['type'] === 'percentage' && $validated['value'] > 100) {
             return back()->withErrors(['value' => 'Percentage value cannot exceed 100%'])->withInput();
         }
+
+        // Set default values for nullable fields
+        $validated['min_purchase'] = $validated['min_purchase'] ?? 0;
+        $validated['max_discount'] = $validated['max_discount'] ?? 0;
+        $validated['usage_limit'] = $validated['usage_limit'] ?? null;
 
         $coupon->update($validated);
 
