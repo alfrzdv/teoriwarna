@@ -15,7 +15,8 @@
       "Bash(npm run build:*)",
       "Bash(cat:*)",
       "Bash(git commit:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git push:*)"
     ]
   }
 }
