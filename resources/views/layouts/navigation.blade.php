@@ -42,6 +42,14 @@
                         <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                             {{ __('Products') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
+                            {{ __('Cart') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('login')" onclick="event.preventDefault(); window.location.href='{{ route('login') }}';">
+                            {{ __('My Orders') }}
+                        </x-nav-link>
                     @endauth
                 </div>
 
@@ -145,6 +153,14 @@
             @else
                 <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                     {{ __('Products') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
+                    {{ __('Cart') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('login')">
+                    {{ __('My Orders') }}
                 </x-responsive-nav-link>
             @endauth
         </div>

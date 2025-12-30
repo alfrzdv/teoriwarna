@@ -118,19 +118,21 @@
 
                             <div class="product-actions">
                                 <a href="{{ route('products.show', $product) }}" class="btn-view">View Details</a>
-                                @if($stock > 0)
-                                    <form action="{{ route('cart.add', $product) }}" method="POST" style="flex: 1;">
-                                        @csrf
-                                        <input type="hidden" name="quantity" value="1">
-                                        <button type="submit" class="btn-add-cart" style="width: 100%;">
-                                            Add to Cart
+                                @auth
+                                    @if($stock > 0)
+                                        <form action="{{ route('cart.add', $product) }}" method="POST" style="flex: 1;">
+                                            @csrf
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn-add-cart" style="width: 100%;">
+                                                Add to Cart
+                                            </button>
+                                        </form>
+                                    @else
+                                        <button class="btn-add-cart" disabled style="background-color: #9ca3af; cursor: not-allowed;">
+                                            Out of Stock
                                         </button>
-                                    </form>
-                                @else
-                                    <button class="btn-add-cart" disabled style="background-color: #9ca3af; cursor: not-allowed;">
-                                        Out of Stock
-                                    </button>
-                                @endif
+                                    @endif
+                                @endauth
                             </div>
                         </div>
                     </div>
