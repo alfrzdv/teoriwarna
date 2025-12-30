@@ -149,6 +149,7 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'user_id' => Auth::id(),
+                'address_id' => $validated['address_id'] ?? null,
                 'order_number' => $this->generateOrderNumber(),
                 'total_amount' => $total,
                 'shipping_cost' => $shipping_cost,
@@ -324,6 +325,7 @@ class CheckoutController extends Controller
             // Create order
             $order = Order::create([
                 'user_id' => Auth::id(),
+                'address_id' => $validated['address_id'] ?? null,
                 'order_number' => $this->generateOrderNumber(),
                 'subtotal' => $subtotal,
                 'total_amount' => $total,

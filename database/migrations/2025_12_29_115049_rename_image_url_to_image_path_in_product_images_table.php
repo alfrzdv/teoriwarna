@@ -6,23 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::table('product_images', function (Blueprint $table) {
-            $table->renameColumn('image_url', 'image_path');
-        });
+        // Skip: image_path already exists in initial migration
+        if (Schema::hasColumn("product_images", "image_url")) {
+            Schema::table("product_images", function (Blueprint $table) {
+                $table->renameColumn("image_url", "image_path");
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('product_images', function (Blueprint $table) {
-            $table->renameColumn('image_path', 'image_url');
-        });
+        if (Schema::hasColumn("product_images", "image_path")) {
+            Schema::table("product_images", function (Blueprint $table) {
+                $table->renameColumn("image_path", "image_url");
+            });
+        }
     }
 };
