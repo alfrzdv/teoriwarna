@@ -182,12 +182,17 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // Send emails
-            Mail::to($order->user->email)->send(new OrderConfirmation($order));
+            // Send emails (wrapped in try-catch to prevent checkout failure)
+            try {
+                Mail::to($order->user->email)->send(new OrderConfirmation($order));
 
-            $adminUsers = User::where('is_admin', true)->get();
-            foreach ($adminUsers as $admin) {
-                Mail::to($admin->email)->send(new AdminNewOrder($order));
+                $adminUsers = User::where('is_admin', true)->get();
+                foreach ($adminUsers as $admin) {
+                    Mail::to($admin->email)->send(new AdminNewOrder($order));
+                }
+            } catch (\Exception $emailError) {
+                \Log::warning('Email sending failed but order created: ' . $emailError->getMessage());
+                // Continue anyway - email failure shouldn't block order
             }
 
             return redirect()->route('orders.show', $order)
@@ -195,7 +200,12 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.');
+            \Log::error('Buy Now Checkout Error: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -369,12 +379,17 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // Send emails
-            Mail::to($order->user->email)->send(new OrderConfirmation($order));
+            // Send emails (wrapped in try-catch to prevent checkout failure)
+            try {
+                Mail::to($order->user->email)->send(new OrderConfirmation($order));
 
-            $adminUsers = User::where('is_admin', true)->get();
-            foreach ($adminUsers as $admin) {
-                Mail::to($admin->email)->send(new AdminNewOrder($order));
+                $adminUsers = User::where('is_admin', true)->get();
+                foreach ($adminUsers as $admin) {
+                    Mail::to($admin->email)->send(new AdminNewOrder($order));
+                }
+            } catch (\Exception $emailError) {
+                \Log::warning('Email sending failed but order created: ' . $emailError->getMessage());
+                // Continue anyway - email failure shouldn't block order
             }
 
             return redirect()->route('orders.show', $order)
@@ -382,7 +397,12 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat memproses pesanan. Silakan coba lagi.');
+            \Log::error('Checkout Error: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
