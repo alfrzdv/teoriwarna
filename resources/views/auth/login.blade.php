@@ -44,4 +44,12 @@
             </x-primary-button>
         </div>
     </form>
+
+    <!-- Register Link -->
+    <div class="mt-4 text-center">
+        <span class="text-sm text-gray-600">{{ __("Don't have an account?") }}</span>
+        <a href="{{ route('register') }}" class="ms-1 text-sm text-indigo-600 hover:text-indigo-900 underline">
+            {{ __('Register') }}
+        </a>
+    </div>
 </x-guest-layout>

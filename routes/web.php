@@ -30,7 +30,7 @@ Route::get('/', function () {
 Route::get('/products', [ProductCatalogController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
 
-// Cart (Public - can be used by guest)
+// Cart - Guest can access but will be redirected to login
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 
