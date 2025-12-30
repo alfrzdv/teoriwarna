@@ -106,7 +106,7 @@
 
                         <div class="payment-methods">
                             <label class="payment-option">
-                                <input type="radio" name="payment_method" value="bank_transfer" required>
+                                <input type="radio" name="payment_method" value="bank_transfer" checked required>
                                 <div>
                                     <strong>Bank Transfer</strong>
                                     <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Transfer to our bank account</p>
@@ -184,15 +184,49 @@
 
                     <div class="summary-row">
                         <span class="summary-label">Shipping</span>
-                        <span class="summary-value">Rp 15.000</span>
+                        <span class="summary-value" id="shipping-cost-display">Rp 15.000</span>
                     </div>
 
                     <div class="summary-total">
                         <span>Total</span>
-                        <span>Rp {{ number_format($subtotal + 15000, 0, ',', '.') }}</span>
+                        <span id="total-display">Rp {{ number_format($subtotal + 15000, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const subtotal = {{ $subtotal }};
+            const shippingMethods = document.querySelectorAll('input[name="shipping_method"]');
+            const shippingCostDisplay = document.getElementById('shipping-cost-display');
+            const totalDisplay = document.getElementById('total-display');
+
+            const shippingCosts = {
+                'regular': 15000,
+                'express': 30000,
+                'same_day': 50000
+            };
+
+            function formatRupiah(amount) {
+                return 'Rp ' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+
+            function updateSummary() {
+                const selectedMethod = document.querySelector('input[name="shipping_method"]:checked');
+                if (selectedMethod) {
+                    const shippingCost = shippingCosts[selectedMethod.value];
+                    const total = subtotal + shippingCost;
+
+                    shippingCostDisplay.textContent = formatRupiah(shippingCost);
+                    totalDisplay.textContent = formatRupiah(total);
+                }
+            }
+
+            shippingMethods.forEach(method => {
+                method.addEventListener('change', updateSummary);
+            });
+        });
+    </script>
 </x-app-layout>
