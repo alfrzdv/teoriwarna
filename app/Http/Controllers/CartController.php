@@ -13,8 +13,27 @@ class CartController extends Controller
     public function index()
     {
         if (!Auth::check()) {
-            return redirect()->route('login')
-                ->with('warning', 'Silakan login terlebih dahulu untuk melihat keranjang belanja.');
+            // Get cart from session for guests
+            $sessionCart = session()->get('cart', []);
+            $cartItems = collect();
+            $subtotal = 0;
+
+            foreach ($sessionCart as $item) {
+                $product = Product::with(['product_images', 'category'])->find($item['product_id']);
+                if ($product) {
+                    $cartItem = (object)[
+                        'id' => 'session_' . $item['product_id'],
+                        'product' => $product,
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price'],
+                        'subtotal' => $item['price'] * $item['quantity'],
+                    ];
+                    $cartItems->push($cartItem);
+                    $subtotal += $cartItem->subtotal;
+                }
+            }
+
+            return view('cart.index', compact('cartItems', 'subtotal'));
         }
 
         $cart = $this->getOrCreateCart();
@@ -29,11 +48,6 @@ class CartController extends Controller
 
     public function add(Request $request, Product $product)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')
-                ->with('warning', 'Silakan login terlebih dahulu untuk menambahkan produk ke keranjang.');
-        }
-
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1',
         ]);
@@ -46,6 +60,39 @@ class CartController extends Controller
             return back()->with('error', 'Stok tidak mencukupi.');
         }
 
+        // Handle guest users with session-based cart
+        if (!Auth::check()) {
+            $cart = session()->get('cart', []);
+
+            // Check if product already in session cart
+            $found = false;
+            foreach ($cart as $key => $item) {
+                if ($item['product_id'] == $product->id) {
+                    $newQuantity = $item['quantity'] + $validated['quantity'];
+
+                    if (!$product->hasEnoughStock($newQuantity)) {
+                        return back()->with('error', 'Stok tidak mencukupi untuk jumlah yang diminta.');
+                    }
+
+                    $cart[$key]['quantity'] = $newQuantity;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $cart[] = [
+                    'product_id' => $product->id,
+                    'quantity' => $validated['quantity'],
+                    'price' => $product->price,
+                ];
+            }
+
+            session()->put('cart', $cart);
+            return back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+        }
+
+        // Handle authenticated users with database cart
         $cart = $this->getOrCreateCart();
 
         // Check if product already in cart
@@ -102,6 +149,30 @@ class CartController extends Controller
         return back()->with('success', 'Keranjang berhasil diupdate.');
     }
 
+    public function updateSession(Request $request, $productId)
+    {
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $cart = session()->get('cart', []);
+        $product = Product::find($productId);
+
+        if (!$product || !$product->hasEnoughStock($validated['quantity'])) {
+            return back()->with('error', 'Stok tidak mencukupi.');
+        }
+
+        foreach ($cart as $key => $item) {
+            if ($item['product_id'] == $productId) {
+                $cart[$key]['quantity'] = $validated['quantity'];
+                break;
+            }
+        }
+
+        session()->put('cart', $cart);
+        return back()->with('success', 'Keranjang berhasil diupdate.');
+    }
+
     public function remove(CartItem $cartItem)
     {
         // Ensure cart item belongs to current user
@@ -114,8 +185,28 @@ class CartController extends Controller
         return back()->with('success', 'Produk berhasil dihapus dari keranjang.');
     }
 
+    public function removeSession($productId)
+    {
+        $cart = session()->get('cart', []);
+
+        foreach ($cart as $key => $item) {
+            if ($item['product_id'] == $productId) {
+                unset($cart[$key]);
+                break;
+            }
+        }
+
+        session()->put('cart', array_values($cart));
+        return back()->with('success', 'Produk berhasil dihapus dari keranjang.');
+    }
+
     public function clear()
     {
+        if (!Auth::check()) {
+            session()->forget('cart');
+            return back()->with('success', 'Keranjang berhasil dikosongkan.');
+        }
+
         $cart = $this->getOrCreateCart();
         $cart->cart_items()->delete();
 

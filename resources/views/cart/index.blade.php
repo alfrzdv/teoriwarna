@@ -47,19 +47,35 @@
                                 <p class="cart-item-price">Rp {{ number_format($item->price, 0, ',', '.') }}</p>
 
                                 <div class="cart-item-actions">
-                                    <form action="{{ route('cart.update', $item) }}" method="POST" class="quantity-control">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" name="quantity" value="{{ max(1, $item->quantity - 1) }}" class="quantity-btn">−</button>
-                                        <span class="quantity-value">{{ $item->quantity }}</span>
-                                        <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" class="quantity-btn">+</button>
-                                    </form>
+                                    @auth
+                                        <form action="{{ route('cart.update', $item) }}" method="POST" class="quantity-control">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" name="quantity" value="{{ max(1, $item->quantity - 1) }}" class="quantity-btn">−</button>
+                                            <span class="quantity-value">{{ $item->quantity }}</span>
+                                            <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" class="quantity-btn">+</button>
+                                        </form>
 
-                                    <form action="{{ route('cart.remove', $item) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="remove-btn" onclick="return confirm('Remove this item?')">Remove</button>
-                                    </form>
+                                        <form action="{{ route('cart.remove', $item) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="remove-btn" onclick="return confirm('Remove this item?')">Remove</button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('cart.update-session', $item->product->id) }}" method="POST" class="quantity-control">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" name="quantity" value="{{ max(1, $item->quantity - 1) }}" class="quantity-btn">−</button>
+                                            <span class="quantity-value">{{ $item->quantity }}</span>
+                                            <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" class="quantity-btn">+</button>
+                                        </form>
+
+                                        <form action="{{ route('cart.remove-session', $item->product->id) }}" method="POST">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="remove-btn" onclick="return confirm('Remove this item?')">Remove</button>
+                                        </form>
+                                    @endauth
                                 </div>
                             </div>
 

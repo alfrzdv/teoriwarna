@@ -30,9 +30,11 @@ Route::get('/', function () {
 Route::get('/products', [ProductCatalogController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
 
-// Cart - Guest can access but will be redirected to login
+// Cart - Guest can access with session-based cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/session/{productId}', [CartController::class, 'updateSession'])->name('cart.update-session');
+Route::delete('/cart/session/{productId}', [CartController::class, 'removeSession'])->name('cart.remove-session');
 
 Route::middleware('auth')->group(function () {
     // Cart (Auth only)
