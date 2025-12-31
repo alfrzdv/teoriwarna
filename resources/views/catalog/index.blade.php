@@ -1,256 +1,150 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white leading-tight font-poppins">
-            Product Catalog
+        <h2 class="font-bold text-2xl text-white leading-tight font-heading">
+            Shop All Products
         </h2>
     </x-slot>
 
-    <style>
-        .font-poppins {
-            font-family: 'Poppins', sans-serif;
+    @push('scripts')
+    <script>
+        function addToCart(productId) {
+            // You can implement this function or use a form submit
+            fetch('/cart/add/' + productId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ quantity: 1 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert('Product added to cart!');
+                }
+            });
         }
+    </script>
+    @endpush
 
-        /* Grid layout minimalis */
-        .products-masonry {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1px;
-            grid-auto-flow: dense;
-        }
-
-        @media (max-width: 768px) {
-            .products-masonry {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
-        }
-
-        .product-card {
-            break-inside: avoid;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .product-card:hover {
-            transform: scale(1.02);
-        }
-
-        /* Uniform card heights */
-        .product-card .product-image {
-            height: 280px;
-        }
-
-        @media (max-width: 768px) {
-            .product-card .product-image {
-                height: 200px;
-            }
-        }
-
-        /* Category Section Styles - Minimal */
-        .category-section {
-            margin-bottom: 0;
-            padding: 0;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .category-header {
-            font-size: 3rem;
-            font-weight: 900;
-            margin-bottom: 1px;
-            padding: 2rem 1rem;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
-            text-transform: uppercase;
-            letter-spacing: -0.05em;
-            line-height: 0.9;
-        }
-
-        @media (max-width: 768px) {
-            .category-header {
-                font-size: 1.75rem;
-                padding: 1.5rem 1rem;
-            }
-        }
-    </style>
-
-    <div class="py-8">
-        <div class="max-w-7xl mx-auto px-2 sm:px-4">
-            <!-- Header with count -->
-            <div class="mb-6">
-                <h1 class="text-3xl md:text-5xl font-black text-white mb-0.5 font-poppins uppercase" style="letter-spacing: -0.5px; line-height: 1;">
-                    CATALOG
-                </h1>
-                <p class="text-gray-600 text-[8px] uppercase" style="letter-spacing: -0.4px;">
-                    {{ $totalProducts }} Items
-                </p>
-            </div>
-
-            <!-- Filter Section - Compact horizontal layout -->
-            <div class="mb-4 bg-black p-3 border border-[#222]">
-                <form method="GET" action="{{ route('products.index') }}">
-                    <div class="flex flex-wrap gap-2 items-end">
-                        <div class="flex-1 min-w-[180px]">
-                            <label class="block text-[8px] font-black uppercase text-gray-500 mb-0.5 font-poppins" style="letter-spacing: -0.4px;">Search</label>
-                            <input type="text" name="search" value="{{ request('search') }}"
-                                placeholder="Search..."
-                                class="w-full bg-[#0a0a0a] border border-[#222] text-white placeholder-gray-600 focus:border-white focus:ring-0 py-1.5 px-2 text-xs">
-                        </div>
-
-                        <div class="w-40">
-                            <label class="block text-[8px] font-black uppercase text-gray-500 mb-0.5 font-poppins" style="letter-spacing: -0.4px;">Category</label>
-                            <select name="category" class="w-full bg-[#0a0a0a] border border-[#222] text-white focus:border-white focus:ring-0 py-1.5 px-2 text-xs">
-                                <option value="">All</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="w-36">
-                            <label class="block text-[8px] font-black uppercase text-gray-500 mb-0.5 font-poppins" style="letter-spacing: -0.4px;">Sort</label>
-                            <select name="sort" class="w-full bg-[#0a0a0a] border border-[#222] text-white focus:border-white focus:ring-0 py-1.5 px-2 text-xs">
-                                <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest</option>
-                                <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low</option>
-                                <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High</option>
-                                <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="px-4 py-1.5 bg-white text-black hover:opacity-80 font-black text-[8px] uppercase transition-opacity self-end" style="letter-spacing: -0.4px;">
-                            Filter
-                        </button>
-
-                        @if(request()->hasAny(['search', 'category', 'min_price', 'max_price', 'sort']))
-                            <a href="{{ route('products.index') }}" class="px-3 py-1.5 bg-black border border-white text-white hover:bg-white hover:text-black font-black text-[8px] uppercase transition-colors self-end" style="letter-spacing: -0.4px;">
-                                Clear
-                            </a>
-                        @endif
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header & Filters -->
+            <div class="mb-10">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
+                    <div>
+                        <x-section-header title="Discover Products" subtitle="Shop">
+                            <p class="text-dark-400 text-sm">
+                                Browse our collection of {{ $totalProducts }} amazing products
+                            </p>
+                        </x-section-header>
                     </div>
-                </form>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="bg-dark-800/30 backdrop-blur-sm border border-dark-700/50 rounded-xl p-6">
+                    <form method="GET" action="{{ route('products.index') }}" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <!-- Search -->
+                            <div class="lg:col-span-2">
+                                <label class="block text-sm font-medium text-dark-300 mb-2">Search Products</label>
+                                <input type="text" name="search" value="{{ request('search') }}"
+                                    placeholder="Search by name or description..."
+                                    class="w-full bg-dark-900 border border-dark-700 text-white placeholder-dark-500 focus:border-brand-500 focus:ring-brand-500 rounded-lg py-2.5 px-4 text-sm">
+                            </div>
+
+                            <!-- Category -->
+                            <div>
+                                <label class="block text-sm font-medium text-dark-300 mb-2">Category</label>
+                                <select name="category" class="w-full bg-dark-900 border border-dark-700 text-white focus:border-brand-500 focus:ring-brand-500 rounded-lg py-2.5 px-4 text-sm">
+                                    <option value="">All Categories</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Sort -->
+                            <div>
+                                <label class="block text-sm font-medium text-dark-300 mb-2">Sort By</label>
+                                <select name="sort" class="w-full bg-dark-900 border border-dark-700 text-white focus:border-brand-500 focus:ring-brand-500 rounded-lg py-2.5 px-4 text-sm">
+                                    <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest First</option>
+                                    <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low to High</option>
+                                    <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High to Low</option>
+                                    <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name (A-Z)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white text-sm font-medium rounded-lg shadow-glow-sm hover:shadow-glow transition-all">
+                                Apply Filters
+                            </button>
+
+                            @if(request()->hasAny(['search', 'category', 'min_price', 'max_price', 'sort']))
+                                <a href="{{ route('products.index') }}" class="px-6 py-2.5 bg-dark-700 hover:bg-dark-600 text-white text-sm font-medium rounded-lg transition-colors">
+                                    Clear All
+                                </a>
+                            @endif
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <!-- Products by Category -->
             @if(count($productsByCategory) > 0)
                 @foreach($productsByCategory as $categoryData)
-                        @php
-                            $category = $categoryData['category'];
-                            $products = $categoryData['products'];
+                    @php
+                        $category = $categoryData['category'];
+                        $products = $categoryData['products'];
+                    @endphp
 
-                            // Array warna berbeda untuk setiap kategori
-                            $colorPalette = [
-                                '#8B5CF6', // Purple
-                                '#EC4899', // Pink
-                                '#F59E0B', // Amber
-                                '#3B82F6', // Blue
-                                '#EF4444', // Red
-                                '#10B981', // Green
-                                '#6366F1', // Indigo
-                                '#F97316', // Orange
-                                '#14B8A6', // Teal
-                                '#8B5A3C', // Brown
-                                '#06B6D4', // Cyan
-                                '#A855F7', // Purple Bright
-                            ];
+                    <div class="mb-16">
+                        <!-- Category Header -->
+                        <div class="mb-6 pb-4 border-b border-dark-800/50">
+                            <h2 class="text-2xl md:text-3xl font-black font-heading text-white">
+                                {{ $category->name }}
+                            </h2>
+                            <p class="text-dark-400 text-sm mt-1">{{ $products->count() }} products</p>
+                        </div>
 
-                            // Gunakan index kategori untuk menentukan warna
-                            static $categoryIndex = 0;
-                            $colorIndex = $categoryIndex % count($colorPalette);
-                            $defaultBg = $colorPalette[$colorIndex];
-                            $categoryIndex++;
-
-                            $bgColor = $category->background_color ?? $defaultBg;
-                            $textColor = $category->text_color ?? '#ffffff';
-                            $styleType = $category->style_type ?? 'solid';
-                        @endphp
-
-                    <div class="category-section">
-
-                        <h2 class="category-header font-poppins text-white">
-                            {{ strtoupper($category->name) }}
-                        </h2>
-
-                        <div class="products-masonry">
-                                @foreach($products as $index => $product)
-                                @php
-                                    $stock = $product->getCurrentStock();
-                                @endphp
-                                <div class="product-card bg-black overflow-hidden relative group">
-
-                                    <a href="{{ route('products.show', $product) }}" class="block relative overflow-hidden">
-                                        @if($product->getPrimaryImage())
-                                            <img src="{{ asset('storage/' . $product->getPrimaryImage()->image_path) }}"
-                                                alt="{{ $product->name }}"
-                                                class="product-image w-full object-cover">
-                                        @else
-                                            <div class="product-image w-full flex items-center justify-center bg-[#111]">
-                                                <span class="text-6xl filter grayscale opacity-30">📦</span>
-                                            </div>
-                                        @endif
-
-                                        @if($stock > 0 && $stock <= 10)
-                                            <span class="absolute top-4 right-4 px-4 py-2 bg-yellow-400 text-black text-xs font-black">
-                                                LOW STOCK
-                                            </span>
-                                        @endif
-                                    </a>
-
-                                    <div class="p-2">
-                                        <a href="{{ route('products.show', $product) }}">
-                                            <h3 class="text-xs font-black mb-0.5 hover:opacity-70 transition-opacity duration-200 font-poppins uppercase line-clamp-2 text-white" style="letter-spacing: -0.5px; line-height: 1.2;">
-                                                {{ $product->name }}
-                                            </h3>
-                                        </a>
-
-                                        <div class="flex items-baseline justify-between mb-1">
-                                            <p class="text-base font-black font-poppins text-white" style="letter-spacing: -0.5px;">
-                                                {{ number_format($product->price / 1000, 0) }}K
-                                            </p>
-                                            <span class="text-[8px] font-bold uppercase text-gray-500" style="letter-spacing: -0.4px;">
-                                                {{ $product->category->name }}
-                                            </span>
-                                        </div>
-
-                                        <div class="flex items-center gap-1 mb-1.5">
-                                            @php
-                                                $stockClass = $stock > 10 ? 'bg-green-500' : ($stock > 0 ? 'bg-yellow-500' : 'bg-red-500');
-                                            @endphp
-                                            <span class="w-1 h-1 {{ $stockClass }}"></span>
-                                            <span class="text-[8px] uppercase text-gray-500" style="letter-spacing: -0.4px;">{{ $stock }}</span>
-                                        </div>
-
-                                        @if($stock > 0)
-                                            <form action="{{ route('cart.add', $product) }}" method="POST" class="w-full">
-                                                @csrf
-                                                <input type="hidden" name="quantity" value="1">
-                                                <button type="submit"
-                                                    class="w-full px-2 py-1 font-black text-[8px] uppercase transition-opacity duration-200 hover:opacity-80 bg-white text-black" style="letter-spacing: -0.4px;">
-                                                    Add
-                                                </button>
-                                            </form>
-                                        @else
-                                            <button class="w-full px-2 py-1 bg-[#111] text-gray-700 cursor-not-allowed font-black text-[8px] uppercase" style="letter-spacing: -0.4px;" disabled>
-                                                Out
-                                            </button>
-                                        @endif
-                                    </div>
-                                </div>
+                        <!-- Products Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            @foreach($products as $product)
+                                <x-product-card :product="$product" />
                             @endforeach
                         </div>
                     </div>
                 @endforeach
             @else
-                <div class="text-center py-32 bg-[#2a2a2a]">
-                    <div class="text-8xl mb-6">🔍</div>
-                    <h3 class="text-3xl font-bold text-white mb-4 font-poppins">No Products Found</h3>
-                    <p class="text-gray-300 text-lg">
-                        @if(request('search') || request('category') || request('sort'))
-                            Try adjusting your filters or search terms.
-                        @else
-                            There are no products available at the moment.
+                <!-- Empty State -->
+                <div class="text-center py-20">
+                    <div class="max-w-md mx-auto">
+                        <div class="w-20 h-20 bg-dark-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <svg class="w-10 h-10 text-dark-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold font-heading text-white mb-3">No Products Found</h3>
+                        <p class="text-dark-400 mb-6">
+                            @if(request('search') || request('category') || request('sort'))
+                                We couldn't find any products matching your filters. Try adjusting your search criteria.
+                            @else
+                                There are no products available at the moment. Please check back later.
+                            @endif
+                        </p>
+                        @if(request()->hasAny(['search', 'category', 'min_price', 'max_price', 'sort']))
+                            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-medium rounded-lg shadow-glow-sm hover:shadow-glow transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Reset Filters
+                            </a>
                         @endif
-                    </p>
+                    </div>
                 </div>
             @endif
         </div>
