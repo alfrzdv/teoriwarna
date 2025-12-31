@@ -1,10 +1,10 @@
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-semibold text-white font-heading">
             {{ __('Profile Picture') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-dark-400">
             {{ __("Update your profile picture.") }}
         </p>
     </header>
@@ -14,9 +14,9 @@
         <div class="flex items-center space-x-6">
             <div class="shrink-0">
                 @if($user->profile_picture)
-                    <img src="{{ $user->getProfilePictureUrl() }}" alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover border-2 border-gray-300">
+                    <img src="{{ $user->getProfilePictureUrl() }}" alt="{{ $user->name }}" class="h-24 w-24 rounded-full object-cover border-2 border-brand-500">
                 @else
-                    <div class="h-24 w-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl font-semibold border-2 border-gray-300">
+                    <div class="h-24 w-24 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white text-3xl font-semibold border-2 border-brand-500">
                         {{ $user->getInitials() }}
                     </div>
                 @endif
@@ -34,11 +34,11 @@
                         label="Choose New Picture"
                         :currentImage="$user->profile_picture ? $user->getProfilePictureUrl() : null"
                     />
-                    <p class="mt-1 text-sm text-gray-500">PNG, JPG, GIF up to 2MB. You can crop and rotate before uploading.</p>
+                    <p class="mt-1 text-sm text-dark-500">PNG, JPG, GIF up to 2MB. You can crop and rotate before uploading.</p>
                     <x-input-error class="mt-2" :messages="$errors->get('profile_picture')" />
 
                     <div class="flex items-center gap-4">
-                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 border border-transparent rounded-lg font-medium text-sm text-white shadow-glow-sm hover:shadow-glow transition-all">
                             {{ __('Upload') }}
                         </button>
 
@@ -48,7 +48,7 @@
                                 x-show="show"
                                 x-transition
                                 x-init="setTimeout(() => show = false, 2000)"
-                                class="text-sm text-gray-600"
+                                class="text-sm text-green-400"
                             >{{ __('Profile picture updated!') }}</p>
                         @endif
                     </div>

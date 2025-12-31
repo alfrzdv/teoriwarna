@@ -43,6 +43,12 @@ class Product extends Model
         'status'
     ];
 
+    protected $appends = [
+        'total_stock',
+        'discount_percentage',
+        'final_price'
+    ];
+
     // Relationships
     public function category()
     {
@@ -60,6 +66,11 @@ class Product extends Model
     }
 
     public function product_images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
+
+    public function images()
     {
         return $this->hasMany(ProductImage::class);
     }
@@ -144,6 +155,27 @@ class Product extends Model
     public function archive()
     {
         $this->update(['status' => 'archived']);
+    }
+
+    // Accessors
+    public function getTotalStockAttribute()
+    {
+        return $this->getCurrentStock();
+    }
+
+    public function getDiscountPercentageAttribute()
+    {
+        // Return 0 if discount column doesn't exist
+        return 0;
+    }
+
+    public function getFinalPriceAttribute()
+    {
+        $discount = $this->discount_percentage;
+        if ($discount > 0) {
+            return $this->price * (1 - ($discount / 100));
+        }
+        return $this->price;
     }
 
     // Scopes

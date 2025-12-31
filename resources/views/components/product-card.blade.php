@@ -5,7 +5,7 @@
         <!-- Product Image -->
         <div class="relative aspect-square bg-dark-900 overflow-hidden">
             @if($product->images && $product->images->count() > 0)
-                <img src="{{ $product->images->first()->getImageUrl() }}"
+                <img src="{{ $product->images->first()->getUrl() }}"
                      alt="{{ $product->name }}"
                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
             @else
