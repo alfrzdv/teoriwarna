@@ -54,18 +54,18 @@
             <div class="flex items-center gap-4">
                 @auth
                     @if(auth()->user()->hasAdminAccess())
-                        <a href="{{ url('/admin') }}" class="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700 transition-all font-semibold font-poppins">
+                        <a href="{{ url('/admin') }}" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 transition-all font-semibold font-poppins">
                             Admin Panel
                         </a>
                     @endif
-                    <a href="{{ route('catalog.index') }}" class="px-6 py-3 rounded-lg btn-solid text-white font-semibold font-poppins">
+                    <a href="{{ route('catalog.index') }}" class="px-6 py-3 btn-solid text-white font-semibold font-poppins">
                         Shop Now
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700 transition-all font-semibold font-poppins">
+                    <a href="{{ route('login') }}" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 transition-all font-semibold font-poppins">
                         Login
                     </a>
-                    <a href="{{ route('register') }}" class="px-6 py-3 rounded-lg btn-solid text-white font-semibold font-poppins">
+                    <a href="{{ route('register') }}" class="px-6 py-3 btn-solid text-white font-semibold font-poppins">
                         Register
                     </a>
                 @endauth
@@ -80,11 +80,11 @@
                 teoriwarna.shop
             </h1>
             <div class="flex flex-wrap gap-6 justify-center items-center mb-16">
-                <a href="{{ route('catalog.index') }}" class="px-8 py-4 rounded-lg btn-solid text-white font-bold text-lg font-poppins">
+                <a href="{{ route('catalog.index') }}" class="px-8 py-4 btn-solid text-white font-bold text-lg font-poppins">
                     Explore Products
                 </a>
                 @guest
-                <a href="{{ route('register') }}" class="px-8 py-4 rounded-lg bg-purple-600 hover:bg-purple-700 transition-all font-bold text-lg font-poppins">
+                <a href="{{ route('register') }}" class="px-8 py-4 bg-purple-600 hover:bg-purple-700 transition-all font-bold text-lg font-poppins">
                     Get Started
                 </a>
                 @endguest
@@ -104,19 +104,19 @@
 
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Guest Access -->
-                <div class="rounded-2xl p-8 bg-yellow-400">
+                <div class="p-8 bg-yellow-400">
                     <div class="text-2xl font-bold mb-4 text-black font-poppins">Guest Access</div>
                     <p class="text-black">Jelajahi produk tanpa registrasi. Tidak perlu login untuk melihat katalog.</p>
                 </div>
 
                 <!-- User Login -->
-                <div class="rounded-2xl p-8 bg-pink-300">
+                <div class="p-8 bg-pink-300">
                     <div class="text-2xl font-bold mb-4 text-black font-poppins">User Login</div>
                     <p class="text-black">Validasi kredensial dengan routing dashboard berbasis role ke interface User atau Admin.</p>
                 </div>
 
                 <!-- Registration -->
-                <div class="rounded-2xl p-8 bg-red-400">
+                <div class="p-8 bg-red-400">
                     <div class="text-2xl font-bold mb-4 text-black font-poppins">Registration</div>
                     <p class="text-black">Pembuatan akun baru dengan setup profil user otomatis dan assignment role.</p>
                 </div>
@@ -135,28 +135,28 @@
             </h3>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="rounded-2xl p-6 bg-blue-600 flex flex-col">
+                <div class="p-6 bg-blue-600 flex flex-col">
                     <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Add & Edit Products
                     </div>
                     <p class="text-white text-sm leading-relaxed">Buat listing baru dengan detail, spesifikasi, gambar, harga, dan level stok</p>
                 </div>
 
-                <div class="rounded-2xl p-6 bg-yellow-500 flex flex-col">
+                <div class="p-6 bg-yellow-500 flex flex-col">
                     <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Category Management
                     </div>
                     <p class="text-white text-sm leading-relaxed">Organisir produk ke dalam kategori hierarki untuk navigasi mudah</p>
                 </div>
 
-                <div class="rounded-2xl p-6 bg-orange-500 flex flex-col">
+                <div class="p-6 bg-orange-500 flex flex-col">
                     <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Stock Management
                     </div>
                     <p class="text-white text-sm leading-relaxed">Monitor level inventori, alert stok rendah, dan update bulk</p>
                 </div>
 
-                <div class="rounded-2xl p-6 bg-red-600 flex flex-col">
+                <div class="p-6 bg-red-600 flex flex-col">
                     <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Delete Products
                     </div>
@@ -209,7 +209,7 @@
             <p class="text-xl text-white mb-12">
                 Explore our colorful collection and find your perfect style
             </p>
-            <a href="{{ route('catalog.index') }}" class="inline-block px-12 py-5 rounded-lg btn-solid text-white font-bold text-xl font-poppins">
+            <a href="{{ route('catalog.index') }}" class="inline-block px-12 py-5 btn-solid text-white font-bold text-xl font-poppins">
                 Start Shopping
             </a>
         </div>
