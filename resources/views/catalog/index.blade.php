@@ -10,17 +10,17 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* Grid layout minimalis */
+        /* Grid layout minimalis ala ohira.design */
         .products-masonry {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2px;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1px;
             grid-auto-flow: dense;
         }
 
         @media (max-width: 768px) {
             .products-masonry {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             }
         }
 
@@ -31,64 +31,37 @@
             overflow: hidden;
         }
 
-        .product-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            opacity: 0.1;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .product-card > * {
-            position: relative;
-            z-index: 1;
-        }
+        /* Removed background overlay */
 
         .product-card:hover {
             transform: scale(1.02);
         }
 
-        /* Varied heights */
-        .product-card:nth-child(3n+1) .product-image {
-            height: 300px;
+        /* Uniform card heights */
+        .product-card .product-image {
+            height: 280px;
         }
 
-        .product-card:nth-child(3n+2) .product-image {
-            height: 250px;
-        }
-
-        .product-card:nth-child(3n+3) .product-image {
-            height: 350px;
-        }
-
-        /* Large featured cards */
-        @media (min-width: 768px) {
-            .product-card.featured {
-                grid-column: span 2;
-            }
-
-            .product-card.featured .product-image {
-                height: 400px;
+        @media (max-width: 768px) {
+            .product-card .product-image {
+                height: 200px;
             }
         }
 
-        /* Category Section Styles */
+        /* Category Section Styles - Minimal */
         .category-section {
-            margin-bottom: 6rem;
-            padding: 3rem 2rem;
+            margin-bottom: 0;
+            padding: 0;
             transition: all 0.2s ease-in-out;
         }
 
         .category-header {
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: 900;
-            margin-bottom: 3rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 1px;
+            padding: 2rem 1rem;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
             text-transform: uppercase;
             letter-spacing: -0.05em;
             line-height: 0.9;
@@ -96,7 +69,8 @@
 
         @media (max-width: 768px) {
             .category-header {
-                font-size: 2.5rem;
+                font-size: 1.75rem;
+                padding: 1.5rem 1rem;
             }
         }
     </style>
@@ -104,29 +78,29 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header with count -->
-            <div class="mb-16">
-                <h1 class="text-6xl md:text-8xl font-black text-white mb-2 font-poppins uppercase tracking-tight leading-none">
-                    Explore Products
+            <div class="mb-8">
+                <h1 class="text-5xl md:text-7xl font-black text-white mb-1 font-poppins uppercase tracking-tight leading-none">
+                    CATALOG
                 </h1>
-                <p class="text-gray-400 text-sm uppercase tracking-wide">
-                    <strong class="text-white font-poppins">{{ $totalProducts }}</strong> Products Available
+                <p class="text-gray-600 text-[10px] uppercase tracking-widest">
+                    {{ $totalProducts }} Items
                 </p>
             </div>
 
             <!-- Filter Section - Compact horizontal layout -->
-            <div class="mb-12 bg-[#2a2a2a] p-6">
+            <div class="mb-8 bg-[#0a0a0a] p-4 border border-[#222]">
                 <form method="GET" action="{{ route('products.index') }}">
                     <div class="flex flex-wrap gap-4 items-end">
                         <div class="flex-1 min-w-[200px]">
-                            <label class="block text-sm font-semibold text-white mb-2 font-poppins">Search</label>
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1 font-poppins">Search</label>
                             <input type="text" name="search" value="{{ request('search') }}"
-                                placeholder="Search products..."
-                                class="w-full bg-[#2a2a2a] border-0 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
+                                placeholder="Search..."
+                                class="w-full bg-black border border-[#222] text-white placeholder-gray-600 focus:border-white focus:ring-0 py-2 px-3 text-sm">
                         </div>
 
                         <div class="w-48">
-                            <label class="block text-sm font-semibold text-white mb-2 font-poppins">Category</label>
-                            <select name="category" class="w-full bg-[#2a2a2a] border-0 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1 font-poppins">Category</label>
+                            <select name="category" class="w-full bg-black border border-[#222] text-white focus:border-white focus:ring-0 py-2 px-3 text-sm">
                                 <option value="">All</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
@@ -137,8 +111,8 @@
                         </div>
 
                         <div class="w-40">
-                            <label class="block text-sm font-semibold text-white mb-2 font-poppins">Sort</label>
-                            <select name="sort" class="w-full bg-[#2a2a2a] border-0 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1 font-poppins">Sort</label>
+                            <select name="sort" class="w-full bg-black border border-[#222] text-white focus:border-white focus:ring-0 py-2 px-3 text-sm">
                                 <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest</option>
                                 <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low</option>
                                 <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High</option>
@@ -146,12 +120,12 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="px-8 py-3 bg-purple-600 text-white hover:bg-purple-700 font-bold font-poppins transition-colors">
+                        <button type="submit" class="px-6 py-2 bg-white text-black hover:bg-gray-200 font-black text-[10px] uppercase tracking-widest transition-colors self-end">
                             Filter
                         </button>
 
                         @if(request()->hasAny(['search', 'category', 'min_price', 'max_price', 'sort']))
-                            <a href="{{ route('products.index') }}" class="px-6 py-3 bg-red-600 text-white hover:bg-red-700 font-semibold font-poppins">
+                            <a href="{{ route('products.index') }}" class="px-4 py-2 bg-black border border-white text-white hover:bg-white hover:text-black font-black text-[10px] uppercase tracking-widest transition-colors self-end">
                                 Clear
                             </a>
                         @endif
@@ -193,10 +167,9 @@
                         $styleType = $category->style_type ?? 'solid';
                     @endphp
 
-                    <div class="category-section mb-16"
-                        style="background-color: {{ $bgColor }}; color: {{ $textColor }};">
+                    <div class="category-section">
 
-                        <h2 class="category-header font-poppins" style="color: {{ $textColor }};">
+                        <h2 class="category-header font-poppins text-white">
                             {{ strtoupper($category->name) }}
                         </h2>
 
@@ -204,16 +177,9 @@
                             @foreach($products as $index => $product)
                                 @php
                                     $stock = $product->getCurrentStock();
-                                    $isFeatured = $index % 5 === 0;
                                 @endphp
-                                <div class="product-card {{ $isFeatured ? 'featured' : '' }} bg-[#1a1a1a] overflow-hidden relative group"
-                                    style="border: 1px solid {{ $textColor }}10;">
-
-                                    <style>
-                                        .product-card:nth-of-type({{ $index + 1 }})::before {
-                                            background-color: {{ $bgColor }};
-                                        }
-                                    </style>
+                                <div class="product-card bg-[#0a0a0a] overflow-hidden relative group"
+                                    style="border: 1px solid #222;")
 
                                     <a href="{{ route('products.show', $product) }}" class="block relative overflow-hidden">
                                         @if($product->getPrimaryImage())
@@ -235,29 +201,28 @@
                                         @endif
                                     </a>
 
-                                    <div class="p-4">
+                                    <div class="p-3">
                                         <a href="{{ route('products.show', $product) }}">
-                                            <h3 class="text-2xl font-black mb-2 hover:opacity-70 transition-opacity duration-200 font-poppins uppercase tracking-tight leading-tight line-clamp-2"
-                                                style="color: {{ $textColor }};">
+                                            <h3 class="text-base font-black mb-1 hover:opacity-70 transition-opacity duration-200 font-poppins uppercase tracking-tight leading-tight line-clamp-2 text-white">
                                                 {{ $product->name }}
                                             </h3>
                                         </a>
 
-                                        <div class="flex items-baseline justify-between mb-3">
-                                            <p class="text-3xl font-black font-poppins tracking-tighter" style="color: {{ $textColor }};">
+                                        <div class="flex items-baseline justify-between mb-2">
+                                            <p class="text-xl font-black font-poppins tracking-tighter text-white">
                                                 {{ number_format($product->price / 1000, 0) }}K
                                             </p>
-                                            <span class="text-[10px] font-bold uppercase tracking-widest" style="color: {{ $textColor }}80;">
+                                            <span class="text-[9px] font-bold uppercase tracking-widest text-gray-500">
                                                 {{ $product->category->name }}
                                             </span>
                                         </div>
 
-                                        <div class="flex items-center gap-2 mb-3">
+                                        <div class="flex items-center gap-1.5 mb-2">
                                             @php
                                                 $stockClass = $stock > 10 ? 'bg-green-500' : ($stock > 0 ? 'bg-yellow-500' : 'bg-red-500');
                                             @endphp
-                                            <span class="w-1.5 h-1.5 {{ $stockClass }}"></span>
-                                            <span class="text-[10px] uppercase tracking-wider" style="color: {{ $textColor }}80;">{{ $stock }} in stock</span>
+                                            <span class="w-1 h-1 {{ $stockClass }}"></span>
+                                            <span class="text-[9px] uppercase tracking-wider text-gray-500">{{ $stock }}</span>
                                         </div>
 
                                         @if($stock > 0)
@@ -265,14 +230,13 @@
                                                 @csrf
                                                 <input type="hidden" name="quantity" value="1">
                                                 <button type="submit"
-                                                    class="w-full px-4 py-2 font-black text-xs uppercase tracking-widest transition-all duration-200 hover:opacity-80"
-                                                    style="background-color: {{ $textColor }}; color: {{ $bgColor }};">
-                                                    Add to Cart
+                                                    class="w-full px-3 py-1.5 font-black text-[10px] uppercase tracking-widest transition-all duration-200 hover:opacity-80 bg-white text-black">
+                                                    Add
                                                 </button>
                                             </form>
                                         @else
-                                            <button class="w-full px-4 py-2 bg-gray-800 text-gray-600 cursor-not-allowed font-black text-xs uppercase tracking-widest" disabled>
-                                                Sold Out
+                                            <button class="w-full px-3 py-1.5 bg-gray-900 text-gray-700 cursor-not-allowed font-black text-[10px] uppercase tracking-widest" disabled>
+                                                Out
                                             </button>
                                         @endif
                                     </div>
