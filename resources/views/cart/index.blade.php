@@ -53,7 +53,7 @@
                                             @method('PATCH')
                                             <button type="submit" name="quantity" value="{{ max(1, $item->quantity - 1) }}" class="quantity-btn">−</button>
                                             <span class="quantity-value">{{ $item->quantity }}</span>
-                                            <button type="submit" name="quantity" value="{{ $item->quantity + 1) }}" class="quantity-btn">+</button>
+                                            <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" class="quantity-btn">+</button>
                                         </form>
 
                                         <form action="{{ route('cart.remove', $item) }}" method="POST">
@@ -67,7 +67,7 @@
                                             @method('PATCH')
                                             <button type="submit" name="quantity" value="{{ max(1, $item->quantity - 1) }}" class="quantity-btn">−</button>
                                             <span class="quantity-value">{{ $item->quantity }}</span>
-                                            <button type="submit" name="quantity" value="{{ $item->quantity + 1) }}" class="quantity-btn">+</button>
+                                            <button type="submit" name="quantity" value="{{ $item->quantity + 1 }}" class="quantity-btn">+</button>
                                         </form>
 
                                         <form action="{{ route('cart.remove-session', $item->product->id) }}" method="POST">
