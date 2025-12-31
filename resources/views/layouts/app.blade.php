@@ -18,7 +18,7 @@
         <style>
             body {
                 font-family: 'Inter', sans-serif;
-                background: #0a0a0a;
+                background: #1a1a1a;
                 color: white;
             }
         </style>
@@ -27,7 +27,7 @@
         @stack('styles')
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-black text-white">
+        <div class="min-h-screen bg-[#1a1a1a] text-white">
             @include('layouts.navigation')
 
             <!-- Page Heading -->

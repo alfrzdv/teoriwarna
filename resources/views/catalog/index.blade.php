@@ -132,7 +132,7 @@
                             </select>
                         </div>
 
-                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 font-bold font-poppins">
+                        <button type="submit" class="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-bold font-poppins transition-colors">
                             Filter
                         </button>
 
@@ -151,8 +151,22 @@
                     @php
                         $category = $categoryData['category'];
                         $products = $categoryData['products'];
-                        $bgColor = $category->background_color ?? '#6B21A8';
-                        $textColor = $category->text_color ?? '#ffffff';
+                        // Default colors berbeda per kategori
+                        $defaultColors = [
+                            'PENSIL WARNA' => ['bg' => '#8B5CF6', 'text' => '#ffffff'],
+                            'CRAYON' => ['bg' => '#EC4899', 'text' => '#ffffff'],
+                            'OIL PASTEL' => ['bg' => '#F59E0B', 'text' => '#ffffff'],
+                            'WATERCOLOR' => ['bg' => '#3B82F6', 'text' => '#ffffff'],
+                            'ACRYLIC' => ['bg' => '#EF4444', 'text' => '#ffffff'],
+                            'BRUSH' => ['bg' => '#10B981', 'text' => '#ffffff'],
+                            'CANVAS' => ['bg' => '#6366F1', 'text' => '#ffffff'],
+                        ];
+
+                        $categoryName = strtoupper($category->name);
+                        $defaults = $defaultColors[$categoryName] ?? ['bg' => '#6B21A8', 'text' => '#ffffff'];
+
+                        $bgColor = $category->background_color ?? $defaults['bg'];
+                        $textColor = $category->text_color ?? $defaults['text'];
                         $styleType = $category->style_type ?? 'solid';
                     @endphp
 

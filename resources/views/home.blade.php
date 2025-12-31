@@ -15,7 +15,7 @@
     <style>
         body {
             font-family: 'Open Sans', sans-serif;
-            background: #000000;
+            background: #0f0f0f;
         }
 
         .font-poppins {
@@ -29,20 +29,21 @@
             color: white;
         }
 
-        .btn-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .btn-solid {
+            background: #667eea;
             transition: all 0.3s ease;
         }
 
-        .btn-gradient:hover {
+        .btn-solid:hover {
             transform: translateY(-2px);
             box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+            background: #5568d3;
         }
     </style>
 </head>
-<body class="bg-black text-white overflow-x-hidden">
+<body class="bg-[#0f0f0f] text-white overflow-x-hidden">
     <!-- Navigation -->
-    <nav class="bg-black container mx-auto px-6 py-8">
+    <nav class="bg-[#0f0f0f] container mx-auto px-6 py-8">
         <div class="flex items-center justify-between">
             <div class="text-2xl font-black font-poppins">
                 <span class="text-white">
@@ -57,14 +58,14 @@
                             Admin Panel
                         </a>
                     @endif
-                    <a href="{{ route('catalog.index') }}" class="px-6 py-3 rounded-lg btn-gradient text-white font-semibold font-poppins">
+                    <a href="{{ route('catalog.index') }}" class="px-6 py-3 rounded-lg btn-solid text-white font-semibold font-poppins">
                         Shop Now
                     </a>
                 @else
                     <a href="{{ route('login') }}" class="px-6 py-3 rounded-lg bg-purple-600 hover:bg-purple-700 transition-all font-semibold font-poppins">
                         Login
                     </a>
-                    <a href="{{ route('register') }}" class="px-6 py-3 rounded-lg btn-gradient text-white font-semibold font-poppins">
+                    <a href="{{ route('register') }}" class="px-6 py-3 rounded-lg btn-solid text-white font-semibold font-poppins">
                         Register
                     </a>
                 @endauth
@@ -73,13 +74,13 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="bg-black container mx-auto px-6 pt-20 pb-32">
+    <section class="bg-[#0f0f0f] container mx-auto px-6 pt-20 pb-32">
         <div class="max-w-6xl mx-auto text-center">
             <h1 class="hero-text mb-12 font-poppins">
                 teoriwarna.shop
             </h1>
             <div class="flex flex-wrap gap-6 justify-center items-center mb-16">
-                <a href="{{ route('catalog.index') }}" class="px-8 py-4 rounded-lg btn-gradient text-white font-bold text-lg font-poppins">
+                <a href="{{ route('catalog.index') }}" class="px-8 py-4 rounded-lg btn-solid text-white font-bold text-lg font-poppins">
                     Explore Products
                 </a>
                 @guest
@@ -97,7 +98,7 @@
             <h2 class="text-4xl md:text-6xl font-black text-center mb-4 font-poppins text-black">
                 AUTHENTICATION
             </h2>
-            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins text-white">
+            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins text-black">
                 User Access Flow
             </h3>
 
@@ -134,32 +135,32 @@
             </h3>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="rounded-2xl p-6 bg-blue-600">
-                    <div class="text-4xl font-bold mb-4 text-white font-poppins">
+                <div class="rounded-2xl p-6 bg-blue-600 flex flex-col">
+                    <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Add & Edit Products
                     </div>
-                    <p class="text-white text-sm">Buat listing baru dengan detail, spesifikasi, gambar, harga, dan level stok</p>
+                    <p class="text-white text-sm leading-relaxed">Buat listing baru dengan detail, spesifikasi, gambar, harga, dan level stok</p>
                 </div>
 
-                <div class="rounded-2xl p-6 bg-yellow-500">
-                    <div class="text-4xl font-bold mb-4 text-white font-poppins">
+                <div class="rounded-2xl p-6 bg-yellow-500 flex flex-col">
+                    <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Category Management
                     </div>
-                    <p class="text-white text-sm">Organisir produk ke dalam kategori hierarki untuk navigasi mudah</p>
+                    <p class="text-white text-sm leading-relaxed">Organisir produk ke dalam kategori hierarki untuk navigasi mudah</p>
                 </div>
 
-                <div class="rounded-2xl p-6 bg-orange-500">
-                    <div class="text-4xl font-bold mb-4 text-white font-poppins">
+                <div class="rounded-2xl p-6 bg-orange-500 flex flex-col">
+                    <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Stock Management
                     </div>
-                    <p class="text-white text-sm">Monitor level inventori, alert stok rendah, dan update bulk</p>
+                    <p class="text-white text-sm leading-relaxed">Monitor level inventori, alert stok rendah, dan update bulk</p>
                 </div>
 
-                <div class="rounded-2xl p-6 bg-red-600">
-                    <div class="text-4xl font-bold mb-4 text-white font-poppins">
+                <div class="rounded-2xl p-6 bg-red-600 flex flex-col">
+                    <div class="text-2xl font-bold mb-4 text-white font-poppins leading-tight">
                         Delete Products
                     </div>
-                    <p class="text-white text-sm">Monitor level inventori, alert stok rendah, dan update bulk</p>
+                    <p class="text-white text-sm leading-relaxed">Monitor level inventori, alert stok rendah, dan update bulk</p>
                 </div>
             </div>
         </div>
@@ -200,7 +201,7 @@
     </section>
 
     <!-- Footer CTA -->
-    <section class="bg-black container mx-auto px-6 py-32">
+    <section class="bg-[#0f0f0f] container mx-auto px-6 py-32">
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="text-5xl md:text-7xl font-black mb-8 font-poppins text-white">
                 Ready to Shop?
@@ -208,7 +209,7 @@
             <p class="text-xl text-white mb-12">
                 Explore our colorful collection and find your perfect style
             </p>
-            <a href="{{ route('catalog.index') }}" class="inline-block px-12 py-5 rounded-lg btn-gradient text-white font-bold text-xl font-poppins">
+            <a href="{{ route('catalog.index') }}" class="inline-block px-12 py-5 rounded-lg btn-solid text-white font-bold text-xl font-poppins">
                 Start Shopping
             </a>
         </div>
