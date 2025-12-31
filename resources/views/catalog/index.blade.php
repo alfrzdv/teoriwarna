@@ -100,19 +100,19 @@
             </div>
 
             <!-- Filter Section - Compact horizontal layout -->
-            <div class="mb-12 bg-purple-900/30 rounded-2xl p-6">
+            <div class="mb-12 bg-[#2a2a2a] rounded-2xl p-6">
                 <form method="GET" action="{{ route('products.index') }}">
                     <div class="flex flex-wrap gap-4 items-end">
                         <div class="flex-1 min-w-[200px]">
                             <label class="block text-sm font-semibold text-white mb-2 font-poppins">Search</label>
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Search products..."
-                                class="w-full bg-black/40 border-0 text-white placeholder-gray-400 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
+                                class="w-full bg-[#2a2a2a] border-0 text-white placeholder-gray-400 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
                         </div>
 
                         <div class="w-48">
                             <label class="block text-sm font-semibold text-white mb-2 font-poppins">Category</label>
-                            <select name="category" class="w-full bg-black/40 border-0 text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
+                            <select name="category" class="w-full bg-[#2a2a2a] border-0 text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
                                 <option value="">All</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
@@ -124,7 +124,7 @@
 
                         <div class="w-40">
                             <label class="block text-sm font-semibold text-white mb-2 font-poppins">Sort</label>
-                            <select name="sort" class="w-full bg-black/40 border-0 text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
+                            <select name="sort" class="w-full bg-[#2a2a2a] border-0 text-white rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-500 py-3">
                                 <option value="latest" {{ request('sort', 'latest') == 'latest' ? 'selected' : '' }}>Latest</option>
                                 <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price: Low</option>
                                 <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price: High</option>
@@ -183,7 +183,7 @@
                                     $stock = $product->getCurrentStock();
                                     $isFeatured = $index % 5 === 0;
                                 @endphp
-                                <div class="product-card {{ $isFeatured ? 'featured' : '' }} bg-black/20 rounded-2xl overflow-hidden relative group"
+                                <div class="product-card {{ $isFeatured ? 'featured' : '' }} bg-[#2a2a2a]/40 rounded-2xl overflow-hidden relative group"
                                     style="border: 2px solid {{ $textColor }}20;">
 
                                     <style>
@@ -198,12 +198,12 @@
                                                 alt="{{ $product->name }}"
                                                 class="product-image w-full object-cover group-hover:scale-110 transition-transform duration-500">
                                         @else
-                                            <div class="product-image w-full flex items-center justify-center bg-black/40">
+                                            <div class="product-image w-full flex items-center justify-center bg-[#2a2a2a]">
                                                 <span class="text-8xl filter grayscale opacity-50">📦</span>
                                             </div>
                                         @endif
 
-                                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                        <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/90 via-[#1a1a1a]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                                         @if($stock > 0 && $stock <= 10)
                                             <span class="absolute top-4 right-4 px-4 py-2 bg-yellow-400 text-black text-xs font-black rounded-lg font-poppins">
@@ -272,7 +272,7 @@
                     </div>
                 @endforeach
             @else
-                <div class="text-center py-32 bg-purple-900/20 rounded-2xl">
+                <div class="text-center py-32 bg-[#2a2a2a] rounded-2xl">
                     <div class="text-8xl mb-6">🔍</div>
                     <h3 class="text-3xl font-bold text-white mb-4 font-poppins">No Products Found</h3>
                     <p class="text-gray-300 text-lg">
