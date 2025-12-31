@@ -42,6 +42,31 @@ class CategoryResource extends Resource
                             ->required()
                             ->default(true),
                     ]),
+
+                Forms\Components\Section::make('Styling & Tampilan')
+                    ->schema([
+                        Forms\Components\Select::make('style_type')
+                            ->label('Tipe Style')
+                            ->options([
+                                'solid' => 'Solid Color',
+                                'gradient' => 'Gradient',
+                            ])
+                            ->default('solid')
+                            ->required()
+                            ->reactive(),
+
+                        Forms\Components\ColorPicker::make('background_color')
+                            ->label('Background Color')
+                            ->nullable()
+                            ->helperText('Pilih warna background untuk kategori ini'),
+
+                        Forms\Components\ColorPicker::make('text_color')
+                            ->label('Text Color')
+                            ->default('#ffffff')
+                            ->required()
+                            ->helperText('Warna teks yang akan ditampilkan'),
+                    ])
+                    ->columns(3),
             ]);
     }
 

@@ -26,10 +26,7 @@
             font-size: clamp(3rem, 8vw, 8rem);
             font-weight: 900;
             line-height: 0.9;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
         }
 
         .btn-gradient {
@@ -100,10 +97,8 @@
             <h2 class="text-4xl md:text-6xl font-black text-center mb-4 font-poppins text-black">
                 AUTHENTICATION
             </h2>
-            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins">
-                <span class="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    User Access Flow
-                </span>
+            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins text-white">
+                User Access Flow
             </h3>
 
             <div class="grid md:grid-cols-3 gap-8">
@@ -134,10 +129,8 @@
             <h2 class="text-4xl md:text-6xl font-black text-center mb-4 font-poppins text-cyan-400">
                 ADMIN FUNCTION
             </h2>
-            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins">
-                <span class="bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 bg-clip-text text-transparent">
-                    Product Management
-                </span>
+            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins text-white">
+                Product Management
             </h3>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -178,10 +171,8 @@
             <h2 class="text-4xl md:text-6xl font-black text-center mb-4 font-poppins text-white">
                 ANALYTICS
             </h2>
-            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins">
-                <span class="bg-gradient-to-r from-red-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    Reports & Insights
-                </span>
+            <h3 class="text-4xl md:text-6xl font-black text-center mb-16 font-poppins text-white">
+                Reports & Insights
             </h3>
 
             <div class="grid md:grid-cols-4 gap-8 mb-12">
@@ -211,10 +202,8 @@
     <!-- Footer CTA -->
     <section class="bg-black container mx-auto px-6 py-32">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-5xl md:text-7xl font-black mb-8 font-poppins">
-                <span class="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-                    Ready to Shop?
-                </span>
+            <h2 class="text-5xl md:text-7xl font-black mb-8 font-poppins text-white">
+                Ready to Shop?
             </h2>
             <p class="text-xl text-white mb-12">
                 Explore our colorful collection and find your perfect style

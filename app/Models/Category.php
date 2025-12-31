@@ -31,7 +31,10 @@ class Category extends Model
     protected $fillable = [
         'name',
         'description',
-        'is_active'
+        'is_active',
+        'background_color',
+        'text_color',
+        'style_type'
     ];
 
     // Relationships

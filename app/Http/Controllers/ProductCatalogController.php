@@ -10,47 +10,71 @@ class ProductCatalogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'product_images'])
-            ->where('status', 'active');
+        $categories = Category::where('is_active', true)
+            ->withCount('products')
+            ->get();
 
-        // Filter by category
+        // Group products by category
+        $productsByCategory = [];
+
+        foreach ($categories as $category) {
+            $query = Product::with(['category', 'product_images'])
+                ->where('status', 'active')
+                ->where('category_id', $category->id);
+
+            // Search
+            if ($request->filled('search')) {
+                $query->search($request->search);
+            }
+
+            // Price range filter
+            if ($request->filled('min_price')) {
+                $query->where('price', '>=', $request->min_price);
+            }
+            if ($request->filled('max_price')) {
+                $query->where('price', '<=', $request->max_price);
+            }
+
+            // Sort
+            $sortBy = $request->get('sort', 'latest');
+            switch ($sortBy) {
+                case 'price_low':
+                    $query->orderBy('price', 'asc');
+                    break;
+                case 'price_high':
+                    $query->orderBy('price', 'desc');
+                    break;
+                case 'name':
+                    $query->orderBy('name', 'asc');
+                    break;
+                default:
+                    $query->latest();
+            }
+
+            $products = $query->get();
+
+            if ($products->count() > 0) {
+                $productsByCategory[] = [
+                    'category' => $category,
+                    'products' => $products
+                ];
+            }
+        }
+
+        // If category filter is selected, show only that category
         if ($request->filled('category')) {
-            $query->byCategory($request->category);
+            $selectedCategoryId = $request->category;
+            $productsByCategory = array_filter($productsByCategory, function($item) use ($selectedCategoryId) {
+                return $item['category']->id == $selectedCategoryId;
+            });
         }
 
-        // Search
-        if ($request->filled('search')) {
-            $query->search($request->search);
-        }
+        // Calculate total products
+        $totalProducts = collect($productsByCategory)->sum(function($item) {
+            return $item['products']->count();
+        });
 
-        // Price range filter
-        if ($request->filled('min_price')) {
-            $query->where('price', '>=', $request->min_price);
-        }
-        if ($request->filled('max_price')) {
-            $query->where('price', '<=', $request->max_price);
-        }
-
-        // Sort
-        $sortBy = $request->get('sort', 'latest');
-        switch ($sortBy) {
-            case 'price_low':
-                $query->orderBy('price', 'asc');
-                break;
-            case 'price_high':
-                $query->orderBy('price', 'desc');
-                break;
-            case 'name':
-                $query->orderBy('name', 'asc');
-                break;
-            default:
-                $query->latest();
-        }
-
-        $products = $query->paginate(15)->withQueryString();
-        $categories = Category::where('is_active', true)->withCount('products')->get();
-
-        return view('catalog.index', compact('products', 'categories'));
+        return view('catalog.index', compact('productsByCategory', 'categories', 'totalProducts'));
     }
 
     public function show(Product $product)
