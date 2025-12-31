@@ -48,7 +48,7 @@
     <nav class="bg-black container mx-auto px-6 py-8">
         <div class="flex items-center justify-between">
             <div class="text-2xl font-black font-poppins">
-                <span class="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+                <span class="text-white">
                     teoriwarna.shop
                 </span>
             </div>

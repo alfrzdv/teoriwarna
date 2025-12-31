@@ -25,7 +25,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-black">
             <div class="mb-8">
                 <a href="/">
-                    <span class="text-3xl font-black bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent">
+                    <span class="text-3xl font-black text-white">
                         teoriwarna.shop
                     </span>
                 </a>
