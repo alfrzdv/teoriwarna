@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property Collection|CartItem[] $cart_items
  * @property Collection|OrderItem[] $order_items
  * @property Collection|ProductImage[] $product_images
- * @property Collection|ProductStock[] $product_stocks
  *
  * @package App\Models
  */
@@ -32,7 +31,8 @@ class Product extends Model
 
     protected $casts = [
         'category_id' => 'int',
-        'price' => 'decimal:2'
+        'price' => 'decimal:2',
+        'stock' => 'int'
     ];
 
     protected $fillable = [
@@ -40,11 +40,11 @@ class Product extends Model
         'name',
         'price',
         'description',
+        'stock',
         'status'
     ];
 
     protected $appends = [
-        'total_stock',
         'discount_percentage',
         'final_price'
     ];
@@ -75,11 +75,6 @@ class Product extends Model
         return $this->hasMany(ProductImage::class);
     }
 
-    public function product_stocks()
-    {
-        return $this->hasMany(ProductStock::class);
-    }
-
     // Helper Methods
     public function isActive()
     {
@@ -98,48 +93,33 @@ class Product extends Model
 
     public function getPrimaryImage()
     {
-        return $this->product_images()->where('is_primary', true)->first() 
+        return $this->product_images()->where('is_primary', true)->first()
             ?? $this->product_images()->first();
-    }
-
-    public function getCurrentStock()
-    {
-        $stockIn = $this->product_stocks()->where('type', 'in')->sum('quantity');
-        $stockOut = $this->product_stocks()->where('type', 'out')->sum('quantity');
-        
-        return $stockIn - $stockOut;
     }
 
     public function isInStock()
     {
-        return $this->getCurrentStock() > 0;
+        return $this->stock > 0;
     }
 
-    public function addStock($quantity, $note = null)
+    public function hasEnoughStock($requestedQuantity)
     {
-        return $this->product_stocks()->create([
-            'quantity' => $quantity,
-            'type' => 'in',
-            'note' => $note
-        ]);
+        return $this->stock >= $requestedQuantity;
     }
 
-    public function reduceStock($quantity, $note = null)
+    public function addStock($quantity)
+    {
+        $this->increment('stock', $quantity);
+    }
+
+    public function reduceStock($quantity)
     {
         if (!$this->hasEnoughStock($quantity)) {
             return false;
         }
 
-        return $this->product_stocks()->create([
-            'quantity' => $quantity,
-            'type' => 'out',
-            'note' => $note
-        ]);
-    }
-
-    public function hasEnoughStock($requestedQuantity)
-    {
-        return $this->getCurrentStock() >= $requestedQuantity;
+        $this->decrement('stock', $quantity);
+        return true;
     }
 
     public function activate()
@@ -158,11 +138,6 @@ class Product extends Model
     }
 
     // Accessors
-    public function getTotalStockAttribute()
-    {
-        return $this->getCurrentStock();
-    }
-
     public function getDiscountPercentageAttribute()
     {
         // Return 0 if discount column doesn't exist
@@ -196,12 +171,7 @@ class Product extends Model
 
     public function scopeInStock($query)
     {
-        return $query->whereHas('product_stocks', function ($q) {
-            $q->selectRaw('product_id')
-              ->selectRaw('SUM(CASE WHEN type = "in" THEN quantity ELSE 0 END) - SUM(CASE WHEN type = "out" THEN quantity ELSE 0 END) as stock')
-              ->groupBy('product_id')
-              ->having('stock', '>', 0);
-        });
+        return $query->where('stock', '>', 0);
     }
 
     public function scopeByCategory($query, $categoryId)

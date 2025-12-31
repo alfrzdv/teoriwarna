@@ -16,7 +16,13 @@
       "Bash(cat:*)",
       "Bash(git commit:*)",
       "Bash(pkill:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(if [ -d \"app/Http/Controllers/Admin\" ])",
+      "Bash(then rm -rf app/Http/Controllers/Admin)",
+      "Bash(fi)",
+      "Bash(if [ -d \"resources/views/admin\" ])",
+      "Bash(then rm -rf resources/views/admin)",
+      "Bash(git rm:*)"
     ]
   }
 }

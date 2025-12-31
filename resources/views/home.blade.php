@@ -87,7 +87,7 @@
                 <!-- Badge -->
                 <div class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600/10 border border-brand-500/20 rounded-full mb-8">
                     <span class="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
-                    <span class="text-brand-400 text-sm font-medium">Premium Fashion Collection 2025</span>
+                    <span class="text-brand-400 text-sm font-medium">premium art supply collection</span>
                 </div>
 
                 <!-- Main Heading -->
@@ -102,7 +102,7 @@
                 </p>
 
                 <p class="text-base md:text-lg text-dark-400 mb-12 max-w-2xl mx-auto">
-                    Premium fashion e-commerce bringing you the latest trends in style and quality. Express yourself through color.
+                    Premium art supply e-commerce bringing you the latest trends in style and quality. Express yourself through color.
                 </p>
 
                 <!-- CTA Buttons -->

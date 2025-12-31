@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Mail\AdminNewOrder;
 use App\Mail\OrderConfirmation;
 use App\Models\Cart;
-use App\Models\Coupon;
-use App\Models\CouponUsage;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Payment;
@@ -196,7 +194,7 @@ class CheckoutController extends Controller
                 'subtotal' => $buyNowData['quantity'] * $buyNowData['price'],
             ]);
 
-            $product->reduceStock($buyNowData['quantity'], "Order #{$order->order_number}");
+            $product->reduceStock($buyNowData['quantity']);
 
             // Map payment method values
             $paymentMethodMap = [
@@ -242,77 +240,6 @@ class CheckoutController extends Controller
         }
     }
 
-    public function applyCoupon(Request $request)
-    {
-        $validated = $request->validate([
-            'coupon_code' => 'required|string',
-        ]);
-
-        $coupon = Coupon::where('code', $validated['coupon_code'])->first();
-
-        if (!$coupon) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kode kupon tidak valid.'
-            ]);
-        }
-
-        if (!$coupon->isValid()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kupon tidak berlaku atau sudah kadaluarsa.'
-            ]);
-        }
-
-        if (!$coupon->canBeUsedBy(Auth::id())) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Anda sudah mencapai batas penggunaan kupon ini.'
-            ]);
-        }
-
-        $cart = Cart::where('user_id', Auth::id())->first();
-
-        // Get selected items or all items
-        $selectedItems = session('selected_cart_items', []);
-        $query = $cart->cart_items()->with(['product']);
-
-        if (!empty($selectedItems)) {
-            $query->whereIn('id', $selectedItems);
-        }
-
-        $cartItems = $query->get();
-
-        $subtotal = $cartItems->sum(function ($item) {
-            return $item->quantity * $item->price;
-        });
-
-        $discount = $coupon->calculateDiscount($subtotal);
-
-        if ($discount == 0) {
-            return response()->json([
-                'success' => false,
-                'message' => "Minimal pembelian untuk kupon ini adalah Rp " . number_format($coupon->min_purchase, 0, ',', '.')
-            ]);
-        }
-
-        session(['applied_coupon' => [
-            'code' => $coupon->code,
-            'discount' => $discount,
-            'coupon_id' => $coupon->id,
-        ]]);
-
-        return response()->json([
-            'success' => true,
-            'message' => "Kupon {$coupon->code} berhasil diterapkan! Anda mendapat diskon Rp " . number_format($discount, 0, ',', '.')
-        ]);
-    }
-
-    public function removeCoupon()
-    {
-        session()->forget('applied_coupon');
-        return back()->with('success', 'Kupon berhasil dihapus.');
-    }
 
     public function process(Request $request)
     {
@@ -375,23 +302,7 @@ class CheckoutController extends Controller
                 default => 15000
             };
 
-            // Apply coupon if exists
-            $discount = 0;
-            $couponCode = null;
-            $couponId = null;
-
-            if (session('applied_coupon')) {
-                $appliedCoupon = session('applied_coupon');
-                $coupon = Coupon::find($appliedCoupon['coupon_id']);
-
-                if ($coupon && $coupon->isValid() && $coupon->canBeUsedBy(Auth::id())) {
-                    $discount = $coupon->calculateDiscount($subtotal);
-                    $couponCode = $coupon->code;
-                    $couponId = $coupon->id;
-                }
-            }
-
-            $total = $subtotal + $shipping_cost - $discount;
+            $total = $subtotal + $shipping_cost;
 
             // Create order
             $order = Order::create([
@@ -402,8 +313,6 @@ class CheckoutController extends Controller
                 'total_amount' => $total,
                 'shipping_cost' => $shipping_cost,
                 'shipping_method' => $validated['shipping_method'],
-                'discount_amount' => $discount,
-                'coupon_code' => $couponCode,
                 'status' => 'pending',
                 'shipping_name' => $validated['shipping_name'],
                 'shipping_phone' => $validated['shipping_phone'],
@@ -424,7 +333,7 @@ class CheckoutController extends Controller
                 ]);
 
                 // Reduce stock
-                $cartItem->product->reduceStock($cartItem->quantity, "Order #{$order->order_number}");
+                $cartItem->product->reduceStock($cartItem->quantity);
             }
 
             // Create payment record
@@ -440,19 +349,6 @@ class CheckoutController extends Controller
                 'method' => $paymentMethodMap[$validated['payment_method']] ?? 'transfer',
                 'status' => 'pending',
             ]);
-
-            // Record coupon usage
-            if ($couponId) {
-                CouponUsage::create([
-                    'coupon_id' => $couponId,
-                    'user_id' => Auth::id(),
-                    'order_id' => $order->id,
-                    'discount_amount' => $discount,
-                ]);
-
-                $coupon->incrementUsage();
-                session()->forget('applied_coupon');
-            }
 
             // Clear only selected cart items
             $cart->cart_items()->whereIn('id', $selectedItems)->delete();
