@@ -23,12 +23,20 @@ use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\RefundController as AdminRefundController;
 
 Route::get('/', function () {
-    return redirect()->route('products.index');
-});
+    return view('home');
+})->name('home');
 
 // Product Catalog (Public/User)
-Route::get('/products', [ProductCatalogController::class, 'index'])->name('products.index');
-Route::get('/products/{product}', [ProductCatalogController::class, 'show'])->name('products.show');
+Route::get('/catalog', [ProductCatalogController::class, 'index'])->name('catalog.index');
+Route::get('/catalog/{product}', [ProductCatalogController::class, 'show'])->name('catalog.show');
+
+// Legacy route redirects
+Route::get('/products', function () {
+    return redirect()->route('catalog.index');
+})->name('products.index');
+Route::get('/products/{product}', function ($product) {
+    return redirect()->route('catalog.show', $product);
+})->name('products.show');
 
 // Cart - Guest can access with session-based cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
