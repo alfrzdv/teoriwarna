@@ -136,13 +136,7 @@ class CouponResource extends Resource
                 Tables\Columns\TextColumn::make('usage')
                     ->label('Penggunaan')
                     ->getStateUsing(fn ($record) => $record->coupon_usages()->count() . ' / ' . ($record->usage_limit ?: '∞'))
-                    ->badge()
-                    ->color(fn ($record) => {
-                        if (!$record->usage_limit) return 'gray';
-                        $used = $record->coupon_usages()->count();
-                        $percent = ($used / $record->usage_limit) * 100;
-                        return $percent >= 80 ? 'danger' : ($percent >= 50 ? 'warning' : 'success');
-                    }),
+                    ->badge(),
 
                 Tables\Columns\BadgeColumn::make('is_active')
                     ->label('Status')
