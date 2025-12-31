@@ -14,8 +14,8 @@
         .categories-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 0;
+            margin-bottom: 0;
         }
 
         @media (max-width: 1024px) {
@@ -27,74 +27,122 @@
         /* Grid layout minimalis */
         .products-masonry {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0;
             grid-auto-flow: dense;
         }
 
         @media (max-width: 768px) {
             .products-masonry {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-                gap: 8px;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 0;
             }
         }
 
         .product-card {
             break-inside: avoid;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .product-card:nth-child(2n) {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .product-card:nth-child(3n) {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .product-card:nth-child(4n) {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .product-card:nth-child(5n) {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .product-card:nth-child(6n) {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
         }
 
         .product-card:hover {
-            transform: translateY(-4px);
-            border-color: #3a3a3a;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* Uniform card heights */
+        /* Image overlay */
         .product-card .product-image {
-            height: 280px;
+            height: 320px;
+            position: relative;
+        }
+
+        .product-card .product-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
         }
 
         @media (max-width: 768px) {
             .product-card .product-image {
-                height: 200px;
+                height: 240px;
             }
         }
 
-        /* Category Section Styles - Minimal */
+        /* Category Section Styles */
         .category-section {
             margin-bottom: 0;
-            padding: 20px;
-            background: #0a0a0a;
-            border: 1px solid #222;
-            transition: all 0.2s ease-in-out;
+            padding: 0;
+            background: transparent;
+            border: none;
+            position: relative;
         }
 
         .category-header {
-            font-size: 2rem;
+            font-size: 3.5rem;
             font-weight: 900;
-            margin-bottom: 16px;
-            padding: 0;
-            background: transparent;
-            border-bottom: none;
+            margin-bottom: 0;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             text-transform: uppercase;
-            letter-spacing: -0.05em;
-            line-height: 0.9;
+            letter-spacing: -0.08em;
+            line-height: 0.85;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .category-header span {
+            position: relative;
+            z-index: 1;
         }
 
         @media (max-width: 768px) {
-            .category-section {
-                padding: 12px;
-            }
-
             .category-header {
-                font-size: 1.5rem;
-                margin-bottom: 12px;
+                font-size: 2rem;
+                padding: 2rem 1rem;
             }
+        }
+
+        /* Filter section styling */
+        .filter-section {
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
     </style>
 
@@ -111,7 +159,7 @@
             </div>
 
             <!-- Filter Section - Compact horizontal layout -->
-            <div class="mb-4 bg-black p-3 border border-[#222]">
+            <div class="mb-6 filter-section p-4 rounded-xl shadow-2xl">
                 <form method="GET" action="{{ route('products.index') }}">
                     <div class="flex flex-wrap gap-2 items-end">
                         <div class="flex-1 min-w-[180px]">
@@ -193,8 +241,8 @@
 
                         <div class="category-section">
 
-                            <h2 class="category-header font-poppins text-white">
-                                {{ strtoupper($category->name) }}
+                            <h2 class="category-header font-poppins">
+                                <span>{{ strtoupper($category->name) }}</span>
                             </h2>
 
                             <div class="products-masonry">
@@ -222,28 +270,28 @@
                                         @endif
                                     </a>
 
-                                    <div class="p-2">
+                                    <div class="p-4 relative z-10">
                                         <a href="{{ route('products.show', $product) }}">
-                                            <h3 class="text-xs font-black mb-0.5 hover:opacity-70 transition-opacity duration-200 font-poppins uppercase line-clamp-2 text-white" style="letter-spacing: -0.5px; line-height: 1.2;">
+                                            <h3 class="text-sm font-black mb-2 hover:scale-105 transition-transform duration-200 font-poppins uppercase line-clamp-2 text-white drop-shadow-lg" style="letter-spacing: -0.5px; line-height: 1.1;">
                                                 {{ $product->name }}
                                             </h3>
                                         </a>
 
-                                        <div class="flex items-baseline justify-between mb-1">
-                                            <p class="text-base font-black font-poppins text-white" style="letter-spacing: -0.5px;">
-                                                {{ number_format($product->price / 1000, 0) }}K
+                                        <div class="flex items-baseline justify-between mb-3">
+                                            <p class="text-2xl font-black font-poppins text-white drop-shadow-lg" style="letter-spacing: -0.5px;">
+                                                Rp {{ number_format($product->price / 1000, 0) }}K
                                             </p>
-                                            <span class="text-[8px] font-bold uppercase text-gray-500" style="letter-spacing: -0.4px;">
-                                                {{ $product->category->name }}
-                                            </span>
                                         </div>
 
-                                        <div class="flex items-center gap-1 mb-1.5">
+                                        <div class="flex items-center gap-2 mb-3">
                                             @php
-                                                $stockClass = $stock > 10 ? 'bg-green-500' : ($stock > 0 ? 'bg-yellow-500' : 'bg-red-500');
+                                                $stockClass = $stock > 10 ? 'bg-green-400' : ($stock > 0 ? 'bg-yellow-400' : 'bg-red-500');
+                                                $stockText = $stock > 10 ? 'In Stock' : ($stock > 0 ? 'Low Stock' : 'Out');
                                             @endphp
-                                            <span class="w-1 h-1 {{ $stockClass }}"></span>
-                                            <span class="text-[8px] uppercase text-gray-500" style="letter-spacing: -0.4px;">{{ $stock }}</span>
+                                            <span class="px-2 py-1 {{ $stockClass }} text-black text-[9px] font-black uppercase rounded">
+                                                {{ $stockText }}
+                                            </span>
+                                            <span class="text-[9px] font-bold uppercase text-white/80">{{ $stock }} pcs</span>
                                         </div>
 
                                         @if($stock > 0)
@@ -251,13 +299,13 @@
                                                 @csrf
                                                 <input type="hidden" name="quantity" value="1">
                                                 <button type="submit"
-                                                    class="w-full px-2 py-1 font-black text-[8px] uppercase transition-opacity duration-200 hover:opacity-80 bg-white text-black" style="letter-spacing: -0.4px;">
-                                                    Add
+                                                    class="w-full px-4 py-2.5 font-black text-xs uppercase transition-all duration-300 hover:scale-105 bg-white text-black rounded-lg shadow-xl hover:shadow-2xl" style="letter-spacing: -0.4px;">
+                                                    Add to Cart
                                                 </button>
                                             </form>
                                         @else
-                                            <button class="w-full px-2 py-1 bg-[#111] text-gray-700 cursor-not-allowed font-black text-[8px] uppercase" style="letter-spacing: -0.4px;" disabled>
-                                                Out
+                                            <button class="w-full px-4 py-2.5 bg-gray-800/50 text-gray-500 cursor-not-allowed font-black text-xs uppercase rounded-lg" style="letter-spacing: -0.4px;" disabled>
+                                                Sold Out
                                             </button>
                                         @endif
                                     </div>
