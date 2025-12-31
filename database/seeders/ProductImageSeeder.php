@@ -16,7 +16,7 @@ class ProductImageSeeder extends Seeder
             // Primary image
             ProductImage::create([
                 'product_id' => $product->id,
-                'image_url' => 'https://via.placeholder.com/500x500/FF0000/FFFFFF?text=' . urlencode($product->name),
+                'image_path' => 'https://via.placeholder.com/500x500/FF0000/FFFFFF?text=' . urlencode($product->name),
                 'is_primary' => true,
             ]);
 
@@ -24,7 +24,7 @@ class ProductImageSeeder extends Seeder
             for ($i = 2; $i <= 3; $i++) {
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_url' => 'https://via.placeholder.com/500x500/0000FF/FFFFFF?text=Image+' . $i,
+                    'image_path' => 'https://via.placeholder.com/500x500/0000FF/FFFFFF?text=Image+' . $i,
                     'is_primary' => false,
                 ]);
             }

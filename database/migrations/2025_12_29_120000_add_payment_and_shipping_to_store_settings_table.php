@@ -10,30 +10,30 @@ return new class extends Migration
     {
         Schema::table('store_settings', function (Blueprint $table) {
             // Payment Gateway Settings
-            $table->boolean('midtrans_enabled')->default(false)->after('meta_description');
-            $table->string('midtrans_server_key')->nullable()->after('midtrans_enabled');
-            $table->string('midtrans_client_key')->nullable()->after('midtrans_server_key');
-            $table->boolean('midtrans_is_production')->default(false)->after('midtrans_client_key');
+            $table->boolean('midtrans_enabled')->default(false);
+            $table->string('midtrans_server_key')->nullable();
+            $table->string('midtrans_client_key')->nullable();
+            $table->boolean('midtrans_is_production')->default(false);
 
-            $table->boolean('bank_transfer_enabled')->default(true)->after('midtrans_is_production');
-            $table->boolean('e_wallet_enabled')->default(false)->after('bank_transfer_enabled');
-            $table->boolean('cod_enabled')->default(true)->after('e_wallet_enabled');
+            $table->boolean('bank_transfer_enabled')->default(true);
+            $table->boolean('e_wallet_enabled')->default(false);
+            $table->boolean('cod_enabled')->default(true);
 
             // Shipping Settings
-            $table->integer('shipping_regular_cost')->default(15000)->after('cod_enabled');
-            $table->string('shipping_regular_name')->default('Regular')->after('shipping_regular_cost');
-            $table->string('shipping_regular_estimation')->default('3-5 hari')->after('shipping_regular_name');
+            $table->integer('shipping_regular_cost')->default(15000);
+            $table->string('shipping_regular_name')->default('Regular');
+            $table->string('shipping_regular_estimation')->default('3-5 hari');
 
-            $table->integer('shipping_express_cost')->default(30000)->after('shipping_regular_estimation');
-            $table->string('shipping_express_name')->default('Express')->after('shipping_express_cost');
-            $table->string('shipping_express_estimation')->default('1-2 hari')->after('shipping_express_name');
+            $table->integer('shipping_express_cost')->default(30000);
+            $table->string('shipping_express_name')->default('Express');
+            $table->string('shipping_express_estimation')->default('1-2 hari');
 
-            $table->integer('shipping_sameday_cost')->default(50000)->after('shipping_express_estimation');
-            $table->string('shipping_sameday_name')->default('Same Day')->after('shipping_sameday_cost');
-            $table->string('shipping_sameday_estimation')->default('1 hari')->after('shipping_sameday_name');
+            $table->integer('shipping_sameday_cost')->default(50000);
+            $table->string('shipping_sameday_name')->default('Same Day');
+            $table->string('shipping_sameday_estimation')->default('1 hari');
 
-            $table->boolean('free_shipping_enabled')->default(false)->after('shipping_sameday_estimation');
-            $table->integer('free_shipping_minimum')->default(500000)->after('free_shipping_enabled');
+            $table->boolean('free_shipping_enabled')->default(false);
+            $table->integer('free_shipping_minimum')->default(500000);
         });
     }
 

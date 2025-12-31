@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\UserSetting;
 use App\Models\UserAddress;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -22,12 +21,6 @@ class UserSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        UserSetting::create([
-            'user_id' => $admin->id,
-            'notification_enabled' => true,
-            'promo_enabled' => true,
-        ]);
-
         // Regular Users
         for ($i = 1; $i <= 5; $i++) {
             $user = User::create([
@@ -37,13 +30,6 @@ class UserSeeder extends Seeder
                 'phone' => '0812345678' . str_pad($i + 10, 2, '0', STR_PAD_LEFT),
                 'role' => 'user',
                 'is_active' => true,
-            ]);
-
-            // Create user setting
-            UserSetting::create([
-                'user_id' => $user->id,
-                'notification_enabled' => true,
-                'promo_enabled' => true,
             ]);
 
             // Create user address
