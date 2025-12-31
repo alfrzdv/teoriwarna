@@ -76,7 +76,7 @@
                                 teoriwarna
                             </div>
                             <p class="text-dark-400 text-sm mb-4 max-w-md">
-                                Your premier destination for colorful and trendy fashion. We bring style and quality together in perfect harmony.
+                                Your premier destination for art supply.
                             </p>
                             <div class="flex gap-4">
                                 <a href="#" class="w-10 h-10 bg-dark-800 hover:bg-brand-600 rounded-full flex items-center justify-center transition-colors">
