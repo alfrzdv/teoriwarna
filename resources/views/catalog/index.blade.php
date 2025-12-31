@@ -151,22 +151,31 @@
                     @php
                         $category = $categoryData['category'];
                         $products = $categoryData['products'];
-                        // Default colors berbeda per kategori
-                        $defaultColors = [
-                            'PENSIL WARNA' => ['bg' => '#8B5CF6', 'text' => '#ffffff'],
-                            'CRAYON' => ['bg' => '#EC4899', 'text' => '#ffffff'],
-                            'OIL PASTEL' => ['bg' => '#F59E0B', 'text' => '#ffffff'],
-                            'WATERCOLOR' => ['bg' => '#3B82F6', 'text' => '#ffffff'],
-                            'ACRYLIC' => ['bg' => '#EF4444', 'text' => '#ffffff'],
-                            'BRUSH' => ['bg' => '#10B981', 'text' => '#ffffff'],
-                            'CANVAS' => ['bg' => '#6366F1', 'text' => '#ffffff'],
+
+                        // Array warna berbeda untuk setiap kategori
+                        $colorPalette = [
+                            '#8B5CF6', // Purple
+                            '#EC4899', // Pink
+                            '#F59E0B', // Amber
+                            '#3B82F6', // Blue
+                            '#EF4444', // Red
+                            '#10B981', // Green
+                            '#6366F1', // Indigo
+                            '#F97316', // Orange
+                            '#14B8A6', // Teal
+                            '#8B5A3C', // Brown
+                            '#06B6D4', // Cyan
+                            '#A855F7', // Purple Bright
                         ];
 
-                        $categoryName = strtoupper($category->name);
-                        $defaults = $defaultColors[$categoryName] ?? ['bg' => '#6B21A8', 'text' => '#ffffff'];
+                        // Gunakan index kategori untuk menentukan warna
+                        static $categoryIndex = 0;
+                        $colorIndex = $categoryIndex % count($colorPalette);
+                        $defaultBg = $colorPalette[$colorIndex];
+                        $categoryIndex++;
 
-                        $bgColor = $category->background_color ?? $defaults['bg'];
-                        $textColor = $category->text_color ?? $defaults['text'];
+                        $bgColor = $category->background_color ?? $defaultBg;
+                        $textColor = $category->text_color ?? '#ffffff';
                         $styleType = $category->style_type ?? 'solid';
                     @endphp
 
