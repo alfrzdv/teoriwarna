@@ -14,13 +14,14 @@
         .products-masonry {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 0;
+            gap: 8px;
             grid-auto-flow: dense;
         }
 
         @media (max-width: 768px) {
             .products-masonry {
                 grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 6px;
             }
         }
 
@@ -49,17 +50,17 @@
 
         /* Category Section Styles - Minimal */
         .category-section {
-            margin-bottom: 0;
+            margin-bottom: 24px;
             padding: 0;
         }
 
         .category-header {
             font-size: 1.5rem;
             font-weight: 900;
-            margin-bottom: 0;
-            padding: 1rem 0.75rem;
-            background: #000;
-            border-bottom: 1px solid #222;
+            margin-bottom: 8px;
+            padding: 0;
+            background: transparent;
+            border: none;
             text-transform: uppercase;
             letter-spacing: -0.5px;
             line-height: 1;
@@ -68,8 +69,28 @@
         @media (max-width: 768px) {
             .category-header {
                 font-size: 1.25rem;
-                padding: 0.75rem 0.5rem;
+                margin-bottom: 6px;
             }
+        }
+
+        /* Scroll Animation - Orange Circle */
+        .scroll-circle {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background: #F97316;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.3s ease-out;
+            mix-blend-mode: multiply;
+        }
+
+        .scroll-circle.active {
+            transform: translate(-50%, -50%) scale(30);
         }
     </style>
 
@@ -189,11 +210,24 @@
                                             </div>
                                         @endif
 
-                                        @if($stock > 0 && $stock <= 10)
-                                            <span class="absolute top-2 right-2 px-2 py-1 bg-yellow-400 text-black text-[8px] font-black font-poppins" style="letter-spacing: -0.4px;">
-                                                LOW
-                                            </span>
-                                        @endif
+                                        <!-- Badges Stack -->
+                                        <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                                            @php
+                                                $isNew = $product->created_at->diffInDays(now()) <= 7;
+                                            @endphp
+
+                                            @if($isNew)
+                                                <span class="px-2 py-1 bg-green-400 text-black text-[8px] font-black font-poppins" style="letter-spacing: -0.4px;">
+                                                    NEW
+                                                </span>
+                                            @endif
+
+                                            @if($stock > 0 && $stock <= 10)
+                                                <span class="px-2 py-1 bg-yellow-400 text-black text-[8px] font-black font-poppins" style="letter-spacing: -0.4px;">
+                                                    {{ $stock }} LEFT
+                                                </span>
+                                            @endif
+                                        </div>
                                     </a>
 
                                     <div class="p-2">
@@ -255,4 +289,50 @@
             @endif
         </div>
     </div>
+
+    <!-- Scroll Animation Circle -->
+    <div class="scroll-circle"></div>
+
+    @push('scripts')
+    <script>
+        // Scroll-triggered animation - Orange circle like ohira.design
+        let scrollTimeout;
+        const scrollCircle = document.querySelector('.scroll-circle');
+
+        window.addEventListener('scroll', () => {
+            // Clear previous timeout
+            clearTimeout(scrollTimeout);
+
+            // Show circle
+            scrollCircle.classList.add('active');
+
+            // Hide circle after scrolling stops
+            scrollTimeout = setTimeout(() => {
+                scrollCircle.classList.remove('active');
+            }, 150);
+        });
+
+        // Smooth scroll reveal animation for product cards
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.product-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `opacity 0.4s ease ${index * 0.05}s, transform 0.4s ease ${index * 0.05}s`;
+            observer.observe(card);
+        });
+    </script>
+    @endpush
 </x-app-layout>

@@ -43,6 +43,59 @@
             <main>
                 {{ $slot }}
             </main>
+
+            <!-- Footer -->
+            <footer class="bg-black border-t border-[#222] py-6 mt-12">
+                <div class="max-w-7xl mx-auto px-2 sm:px-4">
+                    <div class="flex flex-wrap justify-between items-start gap-8">
+                        <!-- Brand -->
+                        <div>
+                            <div class="text-base font-black text-white uppercase mb-2" style="letter-spacing: -0.5px;">
+                                teoriwarna
+                            </div>
+                            <p class="text-[8px] text-gray-500 uppercase" style="letter-spacing: -0.4px;">
+                                Colorful Fashion Store
+                            </p>
+                        </div>
+
+                        <!-- Links -->
+                        <div class="flex gap-12">
+                            <div>
+                                <h3 class="text-[8px] font-black uppercase text-white mb-2" style="letter-spacing: -0.4px;">Shop</h3>
+                                <div class="space-y-1">
+                                    <a href="{{ route('products.index') }}" class="block text-[8px] uppercase text-gray-500 hover:text-white transition-colors" style="letter-spacing: -0.4px;">Catalog</a>
+                                    <a href="{{ route('cart.index') }}" class="block text-[8px] uppercase text-gray-500 hover:text-white transition-colors" style="letter-spacing: -0.4px;">Cart</a>
+                                    @auth
+                                        <a href="{{ route('orders.index') }}" class="block text-[8px] uppercase text-gray-500 hover:text-white transition-colors" style="letter-spacing: -0.4px;">Orders</a>
+                                    @endauth
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-[8px] font-black uppercase text-white mb-2" style="letter-spacing: -0.4px;">Account</h3>
+                                <div class="space-y-1">
+                                    @auth
+                                        <a href="{{ route('profile.edit') }}" class="block text-[8px] uppercase text-gray-500 hover:text-white transition-colors" style="letter-spacing: -0.4px;">Profile</a>
+                                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                                            @csrf
+                                            <button type="submit" class="block text-[8px] uppercase text-gray-500 hover:text-white transition-colors text-left" style="letter-spacing: -0.4px;">Logout</button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('login') }}" class="block text-[8px] uppercase text-gray-500 hover:text-white transition-colors" style="letter-spacing: -0.4px;">Login</a>
+                                        <a href="{{ route('register') }}" class="block text-[8px] uppercase text-gray-500 hover:text-white transition-colors" style="letter-spacing: -0.4px;">Register</a>
+                                    @endauth
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-[#222]">
+                        <p class="text-[8px] text-gray-600 uppercase" style="letter-spacing: -0.4px;">
+                            &copy; 2025 teoriwarna.shop - All rights reserved
+                        </p>
+                    </div>
+                </div>
+            </footer>
         </div>
 
         <!-- Toast Notification -->
