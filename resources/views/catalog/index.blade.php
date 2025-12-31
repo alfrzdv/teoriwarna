@@ -10,87 +10,68 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* Grid layout minimalis ala ohira.design */
+        /* Grid layout minimalis */
         .products-masonry {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1px;
             grid-auto-flow: dense;
         }
 
         @media (max-width: 768px) {
             .products-masonry {
-                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-                gap: 6px;
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             }
         }
 
         .product-card {
             break-inside: avoid;
-            transition: opacity 0.2s ease-in-out;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            border: 1px solid #222;
         }
+
+        /* Removed background overlay */
 
         .product-card:hover {
-            opacity: 0.85;
+            transform: scale(1.02);
         }
 
-        /* Uniform card heights - smaller */
+        /* Uniform card heights */
         .product-card .product-image {
-            height: 240px;
+            height: 280px;
         }
 
         @media (max-width: 768px) {
             .product-card .product-image {
-                height: 180px;
+                height: 200px;
             }
         }
 
         /* Category Section Styles - Minimal */
         .category-section {
-            margin-bottom: 24px;
+            margin-bottom: 0;
             padding: 0;
+            transition: all 0.2s ease-in-out;
         }
 
         .category-header {
-            font-size: 1.5rem;
+            font-size: 3rem;
             font-weight: 900;
-            margin-bottom: 8px;
-            padding: 0;
-            background: transparent;
-            border: none;
+            margin-bottom: 1px;
+            padding: 2rem 1rem;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
             text-transform: uppercase;
-            letter-spacing: -0.5px;
-            line-height: 1;
+            letter-spacing: -0.05em;
+            line-height: 0.9;
         }
 
         @media (max-width: 768px) {
             .category-header {
-                font-size: 1.25rem;
-                margin-bottom: 6px;
+                font-size: 1.75rem;
+                padding: 1.5rem 1rem;
             }
-        }
-
-        /* Scroll Animation - Orange Circle (behind content) */
-        .scroll-circle {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 100px;
-            height: 100px;
-            background: #F97316;
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            pointer-events: none;
-            z-index: 0;
-            transition: transform 0.6s ease-out;
-            mix-blend-mode: normal;
-        }
-
-        .scroll-circle.active {
-            transform: translate(-50%, -50%) scale(25);
         }
     </style>
 
@@ -210,24 +191,11 @@
                                             </div>
                                         @endif
 
-                                        <!-- Badges Stack -->
-                                        <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
-                                            @php
-                                                $isNew = $product->created_at->diffInDays(now()) <= 7;
-                                            @endphp
-
-                                            @if($isNew)
-                                                <span class="px-2 py-1 bg-green-400 text-black text-[8px] font-black font-poppins" style="letter-spacing: -0.4px;">
-                                                    NEW
-                                                </span>
-                                            @endif
-
-                                            @if($stock > 0 && $stock <= 10)
-                                                <span class="px-2 py-1 bg-yellow-400 text-black text-[8px] font-black font-poppins" style="letter-spacing: -0.4px;">
-                                                    {{ $stock }} LEFT
-                                                </span>
-                                            @endif
-                                        </div>
+                                        @if($stock > 0 && $stock <= 10)
+                                            <span class="absolute top-4 right-4 px-4 py-2 bg-yellow-400 text-black text-xs font-black">
+                                                LOW STOCK
+                                            </span>
+                                        @endif
                                     </a>
 
                                     <div class="p-2">
@@ -290,45 +258,4 @@
         </div>
     </div>
 
-    <!-- Scroll Animation Circle -->
-    <div class="scroll-circle"></div>
-
-    @push('scripts')
-    <script>
-        // Scroll-triggered animation - Orange circle like ohira.design
-        const scrollCircle = document.querySelector('.scroll-circle');
-        const scrollThreshold = 300; // Trigger at 300px scroll depth
-
-        window.addEventListener('scroll', () => {
-            const scrollY = window.scrollY;
-
-            // Show/hide circle based on scroll depth
-            if (scrollY > scrollThreshold) {
-                scrollCircle.classList.add('active');
-            } else {
-                scrollCircle.classList.remove('active');
-            }
-        });
-
-        // Smooth scroll reveal for cards
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        });
-
-        document.querySelectorAll('.product-card').forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = `opacity 0.3s ease ${index * 0.03}s, transform 0.3s ease ${index * 0.03}s`;
-            observer.observe(card);
-        });
-    </script>
-    @endpush
 </x-app-layout>
