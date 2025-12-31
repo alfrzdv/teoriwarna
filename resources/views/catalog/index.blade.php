@@ -73,7 +73,7 @@
             }
         }
 
-        /* Scroll Animation - Orange Circle */
+        /* Scroll Animation - Orange Circle (behind content) */
         .scroll-circle {
             position: fixed;
             top: 50%;
@@ -84,13 +84,13 @@
             border-radius: 50%;
             transform: translate(-50%, -50%) scale(0);
             pointer-events: none;
-            z-index: 9999;
-            transition: transform 0.3s ease-out;
-            mix-blend-mode: multiply;
+            z-index: 0;
+            transition: transform 0.6s ease-out;
+            mix-blend-mode: normal;
         }
 
         .scroll-circle.active {
-            transform: translate(-50%, -50%) scale(30);
+            transform: translate(-50%, -50%) scale(25);
         }
     </style>
 
@@ -296,28 +296,21 @@
     @push('scripts')
     <script>
         // Scroll-triggered animation - Orange circle like ohira.design
-        let scrollTimeout;
         const scrollCircle = document.querySelector('.scroll-circle');
+        const scrollThreshold = 300; // Trigger at 300px scroll depth
 
         window.addEventListener('scroll', () => {
-            // Clear previous timeout
-            clearTimeout(scrollTimeout);
+            const scrollY = window.scrollY;
 
-            // Show circle
-            scrollCircle.classList.add('active');
-
-            // Hide circle after scrolling stops
-            scrollTimeout = setTimeout(() => {
+            // Show/hide circle based on scroll depth
+            if (scrollY > scrollThreshold) {
+                scrollCircle.classList.add('active');
+            } else {
                 scrollCircle.classList.remove('active');
-            }, 150);
+            }
         });
 
-        // Smooth scroll reveal animation for product cards
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
+        // Smooth scroll reveal for cards
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -325,12 +318,15 @@
                     entry.target.style.transform = 'translateY(0)';
                 }
             });
-        }, observerOptions);
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
 
         document.querySelectorAll('.product-card').forEach((card, index) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
-            card.style.transition = `opacity 0.4s ease ${index * 0.05}s, transform 0.4s ease ${index * 0.05}s`;
+            card.style.transition = `opacity 0.3s ease ${index * 0.03}s, transform 0.3s ease ${index * 0.03}s`;
             observer.observe(card);
         });
     </script>
