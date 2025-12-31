@@ -10,17 +10,32 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        /* Grid layout untuk kategori */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* Grid layout minimalis */
         .products-masonry {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1px;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
             grid-auto-flow: dense;
         }
 
         @media (max-width: 768px) {
             .products-masonry {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 8px;
             }
         }
 
@@ -29,12 +44,14 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
         }
 
-        /* Removed background overlay */
-
         .product-card:hover {
-            transform: scale(1.02);
+            transform: translateY(-4px);
+            border-color: #3a3a3a;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
 
         /* Uniform card heights */
@@ -51,26 +68,32 @@
         /* Category Section Styles - Minimal */
         .category-section {
             margin-bottom: 0;
-            padding: 0;
+            padding: 20px;
+            background: #0a0a0a;
+            border: 1px solid #222;
             transition: all 0.2s ease-in-out;
         }
 
         .category-header {
-            font-size: 3rem;
+            font-size: 2rem;
             font-weight: 900;
-            margin-bottom: 1px;
-            padding: 2rem 1rem;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
+            margin-bottom: 16px;
+            padding: 0;
+            background: transparent;
+            border-bottom: none;
             text-transform: uppercase;
             letter-spacing: -0.05em;
             line-height: 0.9;
         }
 
         @media (max-width: 768px) {
+            .category-section {
+                padding: 12px;
+            }
+
             .category-header {
-                font-size: 1.75rem;
-                padding: 1.5rem 1rem;
+                font-size: 1.5rem;
+                margin-bottom: 12px;
             }
         }
     </style>
@@ -133,52 +156,53 @@
                 </form>
             </div>
 
-            <!-- Products by Category -->
+            <!-- Products by Category - 2 Column Grid -->
             @if(count($productsByCategory) > 0)
-                @foreach($productsByCategory as $categoryData)
-                    @php
-                        $category = $categoryData['category'];
-                        $products = $categoryData['products'];
+                <div class="categories-grid">
+                    @foreach($productsByCategory as $categoryData)
+                        @php
+                            $category = $categoryData['category'];
+                            $products = $categoryData['products'];
 
-                        // Array warna berbeda untuk setiap kategori
-                        $colorPalette = [
-                            '#8B5CF6', // Purple
-                            '#EC4899', // Pink
-                            '#F59E0B', // Amber
-                            '#3B82F6', // Blue
-                            '#EF4444', // Red
-                            '#10B981', // Green
-                            '#6366F1', // Indigo
-                            '#F97316', // Orange
-                            '#14B8A6', // Teal
-                            '#8B5A3C', // Brown
-                            '#06B6D4', // Cyan
-                            '#A855F7', // Purple Bright
-                        ];
+                            // Array warna berbeda untuk setiap kategori
+                            $colorPalette = [
+                                '#8B5CF6', // Purple
+                                '#EC4899', // Pink
+                                '#F59E0B', // Amber
+                                '#3B82F6', // Blue
+                                '#EF4444', // Red
+                                '#10B981', // Green
+                                '#6366F1', // Indigo
+                                '#F97316', // Orange
+                                '#14B8A6', // Teal
+                                '#8B5A3C', // Brown
+                                '#06B6D4', // Cyan
+                                '#A855F7', // Purple Bright
+                            ];
 
-                        // Gunakan index kategori untuk menentukan warna
-                        static $categoryIndex = 0;
-                        $colorIndex = $categoryIndex % count($colorPalette);
-                        $defaultBg = $colorPalette[$colorIndex];
-                        $categoryIndex++;
+                            // Gunakan index kategori untuk menentukan warna
+                            static $categoryIndex = 0;
+                            $colorIndex = $categoryIndex % count($colorPalette);
+                            $defaultBg = $colorPalette[$colorIndex];
+                            $categoryIndex++;
 
-                        $bgColor = $category->background_color ?? $defaultBg;
-                        $textColor = $category->text_color ?? '#ffffff';
-                        $styleType = $category->style_type ?? 'solid';
-                    @endphp
+                            $bgColor = $category->background_color ?? $defaultBg;
+                            $textColor = $category->text_color ?? '#ffffff';
+                            $styleType = $category->style_type ?? 'solid';
+                        @endphp
 
-                    <div class="category-section">
+                        <div class="category-section">
 
-                        <h2 class="category-header font-poppins text-white">
-                            {{ strtoupper($category->name) }}
-                        </h2>
+                            <h2 class="category-header font-poppins text-white">
+                                {{ strtoupper($category->name) }}
+                            </h2>
 
-                        <div class="products-masonry">
-                            @foreach($products as $index => $product)
+                            <div class="products-masonry">
+                                @foreach($products as $index => $product)
                                 @php
                                     $stock = $product->getCurrentStock();
                                 @endphp
-                                <div class="product-card bg-black overflow-hidden relative group">
+                                <div class="product-card overflow-hidden relative group">
 
                                     <a href="{{ route('products.show', $product) }}" class="block relative overflow-hidden">
                                         @if($product->getPrimaryImage())
@@ -238,10 +262,11 @@
                                         @endif
                                     </div>
                                 </div>
-                            @endforeach
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             @else
                 <div class="text-center py-32 bg-[#2a2a2a]">
                     <div class="text-8xl mb-6">🔍</div>
