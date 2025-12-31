@@ -1,4 +1,9 @@
 <x-guest-layout>
+    <div class="mb-6 text-center">
+        <h2 class="text-2xl font-black text-white mb-2">Create Account</h2>
+        <p class="text-gray-300">Join teoriwarna.shop today</p>
+    </div>
+
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
@@ -39,14 +44,18 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
+        <div class="flex items-center justify-end mt-6">
+            <x-primary-button class="w-full justify-center">
                 {{ __('Register') }}
             </x-primary-button>
         </div>
     </form>
+
+    <!-- Login Link -->
+    <div class="mt-6 text-center pt-6 border-t border-white/10">
+        <span class="text-sm text-gray-300">{{ __("Already have an account?") }}</span>
+        <a href="{{ route('login') }}" class="ms-1 text-sm text-purple-400 hover:text-purple-300 font-semibold">
+            {{ __('Login') }}
+        </a>
+    </div>
 </x-guest-layout>

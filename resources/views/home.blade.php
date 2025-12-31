@@ -119,12 +119,9 @@
     <!-- Hero Section -->
     <section class="relative z-10 container mx-auto px-6 pt-20 pb-32">
         <div class="max-w-6xl mx-auto text-center">
-            <h1 class="hero-text mb-8">
+            <h1 class="hero-text mb-12">
                 teoriwarna.shop
             </h1>
-            <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-                al farizd syawaludin | 607022400043
-            </p>
             <div class="flex flex-wrap gap-6 justify-center items-center mb-16">
                 <a href="{{ route('catalog.index') }}" class="px-8 py-4 rounded-full btn-gradient text-white font-bold text-lg">
                     Explore Products
@@ -273,7 +270,7 @@
     <!-- Footer -->
     <footer class="relative z-10 border-t border-white/10 py-12">
         <div class="container mx-auto px-6 text-center text-gray-400">
-            <p>&copy; 2025 teoriwarna.shop - Al Farizd Syawaludin (607022400043)</p>
+            <p>&copy; 2025 teoriwarna.shop</p>
         </div>
     </footer>
 </body>
