@@ -2,49 +2,50 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Panel;
+
 use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
-use Filament\Panel;
+use Filament\Pages\Dashboard;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
-    public function panel(Panel $panel): Panel
-    {
-        return $panel
+
+        public function panel(Panel $panel): Panel
+        {
+            return $panel
             ->default()
             ->id('admin')
             ->path('admin')
             ->login()
+           // ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+           ->resources([
+                \App\Filament\Resources\CategoryResource::class,
+                \App\Filament\Resources\ProductResource::class,
+                \App\Filament\Resources\OrderResource::class,
+                \App\Filament\Resources\PaymentResource::class,
+                \App\Filament\Resources\RefundResource::class,
+                \App\Filament\Resources\ReviewResource::class,
+                \App\Filament\Resources\UserResource::class,
+            ])
             ->colors([
-                'primary' => Color::hex('#FFD700'), // Bold yellow - Superheroes style
-                'danger' => Color::hex('#FF0000'),
-                'success' => Color::hex('#00FF00'),
-                'info' => Color::hex('#0000FF'),
+                'primary' => Color::Amber,
             ])
-            ->font('Montserrat')
-            ->brandName('TeoriWarna Admin')
-            ->viteTheme('resources/css/filament/admin/theme.css')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
-            ->pages([
-                Pages\Dashboard::class,
-            ])
+            ->pages([])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                Widgets\AccountWidget::class,
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -59,5 +60,5 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
-    }
+        }
 }

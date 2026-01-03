@@ -4,25 +4,81 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Models\Payment;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
+
+    //protected static ?string $navigationGroup = 'Penjualan';
 
     protected static ?string $navigationLabel = 'Pembayaran';
 
-    protected static ?string $navigationGroup = 'Transaksi';
-
     protected static ?int $navigationSort = 2;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                Forms\Components\Section::make('Informasi Pembayaran')
+                    ->schema([
+                        Forms\Components\Select::make('order_id')
+                            ->label('Pesanan')
+                            ->relationship('order', 'order_number')
+                            ->searchable()
+                            ->required()
+                            ->preload(),
+
+                        Forms\Components\TextInput::make('amount')
+                            ->label('Jumlah')
+                            ->numeric()
+                            ->prefix('Rp')
+                            ->required(),
+
+                        Forms\Components\Select::make('method')
+                            ->label('Metode Pembayaran')
+                            ->options([
+                                'bank_transfer' => 'Transfer Bank',
+                                'ewallet' => 'E-Wallet',
+                                'cod' => 'COD',
+                            ])
+                            ->required(),
+
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'success' => 'Success',
+                                'failed' => 'Failed',
+                            ])
+                            ->required()
+                            ->default('pending'),
+
+                        Forms\Components\DateTimePicker::make('payment_date')
+                            ->label('Tanggal Pembayaran'),
+
+                        Forms\Components\FileUpload::make('proof_of_payment')
+                            ->label('Bukti Pembayaran')
+                            ->image()
+                            ->directory('payment-proofs'),
+
+                        Forms\Components\Textarea::make('rejection_reason')
+                            ->label('Alasan Penolakan')
+                            ->rows(3)
+                            ->visible(fn ($get) => $get('status') === 'failed'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
 
     public static function table(Table $table): Table
     {
@@ -44,13 +100,15 @@ class PaymentResource extends Resource
                     ->sortable()
                     ->weight('bold'),
 
-                Tables\Columns\BadgeColumn::make('payment_method')
+                Tables\Columns\TextColumn::make('method')
                     ->label('Metode')
-                    ->colors([
-                        'primary' => 'bank_transfer',
-                        'success' => 'ewallet',
-                        'warning' => 'cod',
-                    ])
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'bank_transfer' => 'primary',
+                        'ewallet' => 'success',
+                        'cod' => 'warning',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'bank_transfer' => 'Transfer Bank',
                         'ewallet' => 'E-Wallet',
@@ -58,13 +116,15 @@ class PaymentResource extends Resource
                         default => $state ?? '-',
                     }),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'warning' => 'pending',
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
                         'success' => 'success',
-                        'danger' => 'failed',
-                    ])
+                        'failed' => 'danger',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending' => 'Pending',
                         'success' => 'Success',
@@ -73,17 +133,11 @@ class PaymentResource extends Resource
                     }),
 
                 Tables\Columns\ImageColumn::make('proof_of_payment')
-                    ->label('Bukti Transfer')
-                    ->circular()
-                    ->defaultImageUrl('https://placehold.co/100x100?text=No+Proof'),
+                    ->label('Bukti')
+                    ->circular(),
 
                 Tables\Columns\TextColumn::make('payment_date')
                     ->label('Tanggal Bayar')
-                    ->dateTime('d M Y H:i')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Dibuat')
                     ->dateTime('d M Y H:i')
                     ->sortable(),
             ])
@@ -97,30 +151,15 @@ class PaymentResource extends Resource
                         'failed' => 'Failed',
                     ]),
 
-                Tables\Filters\SelectFilter::make('payment_method')
+                Tables\Filters\SelectFilter::make('method')
                     ->label('Metode Pembayaran')
                     ->options([
                         'bank_transfer' => 'Transfer Bank',
                         'ewallet' => 'E-Wallet',
                         'cod' => 'COD',
                     ]),
-
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from')
-                            ->label('Dari Tanggal'),
-                        Forms\Components\DatePicker::make('created_until')
-                            ->label('Sampai Tanggal'),
-                    ])
-                    ->query(function ($query, array $data) {
-                        return $query
-                            ->when($data['created_from'], fn ($q, $date) => $q->whereDate('created_at', '>=', $date))
-                            ->when($data['created_until'], fn ($q, $date) => $q->whereDate('created_at', '<=', $date));
-                    }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-
                 Tables\Actions\Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check-circle')
@@ -129,8 +168,7 @@ class PaymentResource extends Resource
                     ->action(function (Payment $record) {
                         $record->markAsSuccess();
                     })
-                    ->visible(fn (Payment $record) => $record->isPending())
-                    ->successNotificationTitle('Pembayaran berhasil diapprove'),
+                    ->visible(fn (Payment $record) => $record->isPending()),
 
                 Tables\Actions\Action::make('reject')
                     ->label('Reject')
@@ -148,8 +186,7 @@ class PaymentResource extends Resource
                             'rejection_reason' => $data['rejection_reason'],
                         ]);
                     })
-                    ->visible(fn (Payment $record) => $record->isPending())
-                    ->successNotificationTitle('Pembayaran ditolak'),
+                    ->visible(fn (Payment $record) => $record->isPending()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -158,15 +195,15 @@ class PaymentResource extends Resource
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->action(fn ($records) => $records->each->markAsSuccess())
-                        ->deselectRecordsAfterCompletion(),
+                        ->action(fn ($records) => $records->each->markAsSuccess()),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
                 Infolists\Components\Section::make('Informasi Pembayaran')
                     ->schema([
@@ -179,7 +216,7 @@ class PaymentResource extends Resource
                             ->label('Jumlah Pembayaran')
                             ->money('IDR')
                             ->weight('bold'),
-                        Infolists\Components\TextEntry::make('payment_method')
+                        Infolists\Components\TextEntry::make('method')
                             ->label('Metode Pembayaran')
                             ->badge()
                             ->color(fn (?string $state): string => match ($state) {
@@ -205,9 +242,6 @@ class PaymentResource extends Resource
                             }),
                         Infolists\Components\TextEntry::make('payment_date')
                             ->label('Tanggal Pembayaran')
-                            ->dateTime('d M Y H:i'),
-                        Infolists\Components\TextEntry::make('created_at')
-                            ->label('Dibuat')
                             ->dateTime('d M Y H:i'),
                     ])
                     ->columns(2),
@@ -241,6 +275,8 @@ class PaymentResource extends Resource
     {
         return [
             'index' => Pages\ListPayments::route('/'),
+            'create' => Pages\CreatePayment::route('/create'),
+            'edit' => Pages\EditPayment::route('/{record}/edit'),
             'view' => Pages\ViewPayment::route('/{record}'),
         ];
     }

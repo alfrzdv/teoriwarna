@@ -3,28 +3,33 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
+use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use BackedEnum;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+
+    //protected static ?string $navigationGroup = 'Products';
 
     protected static ?string $navigationLabel = 'Kategori';
 
-    protected static ?string $navigationGroup = 'Toko';
+    protected static ?int $navigationSort = 1;
 
-    protected static ?int $navigationSort = 2;
-
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Informasi Kategori')
                     ->schema([
@@ -35,7 +40,8 @@ class CategoryResource extends Resource
 
                         Forms\Components\Textarea::make('description')
                             ->label('Deskripsi')
-                            ->rows(3),
+                            ->rows(3)
+                            ->columnSpanFull(),
 
                         Forms\Components\Toggle::make('is_active')
                             ->label('Aktif')
@@ -43,7 +49,7 @@ class CategoryResource extends Resource
                             ->default(true),
                     ]),
 
-                Forms\Components\Section::make('Styling & Tampilan')
+                Forms\Components\Section::make('Styling')
                     ->schema([
                         Forms\Components\Select::make('style_type')
                             ->label('Tipe Style')
@@ -51,20 +57,16 @@ class CategoryResource extends Resource
                                 'solid' => 'Solid Color',
                                 'gradient' => 'Gradient',
                             ])
-                            ->default('solid')
                             ->required()
-                            ->reactive(),
+                            ->default('solid'),
 
                         Forms\Components\ColorPicker::make('background_color')
-                            ->label('Background Color')
-                            ->nullable()
-                            ->helperText('Pilih warna background untuk kategori ini'),
+                            ->label('Warna Background'),
 
                         Forms\Components\ColorPicker::make('text_color')
-                            ->label('Text Color')
-                            ->default('#ffffff')
+                            ->label('Warna Teks')
                             ->required()
-                            ->helperText('Warna teks yang akan ditampilkan'),
+                            ->default('#ffffff'),
                     ])
                     ->columns(3),
             ]);
@@ -86,11 +88,12 @@ class CategoryResource extends Resource
                     ->badge()
                     ->color('info'),
 
+                Tables\Columns\ColorColumn::make('background_color')
+                    ->label('Warna BG'),
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Status')
                     ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
 
@@ -102,20 +105,23 @@ class CategoryResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Aktif')
-                    ->placeholder('Semua')
-                    ->trueLabel('Aktif')
-                    ->falseLabel('Tidak Aktif'),
+                    ->label('Status Aktif'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
     }
 
     public static function getPages(): array
@@ -123,6 +129,7 @@ class CategoryResource extends Resource
         return [
             'index' => Pages\ListCategories::route('/'),
             'create' => Pages\CreateCategory::route('/create'),
+            'view' => Pages\ViewCategory::route('/{record}'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
     }

@@ -1,11 +1,16 @@
-<nav x-data="{ open: false, cartCount: 0 }" class="bg-dark-950/95 backdrop-blur-md border-b border-dark-800/50 sticky top-0 z-50">
+<nav x-data="{ open: false, cartCount: {{ auth()->check() ? (auth()->user()->cart ? auth()->user()->cart->cart_items()->count() : 0) : count(session('cart', [])) }} }" x-init="
+    // Update cart count when page loads
+    window.addEventListener('cart-updated', (e) => {
+        cartCount = e.detail.count;
+    });
+" class="bg-dark-950/95 backdrop-blur-md border-b border-dark-800/50 sticky top-0 z-50">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center gap-12">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ auth()->check() && auth()->user()->hasAdminAccess() ? route('admin.dashboard') : route('home') }}" class="flex items-center gap-2 group">
+                    <a href="{{ auth()->check() && auth()->user()->hasAdminAccess() ? '/admin' : route('home') }}" class="flex items-center gap-2 group">
                         <div class="w-8 h-8 bg-gradient-to-br from-brand-500 to-purple-600 rounded-lg flex items-center justify-center shadow-glow-sm">
                             <span class="text-white font-black text-sm">T</span>
                         </div>
@@ -19,35 +24,35 @@
                 <div class="hidden lg:flex items-center gap-1">
                     @auth
                         @if(auth()->user()->hasAdminAccess())
-                            <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('admin.dashboard') ? 'text-white bg-dark-800/50' : '' }}">
+                            <a href="/admin" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->is('admin') || request()->is('admin/dashboard') ? 'text-white bg-dark-800/50' : '' }}">
                                 Dashboard
                             </a>
-                            <a href="{{ route('admin.products.index') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('admin.products.*') ? 'text-white bg-dark-800/50' : '' }}">
-                                Products
+                            <a href="/admin/products" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->is('admin/products*') ? 'text-white bg-dark-800/50' : '' }}">
+                                Produk
                             </a>
-                            <a href="{{ route('admin.categories.index') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('admin.categories.*') ? 'text-white bg-dark-800/50' : '' }}">
-                                Categories
+                            <a href="/admin/categories" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->is('admin/categories*') ? 'text-white bg-dark-800/50' : '' }}">
+                                Kategori
                             </a>
-                            <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('admin.orders.*') ? 'text-white bg-dark-800/50' : '' }}">
-                                Orders
+                            <a href="/admin/orders" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->is('admin/orders*') ? 'text-white bg-dark-800/50' : '' }}">
+                                Pesanan
                             </a>
                         @else
                             <a href="{{ route('home') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('home') ? 'text-white bg-dark-800/50' : '' }}">
-                                Home
+                                Beranda
                             </a>
                             <a href="{{ route('products.index') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('products.*') ? 'text-white bg-dark-800/50' : '' }}">
-                                Shop
+                                Belanja
                             </a>
                             <a href="{{ route('orders.index') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('orders.*') ? 'text-white bg-dark-800/50' : '' }}">
-                                My Orders
+                                Pesanan Saya
                             </a>
                         @endif
                     @else
                         <a href="{{ route('home') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('home') ? 'text-white bg-dark-800/50' : '' }}">
-                            Home
+                            Beranda
                         </a>
                         <a href="{{ route('products.index') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all {{ request()->routeIs('products.*') ? 'text-white bg-dark-800/50' : '' }}">
-                            Shop
+                            Belanja
                         </a>
                     @endauth
                 </div>
@@ -56,8 +61,8 @@
 
             <!-- Right Side -->
             <div class="hidden lg:flex lg:items-center lg:gap-4">
+                <!-- Cart Icon (for guests and non-admin users) -->
                 @auth
-                    <!-- Cart Icon (non-admin only) -->
                     @if(!auth()->user()->hasAdminAccess())
                         <a href="{{ route('cart.index') }}" class="relative p-2 text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +71,17 @@
                             <span x-show="cartCount > 0" x-text="cartCount" class="absolute -top-1 -right-1 bg-brand-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"></span>
                         </a>
                     @endif
+                @else
+                    <!-- Cart Icon for guests -->
+                    <a href="{{ route('cart.index') }}" class="relative p-2 text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        <span x-show="cartCount > 0" x-text="cartCount" class="absolute -top-1 -right-1 bg-brand-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"></span>
+                    </a>
+                @endauth
 
+                @auth
                     <!-- Profile Dropdown -->
                     <div x-data="{ profileOpen: false }" @click.away="profileOpen = false" class="relative">
                         <button @click="profileOpen = !profileOpen" class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
@@ -97,27 +112,27 @@
                                 <p class="text-xs text-dark-400">{{ Auth::user()->email }}</p>
                             </div>
                             <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-dark-300 hover:bg-dark-700 hover:text-white transition-colors">
-                                My Profile
+                                Profil Saya
                             </a>
                             @if(!auth()->user()->hasAdminAccess())
                                 <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-sm text-dark-300 hover:bg-dark-700 hover:text-white transition-colors">
-                                    My Orders
+                                    Pesanan Saya
                                 </a>
                             @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-dark-700 hover:text-red-300 transition-colors">
-                                    Logout
+                                    Keluar
                                 </button>
                             </form>
                         </div>
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        Login
+                        Masuk
                     </a>
                     <a href="{{ route('register') }}" class="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 rounded-lg shadow-glow-sm hover:shadow-glow transition-all">
-                        Get Started
+                        Daftar
                     </a>
                 @endauth
             </div>
@@ -139,41 +154,41 @@
         <div class="px-4 pt-2 pb-3 space-y-1 bg-dark-950/95 backdrop-blur-md">
             @auth
                 @if(auth()->user()->hasAdminAccess())
-                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.dashboard') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
+                    <a href="/admin" class="block px-4 py-3 text-sm font-medium {{ request()->is('admin') || request()->is('admin/dashboard') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
                         Dashboard
                     </a>
-                    <a href="{{ route('admin.products.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.products.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        Products
+                    <a href="/admin/products" class="block px-4 py-3 text-sm font-medium {{ request()->is('admin/products*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
+                        Produk
                     </a>
-                    <a href="{{ route('admin.categories.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.categories.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        Categories
+                    <a href="/admin/categories" class="block px-4 py-3 text-sm font-medium {{ request()->is('admin/categories*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
+                        Kategori
                     </a>
-                    <a href="{{ route('admin.orders.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('admin.orders.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        Orders
+                    <a href="/admin/orders" class="block px-4 py-3 text-sm font-medium {{ request()->is('admin/orders*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
+                        Pesanan
                     </a>
                 @else
                     <a href="{{ route('home') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('home') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        Home
+                        Beranda
                     </a>
                     <a href="{{ route('products.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('products.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        Shop
+                        Belanja
                     </a>
                     <a href="{{ route('cart.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('cart.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        Cart
+                        Keranjang
                     </a>
                     <a href="{{ route('orders.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('orders.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        My Orders
+                        Pesanan Saya
                     </a>
                 @endif
             @else
                 <a href="{{ route('home') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('home') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                    Home
+                    Beranda
                 </a>
                 <a href="{{ route('products.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('products.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                    Shop
+                    Belanja
                 </a>
                 <a href="{{ route('cart.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('cart.*') ? 'text-white bg-dark-800/50' : 'text-dark-300' }} hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                    Cart
+                    Keranjang
                 </a>
             @endauth
         </div>
@@ -197,13 +212,13 @@
 
                 <div class="space-y-1">
                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                        My Profile
+                        Profil Saya
                     </a>
 
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-dark-800/50 rounded-lg transition-all">
-                            Logout
+                            Keluar
                         </button>
                     </form>
                 </div>
@@ -211,10 +226,10 @@
         @else
             <div class="px-4 py-4 border-t border-dark-800/50 bg-dark-950/95 space-y-2">
                 <a href="{{ route('login') }}" class="block px-4 py-2 text-center text-sm font-medium text-dark-300 hover:text-white hover:bg-dark-800/50 rounded-lg transition-all">
-                    Login
+                    Masuk
                 </a>
                 <a href="{{ route('register') }}" class="block px-4 py-2 text-center text-sm font-medium text-white bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 rounded-lg shadow-glow-sm transition-all">
-                    Get Started
+                    Daftar
                 </a>
             </div>
         @endauth

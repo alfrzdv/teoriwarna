@@ -26,6 +26,10 @@
             </div>
 
             <div class="p-4 sm:p-8 bg-dark-800/50 backdrop-blur-sm border border-dark-700/50 shadow-glow-sm rounded-xl">
+                @include('profile.partials.manage-addresses-form')
+            </div>
+
+            <div class="p-4 sm:p-8 bg-dark-800/50 backdrop-blur-sm border border-dark-700/50 shadow-glow-sm rounded-xl">
                 <div class="max-w-xl">
                     @include('profile.partials.delete-user-form')
                 </div>

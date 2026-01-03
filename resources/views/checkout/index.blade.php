@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-bold text-2xl text-white leading-tight font-heading">
             Checkout
         </h2>
     </x-slot>
@@ -185,7 +185,7 @@
                         @enderror
                     </div>
 
-                    <!-- Coupon Code -->
+                    {{-- Coupon Code - Temporarily disabled
                     <div class="form-section">
                         <h3 class="section-title">Coupon Code (Optional)</h3>
 
@@ -216,6 +216,7 @@
                             <p id="coupon-message" style="margin-top: 0.5rem; font-size: 0.875rem;"></p>
                         @endif
                     </div>
+                    --}}
 
                     <!-- Additional Notes -->
                     <div class="form-section">
@@ -269,16 +270,18 @@
                         <span class="summary-value" id="shipping-cost-display">Rp 15.000</span>
                     </div>
 
+                    {{-- Discount display - Temporarily disabled
                     @if(session('applied_coupon'))
                     <div class="summary-row" style="color: #10b981;">
                         <span class="summary-label">Discount</span>
                         <span class="summary-value">-Rp {{ number_format(session('applied_coupon')['discount'], 0, ',', '.') }}</span>
                     </div>
                     @endif
+                    --}}
 
                     <div class="summary-total">
                         <span>Total</span>
-                        <span id="total-display">Rp {{ number_format($subtotal + 15000 - (session('applied_coupon')['discount'] ?? 0), 0, ',', '.') }}</span>
+                        <span id="total-display">Rp {{ number_format($subtotal + 15000, 0, ',', '.') }}</span>
                     </div>
                 </div>
             </div>
@@ -324,13 +327,9 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const subtotal = {{ $subtotal }};
-            const discount = {{ session('applied_coupon')['discount'] ?? 0 }};
             const shippingMethods = document.querySelectorAll('input[name="shipping_method"]');
             const shippingCostDisplay = document.getElementById('shipping-cost-display');
             const totalDisplay = document.getElementById('total-display');
-            const applyCouponBtn = document.getElementById('apply-coupon-btn');
-            const couponCodeInput = document.getElementById('coupon-code');
-            const couponMessage = document.getElementById('coupon-message');
 
             const shippingCosts = {
                 'regular': 15000,
@@ -346,7 +345,7 @@
                 const selectedMethod = document.querySelector('input[name="shipping_method"]:checked');
                 if (selectedMethod) {
                     const shippingCost = shippingCosts[selectedMethod.value];
-                    const total = subtotal + shippingCost - discount;
+                    const total = subtotal + shippingCost;
 
                     shippingCostDisplay.textContent = formatRupiah(shippingCost);
                     totalDisplay.textContent = formatRupiah(total);
@@ -356,6 +355,11 @@
             shippingMethods.forEach(method => {
                 method.addEventListener('change', updateSummary);
             });
+
+            {{-- Coupon functionality - Temporarily disabled
+            const applyCouponBtn = document.getElementById('apply-coupon-btn');
+            const couponCodeInput = document.getElementById('coupon-code');
+            const couponMessage = document.getElementById('coupon-message');
 
             // Apply coupon functionality
             if (applyCouponBtn) {
@@ -420,6 +424,7 @@
                     }
                 });
             }
+            --}}
         });
     </script>
 </x-app-layout>

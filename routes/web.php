@@ -27,6 +27,7 @@ Route::get('/products/{product}', function ($product) {
 
 // Cart - Guest can access with session-based cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 Route::patch('/cart/session/{productId}', [CartController::class, 'updateSession'])->name('cart.update-session');
 Route::delete('/cart/session/{productId}', [CartController::class, 'removeSession'])->name('cart.remove-session');
@@ -50,8 +51,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/addresses/create', [AddressController::class, 'create'])->name('addresses.create');
     Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
     Route::get('/addresses/{address}/edit', [AddressController::class, 'edit'])->name('addresses.edit');
-    Route::patch('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
-    Route::post('/addresses/{address}/set-primary', [AddressController::class, 'setPrimary'])->name('addresses.set-primary');
+    Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
     Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
 
     // Reviews

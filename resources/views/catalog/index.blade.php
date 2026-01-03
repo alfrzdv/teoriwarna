@@ -13,19 +13,103 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({ quantity: 1 })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw err;
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    // Show success message
-                    alert('Product added to cart!');
+                    // Show success notification
+                    showNotification('Product successfully added to cart!', 'success');
+
+                    // Update cart count
+                    fetch('/cart/count')
+                        .then(response => response.json())
+                        .then(countData => {
+                            window.dispatchEvent(new CustomEvent('cart-updated', {
+                                detail: { count: countData.count }
+                            }));
+                        });
+                } else {
+                    showNotification(data.message || 'Failed to add product to cart', 'error');
                 }
+            })
+            .catch(error => {
+                const message = error.message || (error.errors ? Object.values(error.errors)[0][0] : 'An error occurred. Please try again.');
+                showNotification(message, 'error');
             });
         }
+
+        function showNotification(message, type = 'success') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.cart-notification');
+            existingNotifications.forEach(n => n.remove());
+
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification fixed top-20 right-4 z-50 max-w-md animate-slide-in-right';
+
+            const bgColor = type === 'success' ? 'bg-green-500/90' : 'bg-red-500/90';
+            const icon = type === 'success'
+                ? '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>'
+                : '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+
+            notification.innerHTML = `
+                <div class="${bgColor} backdrop-blur-sm text-white px-6 py-4 rounded-lg shadow-2xl border border-white/20">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-shrink-0">
+                            ${icon}
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium">${message}</p>
+                        </div>
+                        <button onclick="this.closest('.cart-notification').remove()" class="flex-shrink-0 hover:text-white/80 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                notification.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
     </script>
+
+    <style>
+        @keyframes slide-in-right {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-slide-in-right {
+            animation: slide-in-right 0.3s ease-out;
+        }
+    </style>
     @endpush
 
     <div class="py-12">
@@ -44,7 +128,7 @@
 
                 <!-- Filter Section -->
                 <div class="bg-dark-800/30 backdrop-blur-sm border border-dark-700/50 rounded-xl p-6">
-                    <form method="GET" action="{{ route('products.index') }}" class="space-y-4">
+                    <form method="GET" action="{{ route('catalog.index') }}" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <!-- Search -->
                             <div class="lg:col-span-2">
@@ -85,7 +169,7 @@
                             </button>
 
                             @if(request()->hasAny(['search', 'category', 'min_price', 'max_price', 'sort']))
-                                <a href="{{ route('products.index') }}" class="px-6 py-2.5 bg-dark-700 hover:bg-dark-600 text-white text-sm font-medium rounded-lg transition-colors">
+                                <a href="{{ route('catalog.index') }}" class="px-6 py-2.5 bg-dark-700 hover:bg-dark-600 text-white text-sm font-medium rounded-lg transition-colors">
                                     Clear All
                                 </a>
                             @endif
@@ -137,7 +221,7 @@
                             @endif
                         </p>
                         @if(request()->hasAny(['search', 'category', 'min_price', 'max_price', 'sort']))
-                            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-medium rounded-lg shadow-glow-sm hover:shadow-glow transition-all">
+                            <a href="{{ route('catalog.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-medium rounded-lg shadow-glow-sm hover:shadow-glow transition-all">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                 </svg>

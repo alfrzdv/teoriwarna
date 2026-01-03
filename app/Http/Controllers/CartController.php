@@ -53,10 +53,16 @@ class CartController extends Controller
         ]);
 
         if (!$product->isActive()) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Produk tidak tersedia.'], 400);
+            }
             return back()->with('error', 'Produk tidak tersedia.');
         }
 
         if (!$product->hasEnoughStock($validated['quantity'])) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi.'], 400);
+            }
             return back()->with('error', 'Stok tidak mencukupi.');
         }
 
@@ -71,6 +77,9 @@ class CartController extends Controller
                     $newQuantity = $item['quantity'] + $validated['quantity'];
 
                     if (!$product->hasEnoughStock($newQuantity)) {
+                        if ($request->expectsJson()) {
+                            return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi untuk jumlah yang diminta.'], 400);
+                        }
                         return back()->with('error', 'Stok tidak mencukupi untuk jumlah yang diminta.');
                     }
 
@@ -89,6 +98,10 @@ class CartController extends Controller
             }
 
             session()->put('cart', $cart);
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Produk berhasil ditambahkan ke keranjang.']);
+            }
             return back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
         }
 
@@ -103,6 +116,9 @@ class CartController extends Controller
             $newQuantity = $cartItem->quantity + $validated['quantity'];
 
             if (!$product->hasEnoughStock($newQuantity)) {
+                if ($request->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Stok tidak mencukupi untuk jumlah yang diminta.'], 400);
+                }
                 return back()->with('error', 'Stok tidak mencukupi untuk jumlah yang diminta.');
             }
 
@@ -111,6 +127,9 @@ class CartController extends Controller
                 'subtotal' => $cartItem->price * $newQuantity,
             ]);
 
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Jumlah produk di keranjang berhasil diupdate.']);
+            }
             return back()->with('success', 'Jumlah produk di keranjang berhasil diupdate.');
         } else {
             // Add new item to cart
@@ -122,6 +141,9 @@ class CartController extends Controller
                 'subtotal' => $product->price * $validated['quantity'],
             ]);
 
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Produk berhasil ditambahkan ke keranjang.']);
+            }
             return back()->with('success', 'Produk berhasil ditambahkan ke keranjang.');
         }
     }
@@ -211,6 +233,19 @@ class CartController extends Controller
         $cart->cart_items()->delete();
 
         return back()->with('success', 'Keranjang berhasil dikosongkan.');
+    }
+
+    public function count()
+    {
+        if (!Auth::check()) {
+            $count = count(session()->get('cart', []));
+            return response()->json(['count' => $count]);
+        }
+
+        $cart = $this->getOrCreateCart();
+        $count = $cart->cart_items()->count();
+
+        return response()->json(['count' => $count]);
     }
 
     private function getOrCreateCart()

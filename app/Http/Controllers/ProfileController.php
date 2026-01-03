@@ -22,6 +22,7 @@ class ProfileController extends Controller
     {
         return view('profile.edit', [
             'user' => $request->user(),
+            'addresses' => $request->user()->user_addresses,
         ]);
     }
 
@@ -103,14 +104,8 @@ class ProfileController extends Controller
      */
     public function updateProfilePicture(Request $request): RedirectResponse
     {
-        \Log::info('Profile picture update request:', [
-            'has_profile_picture' => $request->has('profile_picture'),
-            'filled_profile_picture' => $request->filled('profile_picture'),
-            'profile_picture_length' => $request->profile_picture ? strlen($request->profile_picture) : 0,
-        ]);
-
         $request->validate([
-            'profile_picture' => ['required', 'string'],
+            'profile_picture' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ]);
 
         $user = $request->user();
@@ -120,41 +115,20 @@ class ProfileController extends Controller
             ImageHelper::deleteWithThumbnail($user->profile_picture);
         }
 
-        $profilePictureData = $request->input('profile_picture');
-
-        // Check if it's base64 data from cropper
-        if (preg_match('/^data:image\/(\w+);base64,/', $profilePictureData, $matches)) {
-            \Log::info('Processing base64 profile picture');
-
-            // Extract base64 string
-            $base64Image = substr($profilePictureData, strpos($profilePictureData, ',') + 1);
-            $imageData = base64_decode($base64Image);
-
-            // Generate filename
-            $extension = $matches[1] === 'jpeg' ? 'jpg' : $matches[1];
-            $filename = 'profile_' . uniqid() . '.' . $extension;
-            $path = 'profile-pictures/' . $filename;
-
-            // Store the image
-            Storage::disk('public')->put($path, $imageData);
-
-            // Create thumbnail
-            try {
-                $thumbnailPath = ImageHelper::createThumbnail($path, 150, 150);
-                \Log::info('Thumbnail created: ' . $thumbnailPath);
-            } catch (\Exception $e) {
-                \Log::warning('Thumbnail generation failed: ' . $e->getMessage());
-            }
-
-            $user->profile_picture = $path;
+        // Handle file upload
+        if ($request->hasFile('profile_picture')) {
+            $result = ImageHelper::uploadWithThumbnail(
+                $request->file('profile_picture'),
+                'profile-pictures',
+                150,
+                150
+            );
+            $user->profile_picture = $result['original'];
             $user->save();
-
-            \Log::info('Profile picture updated successfully');
 
             return Redirect::route('profile.edit')->with('status', 'profile-picture-updated');
         }
 
-        \Log::error('Invalid profile picture format');
         return Redirect::route('profile.edit')->withErrors(['profile_picture' => 'Invalid image format']);
     }
 

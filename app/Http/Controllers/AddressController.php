@@ -26,24 +26,23 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'label' => 'required|string|max:100',
             'recipient_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
             'city' => 'required|string|max:100',
             'province' => 'required|string|max:100',
             'postal_code' => 'required|string|max:10',
-            'is_primary' => 'boolean'
+            'is_default' => 'boolean'
         ]);
 
-        // If this is primary, unset other primary addresses
-        if ($request->is_primary) {
-            Auth::user()->user_addresses()->update(['is_primary' => false]);
+        // If this is default, unset other default addresses
+        if ($request->is_default) {
+            Auth::user()->user_addresses()->update(['is_default' => false]);
         }
 
         Auth::user()->user_addresses()->create($request->all());
 
-        return redirect()->route('addresses.index')
+        return redirect()->route('profile.edit')
             ->with('success', 'Alamat berhasil ditambahkan.');
     }
 
@@ -67,39 +66,37 @@ class AddressController extends Controller
         }
 
         $request->validate([
-            'label' => 'required|string|max:100',
             'recipient_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'address' => 'required|string',
             'city' => 'required|string|max:100',
             'province' => 'required|string|max:100',
             'postal_code' => 'required|string|max:10',
-            'is_primary' => 'boolean'
+            'is_default' => 'boolean'
         ]);
 
-        // If this is primary, unset other primary addresses
-        if ($request->is_primary) {
+        // If this is default, unset other default addresses
+        if ($request->is_default) {
             Auth::user()->user_addresses()
                 ->where('id', '!=', $address->id)
-                ->update(['is_primary' => false]);
+                ->update(['is_default' => false]);
         }
 
         $address->update($request->all());
 
-        return redirect()->route('addresses.index')
+        return redirect()->route('profile.edit')
             ->with('success', 'Alamat berhasil diupdate.');
     }
 
-    // Set primary address
-    public function setPrimary(UserAddress $address)
+    // Set default address
+    public function setDefault(UserAddress $address)
     {
         // Ensure address belongs to current user
         if ($address->user_id !== Auth::id()) {
             abort(403);
         }
 
-        Auth::user()->user_addresses()->update(['is_primary' => false]);
-        $address->update(['is_primary' => true]);
+        $address->makeDefault();
 
         return back()->with('success', 'Alamat utama berhasil diubah.');
     }

@@ -4,25 +4,85 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\RefundResource\Pages;
 use App\Models\Refund;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Infolists;
-use Filament\Infolists\Infolist;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class RefundResource extends Resource
 {
     protected static ?string $model = Refund::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-arrow-uturn-left';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrow-uturn-left';
 
-    protected static ?string $navigationLabel = 'Refunds';
+    //protected static ?string $navigationGroup = 'Penjualan';
 
-    protected static ?string $navigationGroup = 'Transaksi';
+    protected static ?string $navigationLabel = 'Refund';
 
     protected static ?int $navigationSort = 3;
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->schema([
+                Forms\Components\Section::make('Informasi Refund')
+                    ->schema([
+                        Forms\Components\TextInput::make('refund_number')
+                            ->label('Nomor Refund')
+                            ->default(fn () => 'REF-' . strtoupper(uniqid()))
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\Select::make('order_id')
+                            ->label('Pesanan')
+                            ->relationship('order', 'order_number')
+                            ->searchable()
+                            ->required()
+                            ->preload(),
+
+                        Forms\Components\Select::make('user_id')
+                            ->label('Customer')
+                            ->relationship('user', 'name')
+                            ->searchable()
+                            ->required()
+                            ->preload(),
+
+                        Forms\Components\TextInput::make('refund_amount')
+                            ->label('Jumlah Refund')
+                            ->numeric()
+                            ->prefix('Rp')
+                            ->required(),
+
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'approved' => 'Approved',
+                                'rejected' => 'Rejected',
+                                'completed' => 'Completed',
+                            ])
+                            ->required()
+                            ->default('pending'),
+
+                        Forms\Components\Textarea::make('reason')
+                            ->label('Alasan Refund')
+                            ->required()
+                            ->rows(3)
+                            ->columnSpanFull(),
+
+                        Forms\Components\Textarea::make('admin_notes')
+                            ->label('Catatan Admin')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+            ]);
+    }
 
     public static function table(Table $table): Table
     {
@@ -32,39 +92,37 @@ class RefundResource extends Resource
                     ->label('No. Refund')
                     ->searchable()
                     ->sortable()
-                    ->copyable()
-                    ->weight('bold'),
+                    ->copyable(),
 
                 Tables\Columns\TextColumn::make('order.order_number')
-                    ->label('No. Order')
+                    ->label('No. Pesanan')
                     ->searchable()
                     ->copyable(),
 
-                Tables\Columns\TextColumn::make('order.user.name')
+                Tables\Columns\TextColumn::make('user.name')
                     ->label('Customer')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('amount')
+                Tables\Columns\TextColumn::make('refund_amount')
                     ->label('Jumlah')
                     ->money('IDR')
-                    ->sortable()
-                    ->weight('bold'),
+                    ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'approved',
-                        'primary' => 'processing',
-                        'success' => 'completed',
-                        'danger' => 'rejected',
-                    ])
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'approved' => 'info',
+                        'rejected' => 'danger',
+                        'completed' => 'success',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending' => 'Pending',
                         'approved' => 'Approved',
-                        'processing' => 'Processing',
-                        'completed' => 'Completed',
                         'rejected' => 'Rejected',
+                        'completed' => 'Completed',
                         default => $state,
                     }),
 
@@ -80,127 +138,40 @@ class RefundResource extends Resource
                     ->options([
                         'pending' => 'Pending',
                         'approved' => 'Approved',
-                        'processing' => 'Processing',
-                        'completed' => 'Completed',
                         'rejected' => 'Rejected',
+                        'completed' => 'Completed',
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-
                 Tables\Actions\Action::make('approve')
                     ->label('Approve')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->action(function (Refund $record) {
-                        $record->update(['status' => 'approved']);
-                    })
-                    ->visible(fn (Refund $record) => $record->status === 'pending')
-                    ->successNotificationTitle('Refund berhasil diapprove'),
+                    ->action(fn (Refund $record) => $record->approve())
+                    ->visible(fn (Refund $record) => $record->status === 'pending'),
 
                 Tables\Actions\Action::make('reject')
                     ->label('Reject')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->form([
-                        Forms\Components\Textarea::make('rejection_reason')
+                        Forms\Components\Textarea::make('admin_notes')
                             ->label('Alasan Penolakan')
                             ->required()
                             ->rows(3),
                     ])
                     ->action(function (Refund $record, array $data) {
-                        $record->update([
-                            'status' => 'rejected',
-                            'rejection_reason' => $data['rejection_reason'],
-                        ]);
+                        $record->update(['admin_notes' => $data['admin_notes']]);
+                        $record->reject();
                     })
-                    ->visible(fn (Refund $record) => $record->status === 'pending')
-                    ->successNotificationTitle('Refund ditolak'),
-
-                Tables\Actions\Action::make('processing')
-                    ->label('Mark Processing')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('primary')
-                    ->action(function (Refund $record) {
-                        $record->update(['status' => 'processing']);
-                    })
-                    ->visible(fn (Refund $record) => $record->status === 'approved')
-                    ->successNotificationTitle('Refund sedang diproses'),
-
-                Tables\Actions\Action::make('complete')
-                    ->label('Complete')
-                    ->icon('heroicon-o-check-badge')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->action(function (Refund $record) {
-                        $record->update(['status' => 'completed']);
-                    })
-                    ->visible(fn (Refund $record) => $record->status === 'processing')
-                    ->successNotificationTitle('Refund selesai'),
+                    ->visible(fn (Refund $record) => $record->status === 'pending'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\BulkAction::make('approve')
-                        ->label('Approve Semua')
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->requiresConfirmation()
-                        ->action(fn ($records) => $records->each(fn ($r) => $r->update(['status' => 'approved'])))
-                        ->deselectRecordsAfterCompletion(),
+                    Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
-            ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                Infolists\Components\Section::make('Informasi Refund')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('refund_number')
-                            ->label('Nomor Refund')
-                            ->copyable(),
-                        Infolists\Components\TextEntry::make('order.order_number')
-                            ->label('Nomor Order')
-                            ->copyable(),
-                        Infolists\Components\TextEntry::make('order.user.name')
-                            ->label('Customer'),
-                        Infolists\Components\TextEntry::make('amount')
-                            ->label('Jumlah Refund')
-                            ->money('IDR')
-                            ->weight('bold'),
-                        Infolists\Components\TextEntry::make('status')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'pending' => 'warning',
-                                'approved' => 'info',
-                                'processing' => 'primary',
-                                'completed' => 'success',
-                                'rejected' => 'danger',
-                                default => 'gray',
-                            }),
-                        Infolists\Components\TextEntry::make('created_at')
-                            ->label('Tanggal Pengajuan')
-                            ->dateTime('d M Y H:i'),
-                    ])
-                    ->columns(2),
-
-                Infolists\Components\Section::make('Alasan Refund')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('reason')
-                            ->label('Alasan')
-                            ->columnSpanFull()
-                            ->markdown(),
-                    ]),
-
-                Infolists\Components\Section::make('Alasan Penolakan')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('rejection_reason')
-                            ->label('Alasan')
-                            ->columnSpanFull(),
-                    ])
-                    ->visible(fn ($record) => $record->rejection_reason),
             ]);
     }
 
@@ -215,7 +186,9 @@ class RefundResource extends Resource
     {
         return [
             'index' => Pages\ListRefunds::route('/'),
+            'create' => Pages\CreateRefund::route('/create'),
             'view' => Pages\ViewRefund::route('/{record}'),
+            'edit' => Pages\EditRefund::route('/{record}/edit'),
         ];
     }
 

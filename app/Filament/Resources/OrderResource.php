@@ -3,31 +3,31 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Infolists;
-use Filament\Infolists\Infolist;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
+
+    //protected static ?string $navigationGroup = 'Penjualan';
 
     protected static ?string $navigationLabel = 'Pesanan';
 
-    protected static ?string $navigationGroup = 'Transaksi';
-
     protected static ?int $navigationSort = 1;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Informasi Pesanan')
                     ->schema([
@@ -117,7 +117,6 @@ class OrderResource extends Resource
                     ->label('No. Pesanan')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
                     ->copyable(),
 
                 Tables\Columns\TextColumn::make('user.name')
@@ -128,18 +127,20 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total')
                     ->money('IDR')
-                    ->sortable()
-                    ->weight('bold'),
+                    ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'warning' => 'pending',
-                        'info' => 'paid',
-                        'primary' => 'processing',
-                        'success' => fn ($state) => in_array($state, ['shipped', 'completed']),
-                        'danger' => 'cancelled',
-                    ])
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'paid' => 'info',
+                        'processing' => 'primary',
+                        'shipped' => 'success',
+                        'completed' => 'success',
+                        'cancelled' => 'danger',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending' => 'Pending',
                         'paid' => 'Paid',
@@ -148,36 +149,36 @@ class OrderResource extends Resource
                         'completed' => 'Completed',
                         'cancelled' => 'Cancelled',
                         default => $state,
-                    }),
+                    })
+                    ->sortable(),
 
-                Tables\Columns\TextColumn::make('payment.payment_method')
-                    ->label('Metode Pembayaran')
-                    ->badge()
+                Tables\Columns\TextColumn::make('payment.method')
+                    ->label('Pembayaran')
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'bank_transfer' => 'Transfer Bank',
                         'ewallet' => 'E-Wallet',
                         'cod' => 'COD',
-                        default => $state ?? '-',
-                    }),
-
-                Tables\Columns\TextColumn::make('shipping_courier')
-                    ->label('Kurir')
+                        default => '-',
+                    })
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('tracking_number')
                     ->label('No. Resi')
-                    ->toggleable()
-                    ->copyable(),
+                    ->copyable()
+                    ->placeholder('-')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal')
                     ->dateTime('d M Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status')
+                    ->multiple()
                     ->options([
                         'pending' => 'Pending',
                         'paid' => 'Paid',
@@ -188,11 +189,12 @@ class OrderResource extends Resource
                     ]),
 
                 Tables\Filters\Filter::make('created_at')
+                    ->label('Rentang Tanggal')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label('Dari Tanggal'),
+                            ->label('Dari'),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('Sampai'),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
@@ -201,16 +203,12 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-
                 Tables\Actions\Action::make('updateStatus')
                     ->label('Update Status')
                     ->icon('heroicon-o-arrow-path')
-                    ->color('primary')
                     ->form([
                         Forms\Components\Select::make('status')
-                            ->label('Status Baru')
+                            ->label('Status')
                             ->options([
                                 'pending' => 'Pending',
                                 'paid' => 'Paid',
@@ -229,19 +227,19 @@ class OrderResource extends Resource
                             'status' => $data['status'],
                             'tracking_number' => $data['tracking_number'] ?? $record->tracking_number,
                         ]);
-                    })
-                    ->successNotificationTitle('Status pesanan berhasil diupdate'),
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
                 Infolists\Components\Section::make('Informasi Pesanan')
                     ->schema([
@@ -293,7 +291,7 @@ class OrderResource extends Resource
 
                 Infolists\Components\Section::make('Detail Pembayaran')
                     ->schema([
-                        Infolists\Components\TextEntry::make('payment.payment_method')
+                        Infolists\Components\TextEntry::make('payment.method')
                             ->label('Metode Pembayaran')
                             ->formatStateUsing(fn (?string $state): string => match ($state) {
                                 'bank_transfer' => 'Transfer Bank',

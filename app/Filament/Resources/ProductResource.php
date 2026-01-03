@@ -4,31 +4,31 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
+
+    //protected static ?string $navigationGroup = 'Katalog';
 
     protected static ?string $navigationLabel = 'Produk';
 
-    protected static ?string $navigationGroup = 'Toko';
+    protected static ?int $navigationSort = 2;
 
-    protected static ?int $navigationSort = 1;
-
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Informasi Produk')
-                    ->description('Detail produk yang akan dijual')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nama Produk')
@@ -44,8 +44,8 @@ class ProductResource extends Resource
 
                         Forms\Components\TextInput::make('price')
                             ->label('Harga')
-                            ->numeric()
                             ->required()
+                            ->numeric()
                             ->prefix('Rp')
                             ->inputMode('decimal'),
 
@@ -59,8 +59,6 @@ class ProductResource extends Resource
                                 Forms\Components\TextInput::make('name')
                                     ->label('Nama Kategori')
                                     ->required(),
-                                Forms\Components\Textarea::make('description')
-                                    ->label('Deskripsi'),
                             ]),
 
                         Forms\Components\Select::make('status')
@@ -75,19 +73,19 @@ class ProductResource extends Resource
                     ->columns(2),
 
                 Forms\Components\Section::make('Gambar Produk')
-                    ->description('Upload gambar produk (max 5 gambar)')
                     ->schema([
                         Forms\Components\Repeater::make('product_images')
-                            ->label('Gambar Produk')
+                            ->label('Gambar')
                             ->relationship('product_images')
                             ->schema([
                                 Forms\Components\FileUpload::make('image_path')
-                                    ->label('Gambar')
+                                    ->label('Upload Gambar')
                                     ->image()
                                     ->directory('product-images')
                                     ->visibility('public')
                                     ->maxSize(2048)
                                     ->required(),
+
                                 Forms\Components\Toggle::make('is_primary')
                                     ->label('Gambar Utama')
                                     ->default(false),
@@ -95,16 +93,14 @@ class ProductResource extends Resource
                             ->maxItems(5)
                             ->reorderable()
                             ->collapsible()
-                            ->defaultItems(0)
                             ->columnSpanFull(),
                     ]),
 
-                Forms\Components\Section::make('Stok Produk')
-                    ->description('Informasi stok produk')
+                Forms\Components\Section::make('Stok')
                     ->schema([
                         Forms\Components\Placeholder::make('current_stock')
                             ->label('Stok Saat Ini')
-                            ->content(fn ($record) => $record ? $record->getCurrentStock() . ' unit' : 'Belum ada stok'),
+                            ->content(fn ($record) => $record ? $record->stock . ' unit' : 'Belum ada stok'),
 
                         Forms\Components\TextInput::make('initial_stock')
                             ->label('Stok Awal')
@@ -113,8 +109,7 @@ class ProductResource extends Resource
                             ->helperText('Hanya untuk produk baru')
                             ->visible(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\CreateRecord)
                             ->dehydrated(false),
-                    ])
-                    ->columns(1),
+                    ]),
             ]);
     }
 
@@ -125,8 +120,7 @@ class ProductResource extends Resource
                 Tables\Columns\ImageColumn::make('product_images.image_path')
                     ->label('Gambar')
                     ->circular()
-                    ->limit(1)
-                    ->defaultImageUrl('https://placehold.co/200x200?text=No+Image'),
+                    ->limit(1),
 
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Produk')
@@ -148,18 +142,19 @@ class ProductResource extends Resource
 
                 Tables\Columns\TextColumn::make('stock')
                     ->label('Stok')
-                    ->getStateUsing(fn ($record) => $record->getCurrentStock())
                     ->badge()
                     ->color(fn ($state) => $state > 10 ? 'success' : ($state > 0 ? 'warning' : 'danger'))
                     ->suffix(' unit')
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->colors([
-                        'success' => 'active',
-                        'danger' => 'inactive',
-                    ])
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'active' => 'success',
+                        'inactive' => 'danger',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'active' => 'Active',
                         'inactive' => 'Inactive',
@@ -186,18 +181,9 @@ class ProductResource extends Resource
 
                 Tables\Filters\Filter::make('low_stock')
                     ->label('Stok Rendah')
-                    ->query(fn ($query) => $query->whereHas('product_stocks', function ($q) {
-                        $q->selectRaw('product_id')
-                          ->selectRaw('SUM(CASE WHEN type = "in" THEN quantity ELSE 0 END) - SUM(CASE WHEN type = "out" THEN quantity ELSE 0 END) as stock')
-                          ->groupBy('product_id')
-                          ->having('stock', '<=', 10);
-                    })),
+                    ->query(fn ($query) => $query->where('stock', '<=', 10)->where('stock', '>', 0)),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-
                 Tables\Actions\Action::make('manage_stock')
                     ->label('Kelola Stok')
                     ->icon('heroicon-o-cube')
@@ -205,7 +191,7 @@ class ProductResource extends Resource
                     ->form([
                         Forms\Components\Placeholder::make('current_stock')
                             ->label('Stok Saat Ini')
-                            ->content(fn ($record) => $record->getCurrentStock() . ' unit'),
+                            ->content(fn ($record) => $record->stock . ' unit'),
 
                         Forms\Components\Radio::make('action')
                             ->label('Aksi')
@@ -233,26 +219,12 @@ class ProductResource extends Resource
                         } else {
                             $record->reduceStock($data['quantity'], $data['note'] ?? 'Manual stock adjustment');
                         }
-                    })
-                    ->successNotificationTitle('Stok berhasil diupdate'),
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-
-                    Tables\Actions\BulkAction::make('activate')
-                        ->label('Aktifkan')
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->action(fn ($records) => $records->each->activate())
-                        ->deselectRecordsAfterCompletion(),
-
-                    Tables\Actions\BulkAction::make('deactivate')
-                        ->label('Nonaktifkan')
-                        ->icon('heroicon-o-x-circle')
-                        ->color('danger')
-                        ->action(fn ($records) => $records->each->deactivate())
-                        ->deselectRecordsAfterCompletion(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }
@@ -269,18 +241,16 @@ class ProductResource extends Resource
         return [
             'index' => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
+            'view' => Pages\ViewProduct::route('/{record}'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
 
     public static function getNavigationBadge(): ?string
     {
-        $lowStockCount = static::getModel()::whereHas('product_stocks', function ($q) {
-            $q->selectRaw('product_id')
-              ->selectRaw('SUM(CASE WHEN type = "in" THEN quantity ELSE 0 END) - SUM(CASE WHEN type = "out" THEN quantity ELSE 0 END) as stock')
-              ->groupBy('product_id')
-              ->having('stock', '<=', 10);
-        })->count();
+        $lowStockCount = static::getModel()::where('stock', '<=', 10)
+            ->where('stock', '>', 0)
+            ->count();
 
         return $lowStockCount > 0 ? (string) $lowStockCount : null;
     }

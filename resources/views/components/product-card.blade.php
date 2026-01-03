@@ -1,7 +1,7 @@
 @props(['product'])
 
-<div class="group bg-dark-800/50 backdrop-blur-sm border border-dark-700/50 rounded-xl overflow-hidden hover:border-brand-500/50 hover:shadow-glow transition-all duration-300">
-    <a href="{{ route('products.show', $product->id) }}" class="block">
+<div class="group bg-dark-800/50 backdrop-blur-sm border border-dark-700/50 rounded-xl overflow-hidden hover:border-brand-500/50 hover:shadow-glow transition-all duration-300 flex flex-col h-full">
+    <a href="{{ route('products.show', $product->id) }}" class="block flex-1 flex flex-col">
         <!-- Product Image -->
         <div class="relative aspect-square bg-dark-900 overflow-hidden">
             @if($product->images && $product->images->count() > 0)
@@ -17,13 +17,13 @@
             @endif
 
             <!-- Stock Badge -->
-            @if($product->total_stock <= 0)
+            @if($product->stock <= 0)
                 <div class="absolute top-3 left-3">
                     <span class="px-3 py-1 bg-red-600/90 backdrop-blur-sm text-white text-xs font-bold rounded-full">
                         Out of Stock
                     </span>
                 </div>
-            @elseif($product->total_stock <= 10)
+            @elseif($product->stock <= 10)
                 <div class="absolute top-3 left-3">
                     <span class="px-3 py-1 bg-yellow-600/90 backdrop-blur-sm text-white text-xs font-bold rounded-full">
                         Low Stock
@@ -47,7 +47,7 @@
         </div>
 
         <!-- Product Info -->
-        <div class="p-4">
+        <div class="p-4 flex-1 flex flex-col">
             <!-- Category -->
             @if($product->category)
                 <p class="text-xs font-medium text-brand-400 uppercase tracking-wide mb-1">
@@ -78,7 +78,7 @@
             @endif
 
             <!-- Price -->
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 mt-auto">
                 @if($product->discount_percentage > 0)
                     <span class="text-lg font-bold font-heading text-white">
                         Rp {{ number_format($product->final_price, 0, ',', '.') }}
@@ -96,7 +96,7 @@
     </a>
 
     <!-- Add to Cart Button -->
-    @if($product->total_stock > 0)
+    @if($product->stock > 0)
         <div class="p-4 pt-0">
             <button
                 onclick="addToCart({{ $product->id }})"

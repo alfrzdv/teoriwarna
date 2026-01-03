@@ -36,7 +36,7 @@ class AuthenticatedSessionController extends Controller
 
         // Redirect based on role
         if (auth()->user()->hasAdminAccess()) {
-            return redirect()->route('admin.dashboard');
+            return redirect('/admin');
         }
 
         // Check if there's an intended URL (from checkout redirect)

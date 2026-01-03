@@ -4,28 +4,28 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationLabel = 'Users';
+    // protected static ?string $navigationGroup = 'Manajemen User';
 
-    protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $navigationLabel = 'Pengguna';
 
-    protected static ?int $navigationSort = 1;
-
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Section::make('Informasi User')
                     ->schema([
@@ -82,8 +82,7 @@ class UserResource extends Resource
                             ->dehydrated(false)
                             ->required(fn ($record) => $record === null),
                     ])
-                    ->columns(2)
-                    ->visible(fn ($record) => $record === null || request()->has('edit')),
+                    ->columns(2),
 
                 Forms\Components\Section::make('Profile Picture')
                     ->schema([
@@ -123,12 +122,14 @@ class UserResource extends Resource
                     ->searchable()
                     ->toggleable(),
 
-                Tables\Columns\BadgeColumn::make('role')
+                Tables\Columns\TextColumn::make('role')
                     ->label('Role')
-                    ->colors([
-                        'primary' => 'admin',
-                        'secondary' => 'user',
-                    ])
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'admin' => 'primary',
+                        'user' => 'gray',
+                        default => 'gray',
+                    })
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
 
                 Tables\Columns\IconColumn::make('is_active')
@@ -146,12 +147,6 @@ class UserResource extends Resource
                     ->counts('orders')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('last_login')
-                    ->label('Login Terakhir')
-                    ->dateTime('d M Y H:i')
-                    ->sortable()
-                    ->toggleable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Terdaftar')
                     ->dateTime('d M Y')
@@ -167,33 +162,23 @@ class UserResource extends Resource
                     ]),
 
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Status Aktif')
-                    ->placeholder('Semua')
-                    ->trueLabel('Aktif')
-                    ->falseLabel('Tidak Aktif'),
+                    ->label('Status Aktif'),
 
                 Tables\Filters\TernaryFilter::make('is_banned')
-                    ->label('Status Banned')
-                    ->placeholder('Semua')
-                    ->trueLabel('Banned')
-                    ->falseLabel('Tidak Banned'),
+                    ->label('Status Banned'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-
                 Tables\Actions\Action::make('toggleBan')
                     ->label(fn (User $record) => $record->is_banned ? 'Unban' : 'Ban')
                     ->icon('heroicon-o-no-symbol')
                     ->color(fn (User $record) => $record->is_banned ? 'success' : 'danger')
                     ->requiresConfirmation()
-                    ->action(fn (User $record) => $record->update(['is_banned' => !$record->is_banned]))
-                    ->successNotificationTitle(fn (User $record) => $record->is_banned ? 'User berhasil dibanned' : 'User berhasil di-unban'),
+                    ->action(fn (User $record) => $record->update(['is_banned' => !$record->is_banned])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    ExportBulkAction::make(),
                 ]),
             ]);
     }
