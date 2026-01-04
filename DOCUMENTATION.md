@@ -1231,5 +1231,3 @@ For issues or questions:
 ---
 
 **© 2026 TeoriWarna. All rights reserved.**
-
-Generated with [Claude Code](https://claude.com/claude-code)

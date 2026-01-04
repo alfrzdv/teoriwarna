@@ -245,5 +245,3 @@ For issues or questions:
 ---
 
 **Made with ❤️ using Laravel & Filament**
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
