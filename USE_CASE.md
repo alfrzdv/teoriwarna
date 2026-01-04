@@ -3,205 +3,228 @@
 ## System Use Case Diagram
 
 ```mermaid
-flowchart LR
-    Guest(["👤 Guest"])
-    Customer(["👤 Customer"])
-    Admin(["👨‍💼 Admin"])
+flowchart TB
+    Guest(["Guest User"])
+    User(["User"])
+    Admin(["Admin"])
 
-    subgraph System["TeoriWarna Store"]
+    subgraph System["TeoriWarna E-Commerce System"]
         direction TB
-        
-        subgraph G["Guest"]
-            G1["Browse Products"]
-            G2["Register"]
+
+        subgraph GuestUC["Guest Features"]
+            UC1["Browse Products"]
+            UC2["Search Products"]
+            UC3["View Product Details"]
+            UC4["Register Account"]
         end
 
-        subgraph C["Customer"]
-            C1["Shopping & Cart"]
-            C2["Orders & Payment"]
-            C3["Reviews & Refunds"]
+        subgraph UserUC["User Features"]
+            UC5["Add to Cart"]
+            UC6["Manage Cart"]
+            UC7["Checkout"]
+            UC8["Make Payment"]
+            UC9["View Orders"]
+            UC10["Track Order"]
+            UC11["Confirm Delivery"]
+            UC12["Write Review"]
+            UC13["Request Refund"]
+            UC14["Manage Profile"]
         end
 
-        subgraph A["Admin"]
-            A1["Manage Products"]
-            A2["Manage Orders"]
-            A3["Analytics"]
+        subgraph AdminUC["Admin Features"]
+            UC15["Manage Products"]
+            UC16["Manage Categories"]
+            UC17["Manage Orders"]
+            UC18["Update Order Status"]
+            UC19["Process Payments"]
+            UC20["Manage Shipping"]
+            UC21["Process Refunds"]
+            UC22["Manage Users"]
+            UC23["View Analytics"]
         end
     end
 
-    Guest --> G1 & G2
-    Customer --> G1 & C1 & C2 & C3
-    Admin --> A1 & A2 & A3
+    Guest --> UC1
+    Guest --> UC2
+    Guest --> UC3
+    Guest --> UC4
 
-    style Guest fill:#ffd4d4,stroke:#333,stroke-width:2px,color:#000
-    style Customer fill:#d4e7ff,stroke:#333,stroke-width:2px,color:#000
-    style Admin fill:#ffe4d4,stroke:#333,stroke-width:2px,color:#000
-    style System fill:#fff,stroke:#333,stroke-width:2px
-    style G fill:#555,stroke:#333,stroke-width:2px,color:#fff
-    style C fill:#555,stroke:#333,stroke-width:2px,color:#fff
-    style A fill:#555,stroke:#333,stroke-width:2px,color:#fff
-    style G1 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
-    style G2 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
-    style C1 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
-    style C2 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
-    style C3 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
-    style A1 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
-    style A2 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
-    style A3 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC5
+    User --> UC6
+    User --> UC7
+    User --> UC8
+    User --> UC9
+    User --> UC10
+    User --> UC11
+    User --> UC12
+    User --> UC13
+    User --> UC14
+
+    Admin --> UC15
+    Admin --> UC16
+    Admin --> UC17
+    Admin --> UC18
+    Admin --> UC19
+    Admin --> UC20
+    Admin --> UC21
+    Admin --> UC22
+    Admin --> UC23
 ```
 
 ---
 
 ## Use Case Descriptions
 
-### Guest Use Cases
+### Guest User Use Cases
 
 #### UC1: Browse Products
-**Actor:** Guest, Customer
+**Actor:** Guest User, User
 **Description:** Browse all products in the catalog grouped by categories
 **Flow:**
-1. User visits catalog page
+1. Guest visits catalog page
 2. System displays products grouped by category
-3. User can scroll through different categories
+3. Guest can scroll through different categories
 4. Each product shows image, name, and price
 
 #### UC2: Search Products
-**Actor:** Guest, Customer
+**Actor:** Guest User, User
 **Description:** Search and filter products
 **Flow:**
-1. User enters search keyword
-2. User can filter by category or price range
+1. Guest enters search keyword
+2. Guest can filter by category or price range
 3. System displays filtered results
-4. User can sort by price (low to high, high to low)
+4. Guest can sort by price (low to high, high to low)
 
 #### UC3: View Product Details
-**Actor:** Guest, Customer
+**Actor:** Guest User, User
 **Description:** View detailed product information
 **Flow:**
-1. User clicks on a product
+1. Guest clicks on a product
 2. System displays product details page
 3. Shows product images, description, price, stock
 4. Shows customer reviews and ratings
 5. Guest sees "Login to Purchase" button
-6. Customer sees "Add to Cart" button
 
 #### UC4: Register Account
-**Actor:** Guest
-**Description:** Create a new customer account
+**Actor:** Guest User
+**Description:** Create a new user account
 **Flow:**
 1. Guest clicks "Register"
 2. Guest fills in name, email, password, phone
 3. System validates input
 4. System creates account
-5. Guest becomes Customer and is logged in
+5. Guest becomes User and is logged in
 
 ---
 
-### Customer Use Cases
+### User Use Cases
 
 #### UC5: Add to Cart
-**Actor:** Customer
+**Actor:** User
 **Description:** Add products to shopping cart
 **Flow:**
-1. Customer views product detail
-2. Customer clicks "Add to Cart"
+1. User views product detail
+2. User clicks "Add to Cart"
 3. System checks stock availability
 4. System adds product to database cart
 5. Cart count badge updates
 
 #### UC6: Manage Cart
-**Actor:** Customer
+**Actor:** User
 **Description:** View and modify cart items
 **Flow:**
-1. Customer opens cart page
+1. User opens cart page
 2. System displays all cart items with current prices
-3. Customer can update quantity or remove items
+3. User can update quantity or remove items
 4. System recalculates subtotal
-5. Customer can select items for checkout
+5. User can select items for checkout
 
 #### UC7: Checkout
-**Actor:** Customer
+**Actor:** User
 **Description:** Process order checkout
 **Flow:**
-1. Customer selects items and clicks checkout
-2. Customer fills shipping address
-3. Customer selects shipping method (Regular/Express/Same Day)
+1. User selects items and clicks checkout
+2. User fills shipping address
+3. User selects shipping method (Regular/Express/Same Day)
 4. System calculates shipping cost
 5. System shows order summary
-6. Customer confirms order
+6. User confirms order
 7. System creates order and reduces stock
 
 #### UC8: Make Payment
-**Actor:** Customer
+**Actor:** User
 **Description:** Complete payment for order
 **Flow:**
-1. Customer clicks "Pay Now" on order page
+1. User clicks "Pay Now" on order page
 2. System generates Midtrans Snap token
 3. Midtrans payment popup opens
-4. Customer selects payment method (Bank Transfer/E-Wallet/Credit Card)
-5. Customer completes payment
+4. User selects payment method (Bank Transfer/E-Wallet/Credit Card)
+5. User completes payment
 6. Midtrans sends webhook to system
 7. System updates payment and order status
 8. System sends confirmation email
 
 #### UC9: View Orders
-**Actor:** Customer
+**Actor:** User
 **Description:** View order history and details
 **Flow:**
-1. Customer opens orders page
+1. User opens orders page
 2. System displays all orders
-3. Customer can filter by status
-4. Customer clicks order to view details
+3. User can filter by status
+4. User clicks order to view details
 5. Shows items, shipping info, payment status
 
 #### UC10: Track Order
-**Actor:** Customer
+**Actor:** User
 **Description:** Track order delivery status
 **Flow:**
-1. Customer views order detail
+1. User views order detail
 2. System shows current status (Pending/Processing/Shipped/Delivered)
 3. If shipped, system shows tracking number and courier
-4. Customer can view status timeline
+4. User can view status timeline
 
 #### UC11: Confirm Delivery
-**Actor:** Customer
+**Actor:** User
 **Description:** Confirm order has been received
 **Flow:**
 1. Order status is "Shipped"
-2. Customer receives the package
-3. Customer clicks "Confirm Delivery"
+2. User receives the package
+3. User clicks "Confirm Delivery"
 4. System updates order status to "Delivered"
 
 #### UC12: Write Review
-**Actor:** Customer
+**Actor:** User
 **Description:** Write product review and rating
 **Flow:**
 1. Order status is "Delivered"
-2. Customer clicks "Write Review"
-3. Customer selects star rating (1-5)
-4. Customer writes review comment
+2. User clicks "Write Review"
+3. User selects star rating (1-5)
+4. User writes review comment
 5. System saves review
 6. Review appears on product page
 
 #### UC13: Request Refund
-**Actor:** Customer
+**Actor:** User
 **Description:** Request refund for delivered order
 **Flow:**
 1. Order status is "Delivered"
-2. Customer clicks "Request Refund"
-3. Customer enters refund reason
-4. Customer selects refund method (Bank Transfer/E-Wallet)
-5. Customer provides bank/e-wallet details
+2. User clicks "Request Refund"
+3. User enters refund reason
+4. User selects refund method (Bank Transfer/E-Wallet)
+5. User provides bank/e-wallet details
 6. System creates refund request with "Pending" status
 
 #### UC14: Manage Profile
-**Actor:** Customer
+**Actor:** User
 **Description:** Update account information
 **Flow:**
-1. Customer opens profile page
-2. Customer can update name, email, phone, password
-3. Customer can add/edit/delete shipping addresses
-4. Customer can set default address
+1. User opens profile page
+2. User can update name, email, phone, password
+3. User can add/edit/delete shipping addresses
+4. User can set default address
 5. System saves changes
 
 ---
@@ -300,39 +323,18 @@ flowchart LR
 
 ---
 
-## System Integration
-
-### Midtrans Payment Gateway
-- Processes payments via Snap API
-- Supports Bank Transfer, E-Wallet (GoPay, OVO, DANA), Credit Card, Store (Alfamart, Indomaret)
-- Sends webhook for payment status updates
-- Runs in sandbox mode for testing
-
-### Email Service
-- Sends order confirmation emails
-- Sends payment confirmation emails
-- Sends shipping notification emails
-- Sends refund status emails
-
-### Stock Management
-- Automatically reduces stock when order is created
-- Restores stock when order is cancelled or refunded
-- Validates stock before checkout
-
----
-
 ## Actor Descriptions
 
-### 🌐 Guest
-**Visitor** - Anonymous users browsing the site
+### 🌐 Guest User
+**Unauthenticated Visitor** - Anonymous users browsing the site
 - Can browse and search products
 - Can view product details and reviews
 - Must register to make purchases
 - Session-based cart (if implemented)
 
-### 👤 Customer
-**Registered User** - Authenticated customers
-- All guest capabilities
+### 👤 User
+**Registered Customer** - Authenticated customers
+- All guest user capabilities
 - Can add products to cart (database)
 - Can checkout and make payments
 - Can track orders and write reviews
@@ -351,14 +353,14 @@ flowchart LR
 ## Summary
 
 **Total Use Cases:** 23
-- Guest: 4 use cases
-- Customer: 14 use cases (includes guest features)
+- Guest User: 4 use cases
+- User: 14 use cases (includes guest features)
 - Admin: 9 use cases
 
 **Actors:** 3
-- Guest (unauthenticated)
-- Customer (authenticated user)
-- Admin (staff)
+- Guest User (unauthenticated)
+- User (authenticated customer)
+- Admin (staff/administrator)
 
 **External Integrations:**
 - Midtrans Payment Gateway (Snap API)

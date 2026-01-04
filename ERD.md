@@ -1,32 +1,28 @@
-# TeoriWarna E-Commerce - Entity Relationship Diagram
+# TeoriWarna E-Commerce - Database Schema
 
-## Database Entity Relationship Diagram (ERD)
+## Entity Relationship Diagram
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','fontSize':'14px','fontFamily':'Georgia, serif'}}}%%
+
 erDiagram
-    users ||--o{ user_addresses : "has many"
-    users ||--o{ carts : "has many"
-    users ||--o{ orders : "places"
-    users ||--o{ product_reviews : "writes"
-    users ||--o{ refunds : "requests"
-    users ||--o{ refunds : "approves (admin)"
-
-    categories ||--o{ products : "contains"
-
-    products ||--o{ product_images : "has"
-    products ||--o{ cart_items : "in"
-    products ||--o{ order_items : "ordered as"
-    products ||--o{ product_reviews : "reviewed in"
-
-    carts ||--o{ cart_items : "contains"
-
-    orders ||--o{ order_items : "contains"
-    orders ||--o| payments : "has"
-    orders ||--o| refunds : "may have"
-    orders }o--o| user_addresses : "ships to"
-
-    order_items ||--o| product_reviews : "can be reviewed"
-
+    users ||--o{ user_addresses : has
+    users ||--o{ carts : has
+    users ||--o{ orders : places
+    users ||--o{ product_reviews : writes
+    users ||--o{ refunds : requests
+    categories ||--o{ products : contains
+    products ||--o{ product_images : has
+    products ||--o{ cart_items : in
+    products ||--o{ order_items : ordered
+    products ||--o{ product_reviews : reviewed
+    carts ||--o{ cart_items : contains
+    orders ||--o{ order_items : contains
+    orders ||--o| payments : has
+    orders ||--o| refunds : may_have
+    orders }o--o| user_addresses : ships_to
+    order_items ||--o| product_reviews : reviewed
+    
     users {
         bigint id PK
         string name
@@ -37,9 +33,8 @@ erDiagram
         boolean is_active
         boolean is_banned
         timestamp last_login
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     user_addresses {
         bigint id PK
         bigint user_id FK
@@ -50,9 +45,8 @@ erDiagram
         string province
         string postal_code
         boolean is_default
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     categories {
         bigint id PK
         string name
@@ -61,9 +55,8 @@ erDiagram
         string background_color
         string text_color
         string style_type
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     products {
         bigint id PK
         bigint category_id FK
@@ -72,9 +65,8 @@ erDiagram
         text description
         integer stock
         enum status
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     product_images {
         bigint id PK
         bigint product_id FK
@@ -82,23 +74,20 @@ erDiagram
         boolean is_primary
         timestamp created_at
     }
-
     product_reviews {
         bigint id PK
         bigint product_id FK
         bigint user_id FK
-        bigint order_item_id FK "nullable"
+        bigint order_item_id FK
         integer rating
         text comment
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     carts {
         bigint id PK
         bigint user_id FK
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     cart_items {
         bigint id PK
         bigint cart_id FK
@@ -107,11 +96,10 @@ erDiagram
         decimal price
         decimal subtotal
     }
-
     orders {
         bigint id PK
         bigint user_id FK
-        bigint address_id FK "nullable"
+        bigint address_id FK
         string order_number UK
         decimal total_amount
         enum status
@@ -125,9 +113,8 @@ erDiagram
         string tracking_number
         string shipping_courier
         text notes
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     order_items {
         bigint id PK
         bigint order_id FK
@@ -136,7 +123,6 @@ erDiagram
         decimal price
         decimal subtotal
     }
-
     payments {
         bigint id PK
         bigint order_id FK
@@ -149,14 +135,13 @@ erDiagram
         string transaction_id
         string transaction_status
         timestamp paid_at
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
-
     refunds {
         bigint id PK
         bigint order_id FK
         bigint user_id FK
-        bigint approved_by FK "nullable"
+        bigint approved_by FK
         string refund_number UK
         decimal refund_amount
         enum refund_method
@@ -167,190 +152,76 @@ erDiagram
         timestamp approved_at
         timestamp rejected_at
         timestamp completed_at
-        timestamps created_at_updated_at
+        timestamps created_updated
     }
 ```
 
 ---
 
-## Database Statistics
+## Database Overview
 
-### Total Tables: 13
-- users
-- user_addresses
-- categories
-- products
-- product_images
-- product_reviews
-- carts
-- cart_items
-- orders
-- order_items
-- payments
-- refunds
-- store_settings
+**Total Tables:** 13  
+**Total Relationships:** 16  
+**Total Foreign Keys:** 17  
+**Total Indexes:** 20
 
-### Total Relationships: 18
-- **One-to-Many:** 16 relationships
-- **Optional One-to-One:** 2 relationships
-- **Self-referencing:** 1 relationship (refunds.approved_by → users)
+### Table Categories
 
-### Foreign Keys: 17
-- All with proper CASCADE or SET NULL constraints
-- All properly indexed for performance
-
-### Indexes Summary:
-- **Performance Indexes:** 11 (products, cart_items, order_items, product_images, orders, reviews)
-- **Foreign Key Indexes:** 7 (carts, user_addresses, orders, payments, refunds)
-- **Composite Indexes:** 2 (products.status+category_id, product_images.product_id+is_primary)
-- **Total:** 20 indexes
+**User Management** - users, user_addresses, carts, cart_items  
+**Product Catalog** - categories, products, product_images, product_reviews  
+**Order Processing** - orders, order_items, payments, refunds
 
 ---
 
-## Table Details
-
-### Core User Tables
-- **users** - User accounts with authentication
-- **user_addresses** - Shipping addresses for users
-- **carts** - Shopping cart per user
-- **cart_items** - Items in shopping cart
-
-### Product Tables
-- **categories** - Product categories
-- **products** - Product catalog
-- **product_images** - Product images (multiple per product)
-- **product_reviews** - Customer reviews and ratings
-
-### Order Tables
-- **orders** - Customer orders
-- **order_items** - Line items in orders
-- **payments** - Payment records with Midtrans integration
-- **refunds** - Refund requests and processing
-
-### Configuration
-- **store_settings** - Global store configuration
-
----
-
-## Relationship Details
-
-### Users Relationships
-```
-users (1) ─────── (many) user_addresses [CASCADE DELETE]
-users (1) ─────── (many) carts [CASCADE DELETE]
-users (1) ─────── (many) orders [CASCADE DELETE]
-users (1) ─────── (many) product_reviews [CASCADE DELETE]
-users (1) ─────── (many) refunds [CASCADE DELETE]
-users (1) ─────── (many) refunds.approved_by [SET NULL - optional]
-```
-
-### Product Relationships
-```
-categories (1) ─────── (many) products [CASCADE DELETE]
-products (1) ─────── (many) product_images [CASCADE DELETE]
-products (1) ─────── (many) product_reviews [CASCADE DELETE]
-products (1) ─────── (many) cart_items [CASCADE DELETE]
-products (1) ─────── (many) order_items [CASCADE DELETE]
-```
-
-### Cart Relationships
-```
-carts (1) ─────── (many) cart_items [CASCADE DELETE]
-```
-
-### Order Relationships
-```
-orders (1) ─────── (many) order_items [CASCADE DELETE]
-orders (1) ─────── (1) payments [CASCADE DELETE]
-orders (1) ─────── (many) refunds [CASCADE DELETE]
-orders (many) ─────── (1) user_addresses [SET NULL - optional]
-```
-
-### Review Relationships
-```
-order_items (1) ─────── (many) product_reviews [SET NULL - optional]
-```
-
----
-
-## Enum Values
+## Enum Definitions
 
 ### users.role
-- `user` (default)
-- `admin`
-- `super_admin`
+`user` (default), `admin`, `super_admin`
 
 ### products.status
-- `active` (default)
-- `inactive`
-- `archived`
+`active` (default), `inactive`, `archived`
 
 ### orders.status
-- `pending` (awaiting payment)
-- `paid` (payment received)
-- `processing` (being prepared)
-- `shipped` (on delivery)
-- `completed` (delivered)
-- `cancelled` (cancelled by customer/admin)
-- `refunded` (refund processed)
+`pending`, `paid`, `processing`, `shipped`, `completed`, `cancelled`, `refunded`
 
 ### payments.method
-- `transfer` (bank transfer)
-- `ewallet` (e-wallet: GoPay, OVO, DANA)
-- `cod` (cash on delivery)
+`transfer`, `ewallet`, `cod`
 
 ### payments.status
-- `pending` (default)
-- `success` (payment confirmed)
-- `failed` (payment failed)
+`pending` (default), `success`, `failed`
 
 ### refunds.refund_method
-- `bank_transfer`
-- `e_wallet`
-- `store_credit`
+`bank_transfer`, `e_wallet`, `store_credit`
 
 ### refunds.status
-- `pending` (default)
-- `approved`
-- `rejected`
-- `processing`
-- `completed`
+`pending`, `approved`, `rejected`, `processing`, `completed`
+
+---
+
+## Key Relationships
+
+### User Relations
+Users have multiple addresses, carts, orders, and reviews. Users can request refunds, and admin users can approve refunds.
+
+### Product Relations
+Products belong to categories and can have multiple images, reviews, and be in carts or orders. All product-related data cascades on product deletion.
+
+### Order Relations
+Orders contain multiple items, have one payment record, and may have refund requests. Orders reference user addresses for shipping.
+
+### Review Relations
+Reviews are linked to specific order items (optional), ensuring only verified purchases can be reviewed.
 
 ---
 
 ## Indexing Strategy
 
-### Primary Indexes (Performance)
-```
-✅ products.category_id
-✅ products.status
-✅ products.(status, category_id) - composite
-✅ cart_items.cart_id
-✅ cart_items.product_id
-✅ order_items.order_id
-✅ order_items.product_id
-✅ product_images.product_id
-✅ product_images.(product_id, is_primary) - composite
-✅ orders.user_id
-✅ orders.status
-✅ product_reviews.product_id
-✅ product_reviews.user_id
-```
-
-### Foreign Key Indexes (Added)
-```
-✅ carts.user_id
-✅ user_addresses.user_id
-✅ orders.address_id
-✅ payments.order_id
-✅ refunds.order_id
-✅ refunds.user_id
-✅ refunds.approved_by
-```
+**Performance Indexes:** Product status, category lookups, cart operations, order queries  
+**Foreign Key Indexes:** All relationships properly indexed  
+**Composite Indexes:** Product filtering (status + category), primary image selection
 
 ---
 
+**System:** TeoriWarna E-Commerce  
+**Database Version:** 1.0.0  
 **Last Updated:** January 4, 2026
-**Database Version:** After migration 2026_01_04_050000
-**Total Indexes:** 20
-**Total Foreign Keys:** 17

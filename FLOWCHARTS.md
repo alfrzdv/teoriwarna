@@ -3,6 +3,8 @@
 ## 1. Customer Order Flow (Complete Journey)
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','fontSize':'14px','fontFamily':'Georgia, serif'}}}%%
+
 flowchart TD
     Start([Customer Visits Site]) --> Browse[Browse Products]
     Browse --> ProductDetail{View Product<br/>Detail?}
@@ -89,12 +91,21 @@ flowchart TD
     WriteReview --> End
     CancelOrder --> End
 
-    style Start fill:#e1f5ff
-    style End fill:#c8e6c9
-    style OrderCreated fill:#fff9c4
-    style UpdateOrder fill:#c8e6c9
-    style PaymentFailed fill:#ffcdd2
-    style CancelOrder fill:#ffcdd2
+    classDef startEnd fill:#1a1a1a,stroke:#e0e0e0,stroke-width:2px,color:#ffffff
+    classDef success fill:#4caf50,stroke:#388e3c,stroke-width:2px,color:#ffffff
+    classDef warning fill:#ff9800,stroke:#f57c00,stroke-width:2px,color:#ffffff
+    classDef error fill:#f44336,stroke:#d32f2f,stroke-width:2px,color:#ffffff
+    classDef process fill:#ffffff,stroke:#bdbdbd,stroke-width:1.5px,color:#424242
+    classDef decision fill:#f5f5f5,stroke:#bdbdbd,stroke-width:2px,color:#1a1a1a
+    
+    class Start,End startEnd
+    class OrderCreated,UpdateOrder success
+    class PaymentPage warning
+    class PaymentFailed,CancelOrder,StockError error
+    class Browse,ViewProduct,CartAdded,ViewCart,SelectItems,DirectCheckout,Login,FillShipping,SelectShipping,SelectPayment,ReviewOrder,CreateOrder,OpenSnap,SelectPaymentType,MakePayment,WebhookReceived,UpdatePayment,CODConfirm,AdminProcess,PackOrder,ShipOrder,AddTracking,CustomerNotified,WaitDelivery,ConfirmReceived,OrderCompleted,WriteReview process
+    class ProductDetail,AddCart,ContinueShopping,CheckAuth,ConfirmOrder,CheckStock,PaymentMethod,PaymentSuccess,RetryPayment,Delivered,ReviewProduct decision
+    
+    linkStyle default stroke:#757575,stroke-width:1.5px
 ```
 
 ---
@@ -102,6 +113,8 @@ flowchart TD
 ## 2. Payment Integration Flow (Midtrans Snap)
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','fontSize':'14px','fontFamily':'Georgia, serif'}}}%%
+
 flowchart TD
     Start([User Clicks 'Bayar Sekarang']) --> CheckAuth{Order belongs<br/>to user?}
 
@@ -170,12 +183,19 @@ flowchart TD
     Error403 --> End
     TokenError --> End
 
-    style Start fill:#e1f5ff
-    style End fill:#c8e6c9
-    style ProcessSuccess fill:#c8e6c9
-    style ProcessFailed fill:#ffcdd2
-    style Error403 fill:#ffcdd2
-    style TokenError fill:#ffcdd2
+    classDef startEnd fill:#1a1a1a,stroke:#e0e0e0,stroke-width:2px,color:#ffffff
+    classDef success fill:#4caf50,stroke:#388e3c,stroke-width:2px,color:#ffffff
+    classDef error fill:#f44336,stroke:#d32f2f,stroke-width:2px,color:#ffffff
+    classDef process fill:#ffffff,stroke:#bdbdbd,stroke-width:1.5px,color:#424242
+    classDef decision fill:#f5f5f5,stroke:#bdbdbd,stroke-width:2px,color:#1a1a1a
+    
+    class Start,End,WebhookStart,WebhookEnd startEnd
+    class ProcessSuccess success
+    class Error403,TokenError,WebhookError,OrderNotFound,ProcessFailed error
+    class GenerateToken,PrepareData,CallMidtrans,SaveToken,ReturnToken,OpenPopup,UserPays,SuccessCallback,PendingCallback,FailedCallback,CloseCallback,RedirectSuccess,RedirectPending,ShowError,EnableButton,AlreadyPaid,ReceiveNotification,ParseNotification,FindOrder,ProcessPending,SendEmail process
+    class CheckAuth,CheckPaymentStatus,TokenReceived,PaymentResult,VerifySignature,OrderExists,CheckTransactionStatus decision
+    
+    linkStyle default stroke:#757575,stroke-width:1.5px
 ```
 
 ---
@@ -183,6 +203,8 @@ flowchart TD
 ## 3. Admin Order Management Flow
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','fontSize':'14px','fontFamily':'Georgia, serif'}}}%%
+
 flowchart TD
     Start([Admin Access Orders]) --> ViewOrders[View Orders List]
 
@@ -243,12 +265,19 @@ flowchart TD
     RefundRejected --> End
     CancelledOrder --> End
 
-    style Start fill:#e1f5ff
-    style End fill:#c8e6c9
-    style UpdateProcessing fill:#fff9c4
-    style UpdateShipped fill:#fff9c4
-    style AutoComplete fill:#c8e6c9
-    style RefundApproved fill:#c8e6c9
+    classDef startEnd fill:#1a1a1a,stroke:#e0e0e0,stroke-width:2px,color:#ffffff
+    classDef success fill:#4caf50,stroke:#388e3c,stroke-width:2px,color:#ffffff
+    classDef warning fill:#ff9800,stroke:#f57c00,stroke-width:2px,color:#ffffff
+    classDef process fill:#ffffff,stroke:#bdbdbd,stroke-width:1.5px,color:#424242
+    classDef decision fill:#f5f5f5,stroke:#bdbdbd,stroke-width:2px,color:#1a1a1a
+    
+    class Start,End startEnd
+    class UpdateProcessing,UpdateShipped,AutoComplete,RefundApproved warning
+    class OrderComplete success
+    class ViewOrders,ApplyFilter,AllOrders,SelectOrder,ViewOrderDetail,WaitingPayment,ProcessOrder,PrepareItems,PackItems,SelectCourier,GenerateShipping,AddTrackingNumber,NotifyCustomer,TrackShipment,ProcessRefund,RestoreStock,ProcessRefundPayment,RefundRejected,CancelledOrder process
+    class FilterOrders,CheckStatus,CheckPayment,WaitDelivery,CustomerConfirm,CheckRefund,ApproveRefund decision
+    
+    linkStyle default stroke:#757575,stroke-width:1.5px
 ```
 
 ---
@@ -256,6 +285,8 @@ flowchart TD
 ## 4. Cart Management Flow
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','fontSize':'14px','fontFamily':'Georgia, serif'}}}%%
+
 flowchart TD
     Start([User Browses Products]) --> ViewProduct[View Product Detail]
 
@@ -304,10 +335,19 @@ flowchart TD
     EmptyCart --> End([End])
     ProceedCheckout --> End
 
-    style Start fill:#e1f5ff
-    style End fill:#c8e6c9
-    style CartAdded fill:#c8e6c9
-    style ShowError fill:#ffcdd2
+    classDef startEnd fill:#1a1a1a,stroke:#e0e0e0,stroke-width:2px,color:#ffffff
+    classDef success fill:#4caf50,stroke:#388e3c,stroke-width:2px,color:#ffffff
+    classDef error fill:#f44336,stroke:#d32f2f,stroke-width:2px,color:#ffffff
+    classDef process fill:#ffffff,stroke:#bdbdbd,stroke-width:1.5px,color:#424242
+    classDef decision fill:#f5f5f5,stroke:#bdbdbd,stroke-width:2px,color:#1a1a1a
+    
+    class Start,End startEnd
+    class CartAdded success
+    class ShowError error
+    class ViewProduct,SessionCart,DatabaseCart,ShowNotification,UpdateCartCount,ViewCart,LoadSession,LoadDB,ShowItems,UpdateQty,RemoveItem,ClearCart,SelectItems,RecalculateSubtotal,EmptyCart,ProceedCheckout process
+    class AddToCart,CheckAuth,ContinueBrowsing,CheckCartType,UserAction,ValidateSelection decision
+    
+    linkStyle default stroke:#757575,stroke-width:1.5px
 ```
 
 ---
@@ -315,6 +355,8 @@ flowchart TD
 ## 5. Product Review Flow
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','fontSize':'14px','fontFamily':'Georgia, serif'}}}%%
+
 flowchart TD
     Start([Customer Views Order]) --> CheckStatus{Order<br/>Delivered?}
 
@@ -349,10 +391,19 @@ flowchart TD
     ShowSuccess --> End
     CannotReview --> End
 
-    style Start fill:#e1f5ff
-    style End fill:#c8e6c9
-    style ReviewSaved fill:#c8e6c9
-    style ShowValidationError fill:#ffcdd2
+    classDef startEnd fill:#1a1a1a,stroke:#e0e0e0,stroke-width:2px,color:#ffffff
+    classDef success fill:#4caf50,stroke:#388e3c,stroke-width:2px,color:#ffffff
+    classDef error fill:#f44336,stroke:#d32f2f,stroke-width:2px,color:#ffffff
+    classDef process fill:#ffffff,stroke:#bdbdbd,stroke-width:1.5px,color:#424242
+    classDef decision fill:#f5f5f5,stroke:#bdbdbd,stroke-width:2px,color:#1a1a1a
+    
+    class Start,End startEnd
+    class ReviewSaved,ShowSuccess success
+    class ShowValidationError error
+    class ViewProducts,SelectProduct,ViewExisting,WriteReview,UpdateReview,FillRating,WriteComment,SubmitReview,SaveReview,CannotReview process
+    class CheckStatus,CheckExisting,EditReview,ValidateInput decision
+    
+    linkStyle default stroke:#757575,stroke-width:1.5px
 ```
 
 ---
@@ -360,6 +411,8 @@ flowchart TD
 ## 6. Stock Management Flow
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','fontSize':'14px','fontFamily':'Georgia, serif'}}}%%
+
 flowchart TD
     Start([Stock Management]) --> Action{Action<br/>Type?}
 
@@ -404,14 +457,22 @@ flowchart TD
     StockChanged --> End
     RollbackOrder --> End
 
-    style Start fill:#e1f5ff
-    style End fill:#c8e6c9
-    style StockUpdated fill:#c8e6c9
-    style InsufficientStock fill:#ffcdd2
-    style RollbackOrder fill:#ffcdd2
+    classDef startEnd fill:#1a1a1a,stroke:#e0e0e0,stroke-width:2px,color:#ffffff
+    classDef success fill:#4caf50,stroke:#388e3c,stroke-width:2px,color:#ffffff
+    classDef error fill:#f44336,stroke:#d32f2f,stroke-width:2px,color:#ffffff
+    classDef process fill:#ffffff,stroke:#bdbdbd,stroke-width:1.5px,color:#424242
+    classDef decision fill:#f5f5f5,stroke:#bdbdbd,stroke-width:2px,color:#1a1a1a
+    
+    class Start,End startEnd
+    class StockUpdated,StockRestored,RefundStockUpdated,StockChanged success
+    class InsufficientStock,RollbackOrder error
+    class OrderPlaced,OrderCancelled,RefundApproved,AdminUpdate,GetOrderItems,ReduceStock,GetCancelledItems,RestoreStock,GetRefundItems,AddStock,ManualUpdate process
+    class Action,LoopItems,CheckStock,NextItem,RestoreLoop,NextRestore,RefundLoop,NextRefund decision
+    
+    linkStyle default stroke:#757575,stroke-width:1.5px
 ```
 
 ---
 
-**Last Updated:** January 4, 2026
+**Last Updated:** January 4, 2026  
 **System Version:** 1.0.0
