@@ -1,180 +1,179 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-bold text-2xl text-white leading-tight font-heading">
                 {{ $product->name }}
             </h2>
-            <a href="{{ route('products.index') }}" class="text-blue-600 hover:text-blue-800">
-                ← Back to Products
+            <a href="{{ route('products.index') }}" class="text-primary-400 hover:text-primary-300 transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+                Back to Products
             </a>
         </div>
     </x-slot>
 
-    <link rel="stylesheet" href="{{ asset('css/catalog/products.css') }}">
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    <!-- Left: Images (2 columns) -->
+                    <div class="md:col-span-2 space-y-3">
+                        <div class="aspect-square bg-gray-900 border border-gray-700 rounded-lg overflow-hidden">
+                            @php
+                                $primaryImage = $product->getPrimaryImage();
+                            @endphp
+                            @if($primaryImage)
+                                <img src="{{ asset('storage/' . $primaryImage->image_path) }}"
+                                    alt="{{ $product->name }}"
+                                    class="w-full h-full object-contain"
+                                    id="mainImage">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <svg class="w-24 h-24 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                            @endif
+                        </div>
 
-    <div class="product-detail-container">
-        <div class="product-detail-grid">
-            <!-- Left: Images -->
-            <div class="product-images-section">
-                <div class="main-image-wrapper" id="mainImageWrapper">
-                    @if($product->getPrimaryImage())
-                        <img src="{{ asset('storage/' . $product->getPrimaryImage()->image_path) }}"
-                            alt="{{ $product->name }}" class="main-product-image" id="mainImage">
-                    @else
-                        <div class="main-product-image" style="display: flex; align-items: center; justify-content: center; background-color: #e5e7eb;">
-                            <span style="font-size: 6rem; filter: grayscale(100%);">📦</span>
+                        @if($product->product_images->count() > 1)
+                            <div class="grid grid-cols-5 gap-2">
+                                @foreach($product->product_images as $image)
+                                    <button type="button"
+                                        onclick="changeMainImage('{{ asset('storage/' . $image->image_path) }}', this)"
+                                        class="aspect-square bg-gray-900 border-2 rounded-md overflow-hidden transition-all {{ $image->is_primary ? 'border-primary-500' : 'border-gray-700 hover:border-gray-600' }}">
+                                        <img src="{{ asset('storage/' . $image->image_path) }}"
+                                            alt="{{ $product->name }}"
+                                            class="w-full h-full object-contain">
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Right: Product Info (3 columns) -->
+                    <div class="md:col-span-3 space-y-4">
+                    <div>
+                        <p class="text-sm font-medium text-primary-400 uppercase tracking-wide mb-2">
+                            {{ $product->category->name }}
+                        </p>
+                        <h1 class="text-3xl font-bold text-white font-heading mb-4">{{ $product->name }}</h1>
+                        <p class="text-4xl font-bold text-primary-500">
+                            Rp {{ number_format($product->price, 0, ',', '.') }}
+                        </p>
+                    </div>
+
+                    @php
+                        $stock = $product->stock;
+                    @endphp
+
+                    <div class="flex items-center gap-2">
+                        @if($stock > 10)
+                            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                            <span class="text-sm text-gray-300 font-medium">{{ $stock }} items available</span>
+                        @elseif($stock > 0)
+                            <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                            <span class="text-sm text-gray-300 font-medium">Only {{ $stock }} left in stock</span>
+                        @else
+                            <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                            <span class="text-sm text-gray-300 font-medium">Out of stock</span>
+                        @endif
+                    </div>
+
+                    @if($product->description)
+                        <div class="bg-gray-900 border border-gray-700 rounded-lg p-4">
+                            <h3 class="font-semibold text-white mb-2 text-sm">Description</h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">{{ $product->description }}</p>
                         </div>
                     @endif
-                </div>
 
-                @if($product->product_images->count() > 1)
-                    <div class="thumbnail-gallery">
-                        @foreach($product->product_images as $index => $image)
-                            <div class="thumbnail-wrapper {{ $image->is_primary ? 'active' : '' }}"
-                                onclick="changeMainImage('{{ asset('storage/' . $image->image_path) }}', this)">
-                                <img src="{{ asset('storage/' . $image->image_path) }}"
-                                    alt="{{ $product->name }}" class="thumbnail-image">
+                    @if($stock > 0)
+                        @auth
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Quantity</label>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button"
+                                            onclick="decrementQuantity()"
+                                            class="w-10 h-10 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-bold">−</button>
+                                        <input type="number"
+                                            id="quantityInput"
+                                            value="1"
+                                            min="1"
+                                            max="{{ $stock }}"
+                                            class="w-16 h-10 text-center bg-gray-900 border border-gray-700 text-white rounded-lg font-medium"
+                                            readonly>
+                                        <button type="button"
+                                            onclick="incrementQuantity({{ $stock }})"
+                                            class="w-10 h-10 flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors font-bold">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <form action="{{ route('cart.add', $product) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="quantity" id="addToCartQuantity" value="1">
+                                        <button type="submit" class="w-full px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors">
+                                            Add to Cart
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('buy-now', $product) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
+                                        <button type="submit" class="w-full px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all">
+                                            Buy Now
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
+                        @else
+                            <a href="{{ route('login') }}" class="block w-full px-4 py-2.5 text-center bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all">
+                                Login to Purchase
+                            </a>
+                        @endauth
+                    @else
+                        <button disabled class="w-full px-4 py-2.5 bg-gray-700 text-gray-500 font-medium rounded-lg cursor-not-allowed">
+                            Out of Stock
+                        </button>
+                    @endif
+
+                    <div class="bg-gray-900 border border-gray-700 rounded-lg p-4">
+                        <h4 class="font-semibold text-white mb-3 text-sm">Product Information</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Category</span>
+                                <span class="text-white font-medium">{{ $product->category->name }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Stock Status</span>
+                                <span class="font-medium {{ $stock > 0 ? 'text-green-400' : 'text-red-400' }}">
+                                    {{ $stock > 0 ? 'In Stock' : 'Out of Stock' }}
+                                </span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">SKU</span>
+                                <span class="text-white font-medium">#{{ str_pad($product->id, 6, '0', STR_PAD_LEFT) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Products -->
+            @if($relatedProducts->count() > 0)
+                <div class="mt-16">
+                    <h2 class="text-2xl font-bold text-white font-heading mb-6">Related Products</h2>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        @foreach($relatedProducts as $relatedProduct)
+                            <x-product-card :product="$relatedProduct" />
                         @endforeach
                     </div>
-                @endif
-            </div>
-
-            <!-- Right: Product Info -->
-            <div class="product-info-section">
-                <p class="product-detail-category">{{ $product->category->name }}</p>
-                <h1 class="product-detail-title">{{ $product->name }}</h1>
-                <p class="product-detail-price">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-
-                @php
-                    $stock = $product->getCurrentStock();
-                    $stockClass = $stock > 10 ? 'stock-available' : ($stock > 0 ? 'stock-low' : 'stock-out');
-                    $stockText = $stock > 0 ? $stock . ' items available' : 'Out of stock';
-                @endphp
-
-                <div class="product-detail-stock">
-                    <span class="stock-dot {{ $stockClass }}" style="width: 12px; height: 12px;"></span>
-                    <span style="font-weight: 500;">{{ $stockText }}</span>
                 </div>
-
-                @if($product->description)
-                    <div class="product-detail-description">
-                        <h3 style="font-weight: 600; margin-bottom: 0.5rem; color: #111827;">Description</h3>
-                        <p>{{ $product->description }}</p>
-                    </div>
-                @endif
-
-                @if($stock > 0)
-                    @auth
-                        <div class="quantity-selector">
-                            <label class="quantity-label">Quantity</label>
-                            <div class="quantity-input-group">
-                                <button type="button" class="quantity-button" onclick="decrementQuantity()">−</button>
-                                <input type="number" name="quantity" id="quantityInput" value="1"
-                                    min="1" max="{{ $stock }}" class="quantity-input" readonly>
-                                <button type="button" class="quantity-button" onclick="incrementQuantity({{ $stock }})">+</button>
-                            </div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
-                            <form action="{{ route('cart.add', $product) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="quantity" id="addToCartQuantity" value="1">
-                                <button type="submit" class="add-to-cart-button" style="background-color: #6b7280; width: 100%;">
-                                    Add to Cart
-                                </button>
-                            </form>
-
-                            <form action="{{ route('buy-now', $product) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="quantity" id="buyNowQuantity" value="1">
-                                <button type="submit" class="add-to-cart-button" style="width: 100%;">
-                                    Buy Now
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <a href="{{ route('login') }}" class="add-to-cart-button" style="text-decoration: none;">
-                            Login to Purchase
-                        </a>
-                    @endauth
-                @else
-                    <button class="add-to-cart-button" disabled>
-                        Out of Stock
-                    </button>
-                @endif
-
-                <div style="padding: 1rem; background-color: #f9fafb; border-radius: 0.5rem; margin-top: 1rem;">
-                    <h4 style="font-weight: 600; margin-bottom: 0.5rem; color: #374151;">Product Information</h4>
-                    <div style="display: grid; gap: 0.5rem; font-size: 0.875rem; color: #6b7280;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Category:</span>
-                            <span style="font-weight: 500; color: #111827;">{{ $product->category->name }}</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Stock Status:</span>
-                            <span style="font-weight: 500; color: {{ $stock > 0 ? '#059669' : '#dc2626' }};">
-                                {{ $stock > 0 ? 'In Stock' : 'Out of Stock' }}
-                            </span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>SKU:</span>
-                            <span style="font-weight: 500; color: #111827;">#{{ str_pad($product->id, 6, '0', STR_PAD_LEFT) }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @endif
         </div>
-
-        <!-- Related Products -->
-        @if($relatedProducts->count() > 0)
-            <div class="related-products-section">
-                <h2 class="related-products-title">Related Products</h2>
-
-                <div class="products-grid">
-                    @foreach($relatedProducts as $relatedProduct)
-                        <div class="product-card">
-                            <a href="{{ route('products.show', $relatedProduct) }}" class="product-image-wrapper">
-                                @if($relatedProduct->getPrimaryImage())
-                                    <img src="{{ asset('storage/' . $relatedProduct->getPrimaryImage()->image_path) }}"
-                                        alt="{{ $relatedProduct->name }}" class="product-image">
-                                @else
-                                    <div class="product-image" style="display: flex; align-items: center; justify-content: center; background-color: #e5e7eb;">
-                                        <span style="font-size: 4rem; filter: grayscale(100%);">📦</span>
-                                    </div>
-                                @endif
-                            </a>
-
-                            <div class="product-details">
-                                <p class="product-category">{{ $relatedProduct->category->name }}</p>
-
-                                <a href="{{ route('products.show', $relatedProduct) }}" style="text-decoration: none; color: inherit;">
-                                    <h3 class="product-name">{{ $relatedProduct->name }}</h3>
-                                </a>
-
-                                <div class="product-footer">
-                                    <div>
-                                        <p class="product-price">Rp {{ number_format($relatedProduct->price, 0, ',', '.') }}</p>
-                                        <div class="product-stock">
-                                            @php
-                                                $relatedStock = $relatedProduct->getCurrentStock();
-                                                $relatedStockClass = $relatedStock > 10 ? 'stock-available' : ($relatedStock > 0 ? 'stock-low' : 'stock-out');
-                                            @endphp
-                                            <span class="stock-dot {{ $relatedStockClass }}"></span>
-                                            <span>{{ $relatedStock > 0 ? $relatedStock . ' in stock' : 'Out of stock' }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="product-actions">
-                                    <a href="{{ route('products.show', $relatedProduct) }}" class="btn-view">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
     </div>
 
     <script>
@@ -182,12 +181,14 @@
             document.getElementById('mainImage').src = imageSrc;
 
             // Remove active class from all thumbnails
-            document.querySelectorAll('.thumbnail-wrapper').forEach(thumb => {
-                thumb.classList.remove('active');
+            document.querySelectorAll('button[onclick*="changeMainImage"]').forEach(thumb => {
+                thumb.classList.remove('border-primary-500');
+                thumb.classList.add('border-gray-700', 'hover:border-gray-600');
             });
 
             // Add active class to clicked thumbnail
-            thumbnailElement.classList.add('active');
+            thumbnailElement.classList.remove('border-gray-700', 'hover:border-gray-600');
+            thumbnailElement.classList.add('border-primary-500');
         }
 
         function incrementQuantity(maxStock) {

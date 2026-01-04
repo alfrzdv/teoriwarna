@@ -7,55 +7,23 @@
 
     <link rel="stylesheet" href="{{ asset('css/cart/cart.css') }}">
 
-    @if(session('success'))
-        <div id="success-notification" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999; background-color: #d1fae5; border: 1px solid #10b981; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-width: 400px;">
-            <div style="display: flex; align-items: start; gap: 0.75rem;">
-                <div style="flex-shrink: 0; width: 1.25rem; height: 1.25rem; background-color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: white; font-size: 0.875rem;">✓</span>
+    <div class="py-4">
+        @if(session('success'))
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-green-500/20 border border-green-500/50 text-green-400 px-4 py-3 rounded-lg relative mb-4">
+                    {{ session('success') }}
                 </div>
-                <div style="flex: 1;">
-                    <p style="color: #065f46; font-weight: 600; margin: 0;">Berhasil!</p>
-                    <p style="color: #047857; font-size: 0.875rem; margin: 0.25rem 0 0 0;">{{ session('success') }}</p>
-                </div>
-                <button onclick="document.getElementById('success-notification').remove()" style="background: none; border: none; color: #065f46; cursor: pointer; font-size: 1.25rem; line-height: 1; padding: 0;">×</button>
             </div>
-        </div>
-        <script>
-            setTimeout(() => {
-                const notification = document.getElementById('success-notification');
-                if (notification) {
-                    notification.style.transition = 'opacity 0.3s ease-out';
-                    notification.style.opacity = '0';
-                    setTimeout(() => notification.remove(), 300);
-                }
-            }, 5000);
-        </script>
-    @endif
+        @endif
 
-    @if(session('error'))
-        <div id="error-notification" style="position: fixed; top: 1rem; right: 1rem; z-index: 9999; background-color: #fee2e2; border: 1px solid #991b1b; border-radius: 0.5rem; padding: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-width: 400px;">
-            <div style="display: flex; align-items: start; gap: 0.75rem;">
-                <div style="flex-shrink: 0; width: 1.25rem; height: 1.25rem; background-color: #991b1b; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: white; font-size: 0.875rem;">✕</span>
+        @if(session('error'))
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-red-500/20 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg relative mb-4">
+                    {{ session('error') }}
                 </div>
-                <div style="flex: 1;">
-                    <p style="color: #7f1d1d; font-weight: 600; margin: 0;">Error!</p>
-                    <p style="color: #991b1b; font-size: 0.875rem; margin: 0.25rem 0 0 0;">{{ session('error') }}</p>
-                </div>
-                <button onclick="document.getElementById('error-notification').remove()" style="background: none; border: none; color: #7f1d1d; cursor: pointer; font-size: 1.25rem; line-height: 1; padding: 0;">×</button>
             </div>
-        </div>
-        <script>
-            setTimeout(() => {
-                const notification = document.getElementById('error-notification');
-                if (notification) {
-                    notification.style.transition = 'opacity 0.3s ease-out';
-                    notification.style.opacity = '0';
-                    setTimeout(() => notification.remove(), 300);
-                }
-            }, 5000);
-        </script>
-    @endif
+        @endif
+    </div>
 
     <div class="checkout-container">
         <form action="{{ route('checkout.process') }}" method="POST">
@@ -124,7 +92,7 @@
                                 <input type="radio" name="shipping_method" value="regular" checked required>
                                 <div>
                                     <strong>Regular (3-5 hari)</strong>
-                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Rp 15.000</p>
+                                    <p class="text-sm text-gray-500 mt-1">Rp 15.000</p>
                                 </div>
                             </label>
 
@@ -132,7 +100,7 @@
                                 <input type="radio" name="shipping_method" value="express" required>
                                 <div>
                                     <strong>Express (1-2 hari)</strong>
-                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Rp 30.000</p>
+                                    <p class="text-sm text-gray-500 mt-1">Rp 30.000</p>
                                 </div>
                             </label>
 
@@ -140,7 +108,7 @@
                                 <input type="radio" name="shipping_method" value="same_day" required>
                                 <div>
                                     <strong>Same Day</strong>
-                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Rp 50.000</p>
+                                    <p class="text-sm text-gray-500 mt-1">Rp 50.000</p>
                                 </div>
                             </label>
                         </div>
@@ -159,7 +127,7 @@
                                 <input type="radio" name="payment_method" value="bank_transfer" checked required>
                                 <div>
                                     <strong>Bank Transfer</strong>
-                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Transfer to our bank account</p>
+                                    <p class="text-sm text-gray-500 mt-1">Transfer to our bank account</p>
                                 </div>
                             </label>
 
@@ -167,7 +135,7 @@
                                 <input type="radio" name="payment_method" value="e_wallet" required>
                                 <div>
                                     <strong>E-Wallet</strong>
-                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Pay with OVO, GoPay, Dana, etc.</p>
+                                    <p class="text-sm text-gray-500 mt-1">Pay with OVO, GoPay, Dana, etc.</p>
                                 </div>
                             </label>
 
@@ -175,7 +143,7 @@
                                 <input type="radio" name="payment_method" value="cod" required>
                                 <div>
                                     <strong>Cash on Delivery (COD)</strong>
-                                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.25rem;">Pay when the order arrives</p>
+                                    <p class="text-sm text-gray-500 mt-1">Pay when the order arrives</p>
                                 </div>
                             </label>
                         </div>
@@ -185,38 +153,6 @@
                         @enderror
                     </div>
 
-                    {{-- Coupon Code - Temporarily disabled
-                    <div class="form-section">
-                        <h3 class="section-title">Coupon Code (Optional)</h3>
-
-                        @if(session('applied_coupon'))
-                            <div style="padding: 1rem; background-color: #d1fae5; border: 1px solid #10b981; border-radius: 0.5rem; margin-bottom: 1rem;">
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <div>
-                                        <p style="font-weight: 600; color: #065f46;">Kupon Diterapkan: {{ session('applied_coupon')['code'] }}</p>
-                                        <p style="font-size: 0.875rem; color: #047857;">Diskon: Rp {{ number_format(session('applied_coupon')['discount'], 0, ',', '.') }}</p>
-                                    </div>
-                                    <form action="{{ route('checkout.remove-coupon') }}" method="POST" style="margin: 0;">
-                                        @csrf
-                                        <button type="submit" style="padding: 0.5rem 1rem; background-color: #991b1b; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        @else
-                            <div style="display: flex; gap: 0.5rem;">
-                                <input type="text" id="coupon-code" placeholder="Masukkan kode kupon"
-                                    style="flex: 1; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.375rem; font-size: 1rem;">
-                                <button type="button" id="apply-coupon-btn"
-                                    style="padding: 0.75rem 1.5rem; background-color: #10b981; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600;">
-                                    Terapkan
-                                </button>
-                            </div>
-                            <p id="coupon-message" style="margin-top: 0.5rem; font-size: 0.875rem;"></p>
-                        @endif
-                    </div>
-                    --}}
 
                     <!-- Additional Notes -->
                     <div class="form-section">

@@ -4,20 +4,20 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
-use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     //protected static ?string $navigationGroup = 'Penjualan';
 
@@ -25,9 +25,9 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Pesanan')
                     ->schema([
@@ -237,9 +237,9 @@ class OrderResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $schema
+        return $infolist
             ->schema([
                 Infolists\Components\Section::make('Informasi Pesanan')
                     ->schema([

@@ -159,16 +159,4 @@ class ReviewController extends Controller
         return redirect()->route('reviews.index')
             ->with('success', 'Review berhasil dihapus.');
     }
-
-    public function markHelpful(ProductReview $review)
-    {
-        // Prevent marking own review as helpful
-        if ($review->user_id === Auth::id()) {
-            return back()->with('error', 'Anda tidak bisa menandai review sendiri sebagai helpful.');
-        }
-
-        $review->incrementHelpful();
-
-        return back()->with('success', 'Terima kasih atas feedback Anda!');
-    }
 }

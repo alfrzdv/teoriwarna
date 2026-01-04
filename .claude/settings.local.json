@@ -51,7 +51,15 @@
       "Bash(composer show:*)",
       "Bash(del \"C:\\laragon\\www\\teoriwarna\\app\\Filament\\Widgets\\BlogPostsChart.php\")",
       "Bash(curl:*)",
-      "Bash(actions\\([ vendor/filament/*/stubs/*.stub)"
+      "Bash(actions\\([ vendor/filament/*/stubs/*.stub)",
+      "Bash(composer diagnose:*)",
+      "Bash(if [ -f storage/logs/laravel.log ])",
+      "Bash(then tail -100 storage/logs/laravel.log)",
+      "Bash(else echo \"No log file found\")",
+      "Bash(rm:*)",
+      "Bash(touch:*)",
+      "Bash(dir:*)",
+      "Bash(xargs basename:*)"
     ]
   }
 }

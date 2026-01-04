@@ -4,28 +4,27 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\Action;
+
 use Illuminate\Support\Facades\Hash;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class UserResource extends Resource
 {
+    protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
-
-    // protected static ?string $navigationGroup = 'Manajemen User';
+    //protected static ?string $navigationGroup = 'Manajemen User';
 
     protected static ?string $navigationLabel = 'Pengguna';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make('Informasi User')
                     ->schema([
@@ -168,6 +167,10 @@ class UserResource extends Resource
                     ->label('Status Banned'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+
                 Tables\Actions\Action::make('toggleBan')
                     ->label(fn (User $record) => $record->is_banned ? 'Unban' : 'Ban')
                     ->icon('heroicon-o-no-symbol')
@@ -178,7 +181,6 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make(),
                 ]),
             ]);
     }

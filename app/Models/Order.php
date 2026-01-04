@@ -32,16 +32,16 @@ class Order extends Model
     protected $casts = [
         'user_id' => 'int',
         'address_id' => 'int',
-        'total_price' => 'decimal:2'
+        'total_amount' => 'decimal:2',
+        'shipping_cost' => 'decimal:2'
     ];
 
     protected $fillable = [
         'user_id',
         'address_id',
         'order_number',
-        'order_code', // Keep for backward compatibility
         'total_amount',
-        'total_price', // Keep for backward compatibility
+        'subtotal',
         'shipping_name',
         'shipping_phone',
         'shipping_address',

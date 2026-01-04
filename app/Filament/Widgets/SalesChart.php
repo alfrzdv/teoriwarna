@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class SalesChart extends ChartWidget
 {
-    protected ?string $heading = 'Sales Revenue (Last 7 Days)';
+    protected static ?string $heading = 'Sales Revenue (Last 7 Days)';
 
     protected function getData(): array
     {

@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,15 +27,13 @@ use Illuminate\Notifications\Notifiable;
  * 
  * @property Collection|AdminLog[] $admin_logs
  * @property Collection|Cart[] $carts
- * @property Collection|Complaint[] $complaints
- * @property Collection|Notification[] $notifications
  * @property Collection|Order[] $orders
  * @property Collection|UserAddress[] $user_addresses
  * @property Collection|UserSetting[] $user_settings
  *
  * @package App\Models
  */
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use Notifiable;
 
@@ -72,14 +72,9 @@ class User extends Authenticatable
         return $this->hasMany(Cart::class);
     }
 
-    public function complaints()
+    public function cart()
     {
-        return $this->hasMany(Complaint::class);
-    }
-
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
+        return $this->hasOne(Cart::class);
     }
 
     public function orders()
@@ -163,5 +158,12 @@ class User extends Authenticatable
     public function scopeUsers($query)
     {
         return $query->where('role', 'user');
+    }
+
+    // Filament Panel Access Control
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Only admin role can access the admin panel
+        return $this->hasAdminAccess() && $this->isActive();
     }
 }

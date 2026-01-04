@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
             'phone' => '081234567890',
             'role' => 'admin',
             'is_active' => true,
+            'is_banned' => false,
         ]);
 
         // Regular Users
@@ -30,6 +31,7 @@ class UserSeeder extends Seeder
                 'phone' => '0812345678' . str_pad($i + 10, 2, '0', STR_PAD_LEFT),
                 'role' => 'user',
                 'is_active' => true,
+                'is_banned' => false,
             ]);
 
             // Create user address

@@ -44,10 +44,7 @@ class Product extends Model
         'status'
     ];
 
-    protected $appends = [
-        'discount_percentage',
-        'final_price'
-    ];
+    protected $appends = [];
 
     // Relationships
     public function category()
@@ -107,12 +104,12 @@ class Product extends Model
         return $this->stock >= $requestedQuantity;
     }
 
-    public function addStock($quantity)
+    public function addStock($quantity, $note = null)
     {
         $this->increment('stock', $quantity);
     }
 
-    public function reduceStock($quantity)
+    public function reduceStock($quantity, $note = null)
     {
         if (!$this->hasEnoughStock($quantity)) {
             return false;
@@ -135,22 +132,6 @@ class Product extends Model
     public function archive()
     {
         $this->update(['status' => 'archived']);
-    }
-
-    // Accessors
-    public function getDiscountPercentageAttribute()
-    {
-        // Return 0 if discount column doesn't exist
-        return 0;
-    }
-
-    public function getFinalPriceAttribute()
-    {
-        $discount = $this->discount_percentage;
-        if ($discount > 0) {
-            return $this->price * (1 - ($discount / 100));
-        }
-        return $this->price;
     }
 
     // Scopes

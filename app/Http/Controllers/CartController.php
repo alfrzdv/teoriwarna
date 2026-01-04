@@ -18,15 +18,26 @@ class CartController extends Controller
             $cartItems = collect();
             $subtotal = 0;
 
+            // Batch load all products at once
+            $productIds = array_column($sessionCart, 'product_id');
+            $products = Product::with(['product_images' => function($q) {
+                    $q->orderByRaw('is_primary DESC, id ASC');
+                }, 'category'])
+                ->whereIn('id', $productIds)
+                ->get()
+                ->keyBy('id');
+
             foreach ($sessionCart as $item) {
-                $product = Product::with(['product_images', 'category'])->find($item['product_id']);
+                $product = $products->get($item['product_id']);
                 if ($product) {
+                    // Use current product price, not cached price
+                    $currentPrice = $product->price;
                     $cartItem = (object)[
                         'id' => 'session_' . $item['product_id'],
                         'product' => $product,
                         'quantity' => $item['quantity'],
-                        'price' => $item['price'],
-                        'subtotal' => $item['price'] * $item['quantity'],
+                        'price' => $currentPrice,
+                        'subtotal' => $currentPrice * $item['quantity'],
                     ];
                     $cartItems->push($cartItem);
                     $subtotal += $cartItem->subtotal;
@@ -37,7 +48,17 @@ class CartController extends Controller
         }
 
         $cart = $this->getOrCreateCart();
-        $cartItems = $cart->cart_items()->with(['product.product_images', 'product.category'])->get();
+        $cartItems = $cart->cart_items()->with([
+            'product.product_images' => function($q) {
+                $q->orderByRaw('is_primary DESC, id ASC');
+            },
+            'product.category'
+        ])->get();
+
+        // Update prices to current product price
+        foreach ($cartItems as $item) {
+            $item->price = $item->product->price;
+        }
 
         $subtotal = $cartItems->sum(function ($item) {
             return $item->quantity * $item->price;

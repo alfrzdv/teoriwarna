@@ -8,6 +8,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\PaymentController;
 
 Route::get('/', function () {
     return view('home');
@@ -82,7 +83,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/orders/{order}/complete', [OrderController::class, 'complete'])->name('orders.complete');
     Route::post('/orders/{order}/request-refund', [OrderController::class, 'requestRefund'])->name('orders.request-refund');
     Route::get('/orders/{order}/refund', [OrderController::class, 'viewRefund'])->name('orders.refund');
+
+    // Payment
+    Route::post('/payment/{order}/snap-token', [PaymentController::class, 'createSnapToken'])->name('payment.snap-token');
+    Route::get('/payment/{order}/finish', [PaymentController::class, 'finish'])->name('payment.finish');
+    Route::get('/payment/{order}/status', [PaymentController::class, 'checkStatus'])->name('payment.status');
 });
+
+// Midtrans Webhook (no auth required)
+Route::post('/payment/notification', [PaymentController::class, 'notification'])->name('payment.notification');
         
 
 

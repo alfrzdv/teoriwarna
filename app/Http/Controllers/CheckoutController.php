@@ -43,7 +43,9 @@ class CheckoutController extends Controller
 
         // Get only selected cart items
         $cartItems = $cart->cart_items()
-            ->with(['product.product_images'])
+            ->with(['product.product_images' => function($q) {
+                $q->orderByRaw('is_primary DESC, id ASC');
+            }])
             ->whereIn('id', $selectedItems)
             ->get();
 
@@ -51,14 +53,18 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Item yang dipilih tidak valid.');
         }
 
-        // Check stock availability
+        // Update prices to current product price & check stock
         foreach ($cartItems as $item) {
+            // Update to current price
+            $item->price = $item->product->price;
+
             if (!$item->product->hasEnoughStock($item->quantity)) {
                 return redirect()->route('cart.index')
                     ->with('error', "Stok {$item->product->name} tidak mencukupi.");
             }
         }
 
+        // Calculate subtotal with current prices
         $subtotal = $cartItems->sum(function ($item) {
             return $item->quantity * $item->price;
         });
@@ -161,12 +167,7 @@ class CheckoutController extends Controller
         try {
             $subtotal = $buyNowData['quantity'] * $buyNowData['price'];
 
-            $shipping_cost = match($validated['shipping_method']) {
-                'regular' => 15000,
-                'express' => 30000,
-                'same_day' => 50000,
-                default => 15000
-            };
+            $shipping_cost = config('shipping.costs.' . $validated['shipping_method'], config('shipping.costs.regular'));
 
             $total = $subtotal + $shipping_cost;
 
@@ -278,8 +279,11 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'Item yang dipilih tidak valid.');
         }
 
-        // Check stock availability again
+        // Update prices to current & check stock
         foreach ($cartItems as $item) {
+            // CRITICAL: Use current product price
+            $item->price = $item->product->price;
+
             if (!$item->product->hasEnoughStock($item->quantity)) {
                 return redirect()->route('cart.index')
                     ->with('error', "Stok {$item->product->name} tidak mencukupi.");
@@ -289,18 +293,13 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-            // Calculate totals
+            // Calculate totals with CURRENT prices
             $subtotal = $cartItems->sum(function ($item) {
                 return $item->quantity * $item->price;
             });
 
             // Calculate shipping cost based on method
-            $shipping_cost = match($validated['shipping_method']) {
-                'regular' => 15000,
-                'express' => 30000,
-                'same_day' => 50000,
-                default => 15000
-            };
+            $shipping_cost = config('shipping.costs.' . $validated['shipping_method'], config('shipping.costs.regular'));
 
             $total = $subtotal + $shipping_cost;
 

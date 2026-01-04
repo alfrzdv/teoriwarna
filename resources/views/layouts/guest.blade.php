@@ -24,14 +24,17 @@
     <body class="font-sans text-white antialiased bg-black">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-black">
             <div class="mb-8">
-                <a href="/">
+                <a href="/" class="flex items-center gap-2 group">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center">
+                        <span class="text-white font-black text-xl">T</span>
+                    </div>
                     <span class="text-3xl font-black text-white">
-                        teoriwarna.shop
+                        <span class="group-hover:text-primary-500 transition-colors">teoriwarna</span><span class="text-primary-500">.shop</span>
                     </span>
                 </a>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-8 py-8 bg-gradient-to-br from-purple-900/20 to-pink-900/20 backdrop-blur-sm overflow-hidden rounded-2xl">
+            <div class="w-full sm:max-w-md mt-6 px-8 py-8 bg-gradient-to-br from-primary-900/20 to-orange-900/20 backdrop-blur-sm overflow-hidden rounded-2xl">
                 {{ $slot }}
             </div>
         </div>

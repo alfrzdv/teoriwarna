@@ -4,20 +4,20 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Models\Payment;
-use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class PaymentResource extends Resource
 {
     protected static ?string $model = Payment::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
     //protected static ?string $navigationGroup = 'Penjualan';
 
@@ -25,9 +25,9 @@ class PaymentResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Pembayaran')
                     ->schema([
@@ -201,9 +201,9 @@ class PaymentResource extends Resource
             ]);
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
-        return $schema
+        return $infolist
             ->schema([
                 Infolists\Components\Section::make('Informasi Pembayaran')
                     ->schema([

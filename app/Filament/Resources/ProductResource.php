@@ -4,9 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
-use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,7 +15,7 @@ class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
     //protected static ?string $navigationGroup = 'Katalog';
 
@@ -24,9 +23,9 @@ class ProductResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Produk')
                     ->schema([
@@ -81,6 +80,7 @@ class ProductResource extends Resource
                                 Forms\Components\FileUpload::make('image_path')
                                     ->label('Upload Gambar')
                                     ->image()
+                                    ->disk('public')
                                     ->directory('product-images')
                                     ->visibility('public')
                                     ->maxSize(2048)

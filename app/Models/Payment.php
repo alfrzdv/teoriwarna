@@ -39,7 +39,9 @@ class Payment extends Model
         'payment_date',
         'proof_of_payment',
         'proof', // Keep for backward compatibility
-        'rejection_reason'
+        'rejection_reason',
+        'snap_token',
+        'transaction_id'
     ];
 
     // Relationships

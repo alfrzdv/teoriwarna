@@ -4,27 +4,25 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\ProductReview;
-use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ReviewResource extends Resource
 {
     protected static ?string $model = ProductReview::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-star';
+    protected static ?string $navigationIcon = 'heroicon-o-star';
 
-    // protected static ?string $navigationGroup = 'Manajemen User';
+    //protected static ?string $navigationGroup = 'Manajemen User';
 
     protected static ?string $navigationLabel = 'Review';
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
                 Forms\Components\Section::make('Informasi Review')
                     ->schema([
@@ -119,11 +117,13 @@ class ReviewResource extends Resource
                     }),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    ExportBulkAction::make(),
                 ]),
             ]);
     }
@@ -145,4 +145,8 @@ class ReviewResource extends Resource
         ];
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
 }

@@ -32,14 +32,14 @@
         <!-- Remember Me -->
         <div class="block mt-4">
             <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded bg-white/10 border-white/20 text-purple-600 shadow-sm focus:ring-purple-500" name="remember">
+                <input id="remember_me" type="checkbox" class="rounded bg-white/10 border-white/20 text-primary-600 shadow-sm focus:ring-primary-500" name="remember">
                 <span class="ms-2 text-sm text-gray-200">{{ __('Remember me') }}</span>
             </label>
         </div>
 
         <div class="flex items-center justify-between mt-6">
             @if (Route::has('password.request'))
-                <a class="text-sm text-purple-400 hover:text-purple-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 focus:ring-offset-black" href="{{ route('password.request') }}">
+                <a class="text-sm text-primary-400 hover:text-primary-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:ring-offset-black" href="{{ route('password.request') }}">
                     {{ __('Forgot your password?') }}
                 </a>
             @endif
@@ -53,7 +53,7 @@
     <!-- Register Link -->
     <div class="mt-6 text-center pt-6 border-t border-white/10">
         <span class="text-sm text-gray-300">{{ __("Don't have an account?") }}</span>
-        <a href="{{ route('register') }}" class="ms-1 text-sm text-purple-400 hover:text-purple-300 font-semibold">
+        <a href="{{ route('register') }}" class="ms-1 text-sm text-primary-400 hover:text-primary-300 font-semibold">
             {{ __('Register') }}
         </a>
     </div>
