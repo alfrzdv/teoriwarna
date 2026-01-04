@@ -1,6 +1,6 @@
+```mermaid
 %%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ffffff','primaryTextColor':'#1a1a1a','primaryBorderColor':'#e0e0e0','lineColor':'#757575','secondaryColor':'#fafafa','tertiaryColor':'#f5f5f5','background':'#ffffff','mainBkg':'#ffffff','secondaryBkgColor':'#fafafa','tertiaryBkgColor':'#f5f5f5','fontFamily':'Georgia, serif'}}}%%
 
-```mermaid
 flowchart TB
     Start([START])
     
