@@ -3,187 +3,206 @@
 ## System Use Case Diagram
 
 ```mermaid
-graph TB
-    subgraph "TeoriWarna E-Commerce System"
-        subgraph "Customer Use Cases"
-            UC1[Browse Products]
-            UC2[Search Products]
-            UC3[View Product Details]
-            UC4[Add to Cart]
-            UC5[Manage Cart]
-            UC6[Checkout]
-            UC7[Make Payment]
-            UC8[View Orders]
-            UC9[Track Order]
-            UC10[Confirm Delivery]
-            UC11[Write Review]
-            UC12[Request Refund]
-            UC13[Manage Profile]
-            UC14[Manage Addresses]
+flowchart LR
+    Guest(["👤 Guest"])
+    Customer(["👤 Customer"])
+    Admin(["👨‍💼 Admin"])
+
+    subgraph System["TeoriWarna Store"]
+        direction TB
+        
+        subgraph G["Guest"]
+            G1["Browse Products"]
+            G2["Register"]
         end
 
-        subgraph "Admin Use Cases"
-            UC15[Manage Products]
-            UC16[Manage Categories]
-            UC17[Manage Orders]
-            UC18[Process Payments]
-            UC19[Manage Shipping]
-            UC20[Process Refunds]
-            UC21[Manage Users]
-            UC22[View Analytics]
-            UC23[Manage Reviews]
-            UC24[Configure Settings]
+        subgraph C["Customer"]
+            C1["Shopping & Cart"]
+            C2["Orders & Payment"]
+            C3["Reviews & Refunds"]
         end
 
-        subgraph "System Use Cases"
-            UC25[Send Email Notifications]
-            UC26[Process Midtrans Webhook]
-            UC27[Calculate Shipping]
-            UC28[Manage Stock]
-            UC29[Generate Reports]
+        subgraph A["Admin"]
+            A1["Manage Products"]
+            A2["Manage Orders"]
+            A3["Analytics"]
         end
     end
 
-    Customer([Customer/User])
-    Admin([Admin])
-    Midtrans([Midtrans Gateway])
-    EmailSystem([Email System])
+    Guest --> G1 & G2
+    Customer --> G1 & C1 & C2 & C3
+    Admin --> A1 & A2 & A3
 
-    Customer -.-> UC1
-    Customer -.-> UC2
-    Customer -.-> UC3
-    Customer -.-> UC4
-    Customer -.-> UC5
-    Customer -.-> UC6
-    Customer -.-> UC7
-    Customer -.-> UC8
-    Customer -.-> UC9
-    Customer -.-> UC10
-    Customer -.-> UC11
-    Customer -.-> UC12
-    Customer -.-> UC13
-    Customer -.-> UC14
-
-    Admin -.-> UC15
-    Admin -.-> UC16
-    Admin -.-> UC17
-    Admin -.-> UC18
-    Admin -.-> UC19
-    Admin -.-> UC20
-    Admin -.-> UC21
-    Admin -.-> UC22
-    Admin -.-> UC23
-    Admin -.-> UC24
-
-    UC7 --> Midtrans
-    Midtrans --> UC26
-
-    UC25 --> EmailSystem
-
-    UC6 -.->|includes| UC27
-    UC6 -.->|includes| UC28
-    UC7 -.->|includes| UC25
-    UC17 -.->|includes| UC25
-    UC20 -.->|includes| UC28
-
-    style Customer fill:#e1f5ff
-    style Admin fill:#ffe1e1
-    style Midtrans fill:#fff4e1
-    style EmailSystem fill:#f0ffe1
+    style Guest fill:#ffd4d4,stroke:#333,stroke-width:2px,color:#000
+    style Customer fill:#d4e7ff,stroke:#333,stroke-width:2px,color:#000
+    style Admin fill:#ffe4d4,stroke:#333,stroke-width:2px,color:#000
+    style System fill:#fff,stroke:#333,stroke-width:2px
+    style G fill:#555,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#555,stroke:#333,stroke-width:2px,color:#fff
+    style A fill:#555,stroke:#333,stroke-width:2px,color:#fff
+    style G1 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    style G2 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    style C1 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    style C2 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    style C3 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    style A1 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    style A2 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
+    style A3 fill:#333,stroke:#fff,stroke-width:1px,color:#fff
 ```
 
 ---
 
 ## Use Case Descriptions
 
-### Customer Use Cases
+### Guest Use Cases
 
 #### UC1: Browse Products
-**Actor:** Customer
-**Description:** Customer can browse all available products in the catalog
-**Precondition:** None
-**Postcondition:** Products displayed to customer
+**Actor:** Guest, Customer
+**Description:** Browse all products in the catalog grouped by categories
+**Flow:**
+1. User visits catalog page
+2. System displays products grouped by category
+3. User can scroll through different categories
+4. Each product shows image, name, and price
 
 #### UC2: Search Products
-**Actor:** Customer
-**Description:** Customer can search products by name, category, or price range
-**Precondition:** None
-**Postcondition:** Filtered products displayed
+**Actor:** Guest, Customer
+**Description:** Search and filter products
+**Flow:**
+1. User enters search keyword
+2. User can filter by category or price range
+3. System displays filtered results
+4. User can sort by price (low to high, high to low)
 
 #### UC3: View Product Details
-**Actor:** Customer
-**Description:** Customer can view detailed information about a product
-**Precondition:** Product exists and is active
-**Postcondition:** Product details, images, and reviews displayed
+**Actor:** Guest, Customer
+**Description:** View detailed product information
+**Flow:**
+1. User clicks on a product
+2. System displays product details page
+3. Shows product images, description, price, stock
+4. Shows customer reviews and ratings
+5. Guest sees "Login to Purchase" button
+6. Customer sees "Add to Cart" button
 
-#### UC4: Add to Cart
-**Actor:** Customer
-**Description:** Customer can add products to shopping cart
-**Precondition:** Product has sufficient stock
-**Postcondition:** Product added to cart (session or database)
+#### UC4: Register Account
+**Actor:** Guest
+**Description:** Create a new customer account
+**Flow:**
+1. Guest clicks "Register"
+2. Guest fills in name, email, password, phone
+3. System validates input
+4. System creates account
+5. Guest becomes Customer and is logged in
 
-#### UC5: Manage Cart
-**Actor:** Customer
-**Description:** Customer can view, update quantity, or remove items from cart
-**Precondition:** Cart has items
-**Postcondition:** Cart updated according to customer action
+---
 
-#### UC6: Checkout
-**Actor:** Customer
-**Description:** Customer proceeds to checkout with selected items
-**Precondition:** Customer is logged in, cart has items
-**Postcondition:** Order created with shipping details
-**Includes:** UC27 (Calculate Shipping), UC28 (Manage Stock)
+### Customer Use Cases
 
-#### UC7: Make Payment
+#### UC5: Add to Cart
 **Actor:** Customer
-**Description:** Customer completes payment for order
-**Precondition:** Order exists with pending payment
-**Postcondition:** Payment processed, order status updated
-**Includes:** UC25 (Send Email)
-**Extends to:** Midtrans Gateway
+**Description:** Add products to shopping cart
+**Flow:**
+1. Customer views product detail
+2. Customer clicks "Add to Cart"
+3. System checks stock availability
+4. System adds product to database cart
+5. Cart count badge updates
 
-#### UC8: View Orders
+#### UC6: Manage Cart
 **Actor:** Customer
-**Description:** Customer can view order history
-**Precondition:** Customer is logged in
-**Postcondition:** Order list displayed
+**Description:** View and modify cart items
+**Flow:**
+1. Customer opens cart page
+2. System displays all cart items with current prices
+3. Customer can update quantity or remove items
+4. System recalculates subtotal
+5. Customer can select items for checkout
 
-#### UC9: Track Order
+#### UC7: Checkout
 **Actor:** Customer
-**Description:** Customer can track order status and shipping
-**Precondition:** Order exists
-**Postcondition:** Order status and tracking info displayed
+**Description:** Process order checkout
+**Flow:**
+1. Customer selects items and clicks checkout
+2. Customer fills shipping address
+3. Customer selects shipping method (Regular/Express/Same Day)
+4. System calculates shipping cost
+5. System shows order summary
+6. Customer confirms order
+7. System creates order and reduces stock
 
-#### UC10: Confirm Delivery
+#### UC8: Make Payment
 **Actor:** Customer
-**Description:** Customer confirms receipt of delivered order
-**Precondition:** Order status is "shipped"
-**Postcondition:** Order status updated to "delivered"
+**Description:** Complete payment for order
+**Flow:**
+1. Customer clicks "Pay Now" on order page
+2. System generates Midtrans Snap token
+3. Midtrans payment popup opens
+4. Customer selects payment method (Bank Transfer/E-Wallet/Credit Card)
+5. Customer completes payment
+6. Midtrans sends webhook to system
+7. System updates payment and order status
+8. System sends confirmation email
 
-#### UC11: Write Review
+#### UC9: View Orders
 **Actor:** Customer
-**Description:** Customer writes product review and rating
-**Precondition:** Customer has received the product
-**Postcondition:** Review saved and displayed on product page
+**Description:** View order history and details
+**Flow:**
+1. Customer opens orders page
+2. System displays all orders
+3. Customer can filter by status
+4. Customer clicks order to view details
+5. Shows items, shipping info, payment status
 
-#### UC12: Request Refund
+#### UC10: Track Order
 **Actor:** Customer
-**Description:** Customer requests refund for delivered order
-**Precondition:** Order is delivered
-**Postcondition:** Refund request created with pending status
+**Description:** Track order delivery status
+**Flow:**
+1. Customer views order detail
+2. System shows current status (Pending/Processing/Shipped/Delivered)
+3. If shipped, system shows tracking number and courier
+4. Customer can view status timeline
 
-#### UC13: Manage Profile
+#### UC11: Confirm Delivery
 **Actor:** Customer
-**Description:** Customer can update profile information
-**Precondition:** Customer is logged in
-**Postcondition:** Profile updated
+**Description:** Confirm order has been received
+**Flow:**
+1. Order status is "Shipped"
+2. Customer receives the package
+3. Customer clicks "Confirm Delivery"
+4. System updates order status to "Delivered"
 
-#### UC14: Manage Addresses
+#### UC12: Write Review
 **Actor:** Customer
-**Description:** Customer can add, edit, or delete shipping addresses
-**Precondition:** Customer is logged in
-**Postcondition:** Address list updated
+**Description:** Write product review and rating
+**Flow:**
+1. Order status is "Delivered"
+2. Customer clicks "Write Review"
+3. Customer selects star rating (1-5)
+4. Customer writes review comment
+5. System saves review
+6. Review appears on product page
+
+#### UC13: Request Refund
+**Actor:** Customer
+**Description:** Request refund for delivered order
+**Flow:**
+1. Order status is "Delivered"
+2. Customer clicks "Request Refund"
+3. Customer enters refund reason
+4. Customer selects refund method (Bank Transfer/E-Wallet)
+5. Customer provides bank/e-wallet details
+6. System creates refund request with "Pending" status
+
+#### UC14: Manage Profile
+**Actor:** Customer
+**Description:** Update account information
+**Flow:**
+1. Customer opens profile page
+2. Customer can update name, email, phone, password
+3. Customer can add/edit/delete shipping addresses
+4. Customer can set default address
+5. System saves changes
 
 ---
 
@@ -191,176 +210,160 @@ graph TB
 
 #### UC15: Manage Products
 **Actor:** Admin
-**Description:** Admin can create, update, or delete products
-**Precondition:** Admin is authenticated
-**Postcondition:** Product catalog updated
+**Description:** CRUD operations on products
+**Flow:**
+1. Admin opens product management (Filament)
+2. Admin can create new product
+3. Admin can upload multiple product images
+4. Admin can edit product details (name, price, stock, description)
+5. Admin can set product status (Active/Inactive)
+6. Admin can delete products
 
 #### UC16: Manage Categories
 **Actor:** Admin
-**Description:** Admin can create, update, or delete product categories
-**Precondition:** Admin is authenticated
-**Postcondition:** Category list updated
+**Description:** CRUD operations on categories
+**Flow:**
+1. Admin opens category management
+2. Admin can create new category
+3. Admin can set category styling (background color, text color, style type)
+4. Admin can activate/deactivate categories
+5. Admin can delete categories
 
 #### UC17: Manage Orders
 **Actor:** Admin
-**Description:** Admin can view and update order status
-**Precondition:** Admin is authenticated
-**Postcondition:** Order status updated
-**Includes:** UC25 (Send Email)
+**Description:** View and manage all orders
+**Flow:**
+1. Admin opens order management
+2. System displays all orders with filters
+3. Admin can filter by status
+4. Admin can view order details
+5. Admin can see customer info and items
 
-#### UC18: Process Payments
+#### UC18: Update Order Status
 **Actor:** Admin
-**Description:** Admin can view payment status and verify manual payments
-**Precondition:** Admin is authenticated
-**Postcondition:** Payment status verified
+**Description:** Change order status through fulfillment process
+**Flow:**
+1. Admin views order with "Processing" status
+2. Admin prepares and packs items
+3. Admin updates status to "Shipped"
+4. Admin adds tracking number and courier
+5. System sends shipping notification email to customer
 
-#### UC19: Manage Shipping
+#### UC19: Process Payments
 **Actor:** Admin
-**Description:** Admin can update shipping status and add tracking numbers
-**Precondition:** Order payment is confirmed
-**Postcondition:** Shipping info updated
+**Description:** Verify and manage payments
+**Flow:**
+1. Admin views payment list
+2. Admin can see payment status (Pending/Paid/Failed)
+3. Admin can view Midtrans transaction details
+4. Admin can verify manual payments (if needed)
 
-#### UC20: Process Refunds
+#### UC20: Manage Shipping
 **Actor:** Admin
-**Description:** Admin can approve or reject refund requests
-**Precondition:** Refund request exists
-**Postcondition:** Refund processed or rejected
-**Includes:** UC28 (Manage Stock)
+**Description:** Handle shipping and delivery
+**Flow:**
+1. Admin views orders ready to ship
+2. Admin enters tracking number
+3. Admin selects courier service
+4. Admin updates status to "Shipped"
+5. Customer receives notification
 
-#### UC21: Manage Users
+#### UC21: Process Refunds
 **Actor:** Admin
-**Description:** Admin can view and manage user accounts
-**Precondition:** Admin is authenticated
-**Postcondition:** User data updated
+**Description:** Handle refund requests
+**Flow:**
+1. Admin views refund requests
+2. Admin reviews refund reason and order details
+3. Admin can approve or reject refund
+4. If approved: system restores stock, processes refund payment
+5. If rejected: admin enters rejection reason
+6. System notifies customer
 
-#### UC22: View Analytics
+#### UC22: Manage Users
 **Actor:** Admin
-**Description:** Admin can view sales analytics and reports
-**Precondition:** Admin is authenticated
-**Postcondition:** Analytics data displayed
+**Description:** Manage user accounts
+**Flow:**
+1. Admin opens user management
+2. Admin can view all users
+3. Admin can edit user information
+4. Admin can ban/unban users
+5. Admin can change user roles (User/Admin)
 
-#### UC23: Manage Reviews
+#### UC23: View Analytics
 **Actor:** Admin
-**Description:** Admin can moderate product reviews
-**Precondition:** Admin is authenticated
-**Postcondition:** Reviews moderated
-
-#### UC24: Configure Settings
-**Actor:** Admin
-**Description:** Admin can configure store settings
-**Precondition:** Admin is authenticated
-**Postcondition:** Store settings updated
+**Description:** View sales reports and statistics
+**Flow:**
+1. Admin opens dashboard
+2. System displays sales chart (daily/weekly/monthly)
+3. Shows total revenue, orders, products sold
+4. Admin can generate custom reports
 
 ---
 
-### System Use Cases
+## System Integration
 
-#### UC25: Send Email Notifications
-**Actor:** System
-**Description:** System sends automated email notifications
-**Trigger:** Order created, payment received, order shipped
-**Extends to:** Email System
+### Midtrans Payment Gateway
+- Processes payments via Snap API
+- Supports Bank Transfer, E-Wallet (GoPay, OVO, DANA), Credit Card, Store (Alfamart, Indomaret)
+- Sends webhook for payment status updates
+- Runs in sandbox mode for testing
 
-#### UC26: Process Midtrans Webhook
-**Actor:** System
-**Description:** System receives and processes Midtrans payment webhooks
-**Trigger:** Midtrans sends payment notification
-**Postcondition:** Payment and order status updated
+### Email Service
+- Sends order confirmation emails
+- Sends payment confirmation emails
+- Sends shipping notification emails
+- Sends refund status emails
 
-#### UC27: Calculate Shipping
-**Actor:** System
-**Description:** System calculates shipping cost based on method
-**Trigger:** Checkout process
-**Postcondition:** Shipping cost added to order total
-
-#### UC28: Manage Stock
-**Actor:** System
-**Description:** System automatically manages product stock
-**Trigger:** Order created, cancelled, or refunded
-**Postcondition:** Product stock updated
-
-#### UC29: Generate Reports
-**Actor:** System
-**Description:** System generates sales and analytics reports
-**Trigger:** Admin requests report
-**Postcondition:** Report data generated
+### Stock Management
+- Automatically reduces stock when order is created
+- Restores stock when order is cancelled or refunded
+- Validates stock before checkout
 
 ---
 
 ## Actor Descriptions
 
-### Customer/User
-- **Type:** Primary Actor
-- **Description:** End users who browse and purchase products
-- **Permissions:**
-  - Browse catalog
-  - Manage cart
-  - Place orders
-  - Make payments
-  - Write reviews
-  - Request refunds
+### 🌐 Guest
+**Visitor** - Anonymous users browsing the site
+- Can browse and search products
+- Can view product details and reviews
+- Must register to make purchases
+- Session-based cart (if implemented)
 
-### Admin
-- **Type:** Primary Actor
-- **Description:** System administrators who manage the store
-- **Permissions:**
-  - Full CRUD on products, categories
-  - Order management
-  - Payment verification
-  - Refund processing
-  - User management
-  - Analytics access
-  - System configuration
+### 👤 Customer
+**Registered User** - Authenticated customers
+- All guest capabilities
+- Can add products to cart (database)
+- Can checkout and make payments
+- Can track orders and write reviews
+- Can request refunds
 
-### Midtrans Gateway
-- **Type:** External System
-- **Description:** Third-party payment gateway service
-- **Interactions:**
-  - Processes payments
-  - Sends webhooks for payment status
-  - Provides payment methods
-
-### Email System
-- **Type:** External System
-- **Description:** Email delivery service
-- **Interactions:**
-  - Sends order confirmations
-  - Sends shipping notifications
-  - Sends admin notifications
+### 👨‍💼 Admin
+**Administrator** - Store managers and staff
+- Access to Filament admin panel
+- Full CRUD on products and categories
+- Manages orders from payment to delivery
+- Processes refunds and manages users
+- Views analytics and reports
 
 ---
 
-## Use Case Relationships
+## Summary
 
-### Includes Relationships
-- **UC6 (Checkout)** includes **UC27 (Calculate Shipping)**
-- **UC6 (Checkout)** includes **UC28 (Manage Stock)**
-- **UC7 (Make Payment)** includes **UC25 (Send Email)**
-- **UC17 (Manage Orders)** includes **UC25 (Send Email)**
-- **UC20 (Process Refunds)** includes **UC28 (Manage Stock)**
+**Total Use Cases:** 23
+- Guest: 4 use cases
+- Customer: 14 use cases (includes guest features)
+- Admin: 9 use cases
 
-### Extends Relationships
-- **UC7 (Make Payment)** extends to **Midtrans Gateway**
-- **UC26 (Process Webhook)** extends from **Midtrans Gateway**
-- **UC25 (Send Email)** extends to **Email System**
+**Actors:** 3
+- Guest (unauthenticated)
+- Customer (authenticated user)
+- Admin (staff)
 
----
-
-## Summary Statistics
-
-### Total Use Cases: 29
-- **Customer Use Cases:** 14
-- **Admin Use Cases:** 10
-- **System Use Cases:** 5
-
-### Actors: 4
-- **Primary Actors:** 2 (Customer, Admin)
-- **External Systems:** 2 (Midtrans, Email)
-
-### Relationships:
-- **Includes:** 5 relationships
-- **Extends:** 3 relationships
-- **Direct Interactions:** 21 relationships
+**External Integrations:**
+- Midtrans Payment Gateway (Snap API)
+- Email Notification Service
+- Automatic Stock Management
 
 ---
 
