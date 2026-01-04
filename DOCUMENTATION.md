@@ -685,6 +685,45 @@ user_addresses
 └── timestamps
 ```
 
+### Refunds Table
+```sql
+refunds
+├── id (PK)
+├── order_id (FK)
+├── user_id (FK)
+├── approved_by (FK)
+├── refund_number (unique)
+├── refund_amount (decimal)
+├── refund_method (enum: bank_transfer, e_wallet, store_credit)
+├── status (enum: pending, approved, rejected, processing, completed)
+├── reason (text)
+├── admin_notes (text)
+├── bank_details (json)
+├── approved_at
+├── rejected_at
+├── completed_at
+└── timestamps
+```
+
+### Store Settings Table
+```sql
+store_settings
+├── id (PK)
+├── store_name
+├── address (text)
+├── email
+├── phone
+├── description (text)
+├── logo_path
+├── favicon_path
+├── social_media (json)
+├── payment_methods (json)
+├── shipping_methods (json)
+├── maintenance_mode (boolean)
+├── maintenance_message (text)
+└── timestamps
+```
+
 ---
 
 ## 7. API Integration

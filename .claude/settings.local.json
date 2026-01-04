@@ -60,7 +60,8 @@
       "Bash(touch:*)",
       "Bash(dir:*)",
       "Bash(xargs basename:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(php artisan db:show:*)"
     ]
   }
 }

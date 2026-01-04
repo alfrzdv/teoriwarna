@@ -210,6 +210,8 @@ php artisan migrate --force
 - `payments` - Payment records
 - `product_reviews` - Product reviews
 - `user_addresses` - Shipping addresses
+- `refunds` - Refund requests
+- `store_settings` - Store configuration
 
 See [full schema](DOCUMENTATION.md#6-database-schema) in documentation.
 

@@ -154,22 +154,39 @@ erDiagram
         timestamp completed_at
         timestamps created_updated
     }
+    store_settings {
+        bigint id PK
+        string store_name
+        text address
+        string email
+        string phone
+        text description
+        string logo_path
+        string favicon_path
+        json social_media
+        json payment_methods
+        json shipping_methods
+        boolean maintenance_mode
+        text maintenance_message
+        timestamps created_updated
+    }
 ```
 
 ---
 
 ## Database Overview
 
-**Total Tables:** 13  
-**Total Relationships:** 16  
-**Total Foreign Keys:** 17  
+**Total Tables:** 13
+**Total Relationships:** 16
+**Total Foreign Keys:** 17
 **Total Indexes:** 20
 
 ### Table Categories
 
-**User Management** - users, user_addresses, carts, cart_items  
-**Product Catalog** - categories, products, product_images, product_reviews  
+**User Management** - users, user_addresses, carts, cart_items
+**Product Catalog** - categories, products, product_images, product_reviews
 **Order Processing** - orders, order_items, payments, refunds
+**System Settings** - store_settings
 
 ---
 
