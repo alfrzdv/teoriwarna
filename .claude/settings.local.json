@@ -59,7 +59,8 @@
       "Bash(rm:*)",
       "Bash(touch:*)",
       "Bash(dir:*)",
-      "Bash(xargs basename:*)"
+      "Bash(xargs basename:*)",
+      "Bash(ls:*)"
     ]
   }
 }
