@@ -43,14 +43,14 @@
                                 Admin Panel
                             </a>
                         @endif
-                        <a href="{{ route('products.index') }}" class="px-6 py-2 text-sm font-semibold bg-primary-600 hover:bg-primary-500 text-white rounded-lg shadow-sm transition-colors">
+                        <a href="{{ route('catalog.index') }}" class="px-6 py-2 text-sm font-semibold bg-primary-600 hover:bg-primary-500 text-white rounded-lg shadow-sm transition-colors">
                             Shop Now
                         </a>
                     @else
                         <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
                             Login
                         </a>
-                        <a href="{{ route('register') }}" class="px-6 py-2 text-sm font-semibold bg-primary-600 hover:bg-primary-500 text-white rounded-lg shadow-sm transition-colors">
+                        <a href="{{ route('guest.login') }}" class="px-6 py-2 text-sm font-semibold bg-primary-600 hover:bg-primary-500 text-white rounded-lg shadow-sm transition-colors">
                             Get Started
                         </a>
                     @endauth
@@ -84,14 +84,14 @@
 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold text-lg rounded-lg shadow-sm transition-colors">
+                    <a href="{{ route('catalog.index') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold text-lg rounded-lg shadow-sm transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
                         Shop Collection
                     </a>
                     @guest
-                        <a href="{{ route('register') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white font-semibold text-lg rounded-lg border border-gray-700 shadow-sm transition-colors">
+                        <a href="{{ route('guest.login') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white font-semibold text-lg rounded-lg border border-gray-700 shadow-sm transition-colors">
                             Get Started Free
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
@@ -161,7 +161,7 @@
             <p class="text-lg text-gray-400 mb-10 max-w-2xl mx-auto">
                 Join thousands of satisfied customers and discover the perfect blend of quality and creativity
             </p>
-            <a href="{{ route('products.index') }}" class="inline-flex items-center gap-2 px-10 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold text-lg rounded-lg shadow-sm transition-colors">
+            <a href="{{ route('catalog.index') }}" class="inline-flex items-center gap-2 px-10 py-4 bg-primary-600 hover:bg-primary-500 text-white font-semibold text-lg rounded-lg shadow-sm transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
@@ -202,7 +202,7 @@
                 <div>
                     <h3 class="text-sm font-bold font-heading text-white mb-4 uppercase tracking-wide">Shop</h3>
                     <ul class="space-y-2">
-                        <li><a href="{{ route('products.index') }}" class="text-gray-400 hover:text-primary-500 transition-colors text-sm">All Products</a></li>
+                        <li><a href="{{ route('catalog.index') }}" class="text-gray-400 hover:text-primary-500 transition-colors text-sm">All Products</a></li>
                         <li><a href="{{ route('cart.index') }}" class="text-gray-400 hover:text-primary-500 transition-colors text-sm">Shopping Cart</a></li>
                     </ul>
                 </div>

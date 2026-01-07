@@ -61,7 +61,9 @@
       "Bash(dir:*)",
       "Bash(xargs basename:*)",
       "Bash(ls:*)",
-      "Bash(php artisan db:show:*)"
+      "Bash(php artisan db:show:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(xargs:*)"
     ]
   }
 }

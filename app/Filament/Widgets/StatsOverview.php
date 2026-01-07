@@ -28,11 +28,13 @@ class StatsOverview extends BaseWidget
 
         // Total Products
         $totalProducts = Product::count();
-        $lowStockProducts = Product::where('stock', '<=', 10)->count();
+        $lowStockProducts = Product::where('stock', '<=', 10)
+            ->where('stock', '>', 0)
+            ->count();
 
-        // Total Customers
-        $totalCustomers = User::where('role', 'customer')->count();
-        $newCustomersThisMonth = User::where('role', 'customer')
+        // Total Customers (users with role 'user')
+        $totalCustomers = User::where('role', 'user')->count();
+        $newCustomersThisMonth = User::where('role', 'user')
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();

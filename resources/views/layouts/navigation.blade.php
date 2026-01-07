@@ -58,7 +58,7 @@
                                 Pesanan
                             </a>
                         @else
-                            <a href="{{ route('products.index') }}" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all {{ request()->routeIs('products.*') ? 'text-white bg-gray-800' : '' }}">
+                            <a href="{{ route('catalog.index') }}" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all {{ request()->routeIs('catalog.*') ? 'text-white bg-gray-800' : '' }}">
                                 Belanja
                             </a>
                             <a href="{{ route('orders.index') }}" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all {{ request()->routeIs('orders.*') ? 'text-white bg-gray-800' : '' }}">
@@ -66,7 +66,7 @@
                             </a>
                         @endif
                     @else
-                        <a href="{{ route('products.index') }}" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all {{ request()->routeIs('products.*') ? 'text-white bg-gray-800' : '' }}">
+                        <a href="{{ route('catalog.index') }}" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all {{ request()->routeIs('catalog.*') ? 'text-white bg-gray-800' : '' }}">
                             Belanja
                         </a>
                     @endauth
@@ -143,12 +143,15 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
-                        Masuk
-                    </a>
-                    <a href="{{ route('register') }}" class="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 rounded-lg shadow-sm hover:shadow transition-all">
-                        Daftar
-                    </a>
+                    <!-- Guest User Buttons -->
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
+                            Login
+                        </a>
+                        <a href="{{ route('register') }}" class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 rounded-lg shadow-sm hover:shadow transition-all">
+                            Register
+                        </a>
+                    </div>
                 @endauth
             </div>
 
@@ -182,7 +185,7 @@
                         Pesanan
                     </a>
                 @else
-                    <a href="{{ route('products.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('products.*') ? 'text-white bg-gray-800' : 'text-gray-400' }} hover:text-white hover:bg-gray-800 rounded-lg transition-all">
+                    <a href="{{ route('catalog.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('catalog.*') ? 'text-white bg-gray-800' : 'text-gray-400' }} hover:text-white hover:bg-gray-800 rounded-lg transition-all">
                         Belanja
                     </a>
                     <a href="{{ route('cart.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('cart.*') ? 'text-white bg-gray-800' : 'text-gray-400' }} hover:text-white hover:bg-gray-800 rounded-lg transition-all">
@@ -193,7 +196,7 @@
                     </a>
                 @endif
             @else
-                <a href="{{ route('products.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('products.*') ? 'text-white bg-gray-800' : 'text-gray-400' }} hover:text-white hover:bg-gray-800 rounded-lg transition-all">
+                <a href="{{ route('catalog.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('catalog.*') ? 'text-white bg-gray-800' : 'text-gray-400' }} hover:text-white hover:bg-gray-800 rounded-lg transition-all">
                     Belanja
                 </a>
                 <a href="{{ route('cart.index') }}" class="block px-4 py-3 text-sm font-medium {{ request()->routeIs('cart.*') ? 'text-white bg-gray-800' : 'text-gray-400' }} hover:text-white hover:bg-gray-800 rounded-lg transition-all">
@@ -234,11 +237,11 @@
             </div>
         @else
             <div class="px-4 py-4 border-t border-gray-800 bg-gray-900 space-y-2">
-                <a href="{{ route('login') }}" class="block px-4 py-2 text-center text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
-                    Masuk
+                <a href="{{ route('login') }}" class="block px-4 py-2 text-center text-sm font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
+                    Login
                 </a>
                 <a href="{{ route('register') }}" class="block px-4 py-2 text-center text-sm font-medium text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 rounded-lg shadow-sm transition-all">
-                    Daftar
+                    Register
                 </a>
             </div>
         @endauth

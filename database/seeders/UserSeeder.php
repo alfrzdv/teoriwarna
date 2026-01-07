@@ -12,15 +12,17 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Admin
-        $admin = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@teoriwarna.com',
-            'password' => Hash::make('password'),
-            'phone' => '081234567890',
-            'role' => 'admin',
-            'is_active' => true,
-            'is_banned' => false,
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@teoriwarna.com'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+                'phone' => '081234567890',
+                'role' => 'admin',
+                'is_active' => true,
+                'is_banned' => false,
+            ]
+        );
 
         // Regular Users
         for ($i = 1; $i <= 5; $i++) {

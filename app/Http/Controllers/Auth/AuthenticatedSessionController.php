@@ -45,7 +45,7 @@ class AuthenticatedSessionController extends Controller
             return redirect($intended);
         }
 
-        return redirect()->route('products.index');
+        return redirect()->route('catalog.index');
     }
 
     /**
@@ -102,10 +102,45 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
+     * Login as guest user.
+     */
+    public function guestLogin(): RedirectResponse
+    {
+        // Find guest user by email
+        $guestUser = \App\Models\User::where('email', 'guest@teoriwarna.com')->first();
+
+        if (!$guestUser) {
+            return redirect()->route('register')->with('error', 'Guest account not found. Please register.');
+        }
+
+        // Login as guest user
+        Auth::loginUsingId($guestUser->id);
+
+        session()->regenerate();
+
+        // Merge guest cart with user cart
+        $this->mergeGuestCart();
+
+        return redirect()->route('catalog.index');
+    }
+
+    /**
      * Destroy an authenticated session.
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = Auth::user();
+
+        // If logging out as guest user, clear all their data
+        if ($user && $user->email === 'guest@teoriwarna.com') {
+            // Clear guest user's cart
+            $cart = Cart::where('user_id', $user->id)->first();
+            if ($cart) {
+                $cart->cart_items()->delete();
+                $cart->delete();
+            }
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

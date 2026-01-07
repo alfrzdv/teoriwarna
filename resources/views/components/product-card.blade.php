@@ -1,7 +1,7 @@
 @props(['product'])
 
 <div class="group bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-primary-500 hover:shadow-lg transition-all duration-300 flex flex-col h-full">
-    <a href="{{ route('products.show', $product->id) }}" class="block flex-1 flex flex-col">
+    <a href="{{ route('catalog.show', $product->id) }}" class="block flex-1 flex flex-col">
         <!-- Product Image -->
         <div class="relative aspect-square bg-gray-900 overflow-hidden">
             @php

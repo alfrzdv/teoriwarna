@@ -100,14 +100,30 @@ class ProductResource extends Resource
                     ->schema([
                         Forms\Components\Placeholder::make('current_stock')
                             ->label('Stok Saat Ini')
-                            ->content(fn ($record) => $record ? $record->stock . ' unit' : 'Belum ada stok'),
+                            ->content(fn ($record) => $record ? $record->stock . ' unit' : 'Belum ada stok')
+                            ->visible(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\EditRecord),
 
                         Forms\Components\TextInput::make('initial_stock')
                             ->label('Stok Awal')
                             ->numeric()
                             ->minValue(0)
-                            ->helperText('Hanya untuk produk baru')
+                            ->default(0)
+                            ->helperText('Isi dengan jumlah stok awal produk')
                             ->visible(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\CreateRecord)
+                            ->dehydrated(false),
+
+                        Forms\Components\TextInput::make('stock_adjustment')
+                            ->label('Tambah/Kurangi Stok')
+                            ->numeric()
+                            ->helperText('Gunakan angka negatif untuk mengurangi stok (contoh: -5 untuk mengurangi 5 unit)')
+                            ->visible(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\EditRecord)
+                            ->dehydrated(false),
+
+                        Forms\Components\Textarea::make('stock_note')
+                            ->label('Catatan Perubahan Stok')
+                            ->rows(2)
+                            ->placeholder('Opsional - jelaskan alasan perubahan stok')
+                            ->visible(fn ($livewire) => $livewire instanceof \Filament\Resources\Pages\EditRecord)
                             ->dehydrated(false),
                     ]),
             ]);
@@ -184,42 +200,63 @@ class ProductResource extends Resource
                     ->query(fn ($query) => $query->where('stock', '<=', 10)->where('stock', '>', 0)),
             ])
             ->actions([
-                Tables\Actions\Action::make('manage_stock')
-                    ->label('Kelola Stok')
-                    ->icon('heroicon-o-cube')
-                    ->color('warning')
-                    ->form([
-                        Forms\Components\Placeholder::make('current_stock')
-                            ->label('Stok Saat Ini')
-                            ->content(fn ($record) => $record->stock . ' unit'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('add_stock')
+                        ->label('Tambah Stok')
+                        ->icon('heroicon-o-plus-circle')
+                        ->color('success')
+                        ->form([
+                            Forms\Components\Placeholder::make('current_stock')
+                                ->label('Stok Saat Ini')
+                                ->content(fn ($record) => $record->stock . ' unit'),
 
-                        Forms\Components\Radio::make('action')
-                            ->label('Aksi')
-                            ->options([
-                                'add' => 'Tambah Stok',
-                                'reduce' => 'Kurangi Stok',
-                            ])
-                            ->required()
-                            ->default('add')
-                            ->inline(),
+                            Forms\Components\TextInput::make('quantity')
+                                ->label('Jumlah')
+                                ->numeric()
+                                ->required()
+                                ->minValue(1)
+                                ->default(1),
 
-                        Forms\Components\TextInput::make('quantity')
-                            ->label('Jumlah')
-                            ->numeric()
-                            ->required()
-                            ->minValue(1),
-
-                        Forms\Components\Textarea::make('note')
-                            ->label('Catatan')
-                            ->rows(2),
-                    ])
-                    ->action(function (Product $record, array $data) {
-                        if ($data['action'] === 'add') {
+                            Forms\Components\Textarea::make('note')
+                                ->label('Catatan')
+                                ->rows(2)
+                                ->placeholder('Opsional'),
+                        ])
+                        ->action(function (Product $record, array $data) {
                             $record->addStock($data['quantity'], $data['note'] ?? 'Manual stock adjustment');
-                        } else {
+                        }),
+
+                    Tables\Actions\Action::make('reduce_stock')
+                        ->label('Kurangi Stok')
+                        ->icon('heroicon-o-minus-circle')
+                        ->color('danger')
+                        ->form([
+                            Forms\Components\Placeholder::make('current_stock')
+                                ->label('Stok Saat Ini')
+                                ->content(fn ($record) => $record->stock . ' unit'),
+
+                            Forms\Components\TextInput::make('quantity')
+                                ->label('Jumlah')
+                                ->numeric()
+                                ->required()
+                                ->minValue(1)
+                                ->maxValue(fn ($record) => $record->stock)
+                                ->helperText(fn ($record) => 'Maksimal: ' . $record->stock . ' unit')
+                                ->default(1),
+
+                            Forms\Components\Textarea::make('note')
+                                ->label('Catatan')
+                                ->rows(2)
+                                ->placeholder('Opsional'),
+                        ])
+                        ->action(function (Product $record, array $data) {
                             $record->reduceStock($data['quantity'], $data['note'] ?? 'Manual stock adjustment');
-                        }
-                    }),
+                        }),
+                ])
+                ->label('Kelola Stok')
+                ->icon('heroicon-o-cube')
+                ->color('warning')
+                ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -246,17 +283,4 @@ class ProductResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        $lowStockCount = static::getModel()::where('stock', '<=', 10)
-            ->where('stock', '>', 0)
-            ->count();
-
-        return $lowStockCount > 0 ? (string) $lowStockCount : null;
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'warning';
-    }
 }

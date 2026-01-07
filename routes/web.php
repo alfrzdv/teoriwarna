@@ -18,14 +18,6 @@ Route::get('/', function () {
 Route::get('/catalog', [ProductCatalogController::class, 'index'])->name('catalog.index');
 Route::get('/catalog/{product}', [ProductCatalogController::class, 'show'])->name('catalog.show');
 
-// Legacy route redirects
-Route::get('/products', function () {
-    return redirect()->route('catalog.index');
-})->name('products.index');
-Route::get('/products/{product}', function ($product) {
-    return redirect()->route('catalog.show', $product);
-})->name('products.show');
-
 // Cart - Guest can access with session-based cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
@@ -39,23 +31,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/cart/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.picture.update');
-    Route::delete('/profile/picture', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Addresses
-    Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
-    Route::get('/addresses/create', [AddressController::class, 'create'])->name('addresses.create');
-    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
-    Route::get('/addresses/{address}/edit', [AddressController::class, 'edit'])->name('addresses.edit');
-    Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
-    Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
-    Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
-
     // Reviews
     Route::get('/reviews', [ReviewController::class, 'index'])->name('reviews.index');
     Route::get('/reviews/create/{orderItem}', [ReviewController::class, 'create'])->name('reviews.create');
@@ -65,18 +40,18 @@ Route::middleware('auth')->group(function () {
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
-// Routes that require verified email
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Checkout
+// Routes that require non-guest account (block guest user)
+Route::middleware(['auth', 'block.guest'])->group(function () {
+    // Checkout - Guest user cannot checkout
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 
-    // Buy Now
+    // Buy Now - Guest user cannot buy now
     Route::post('/buy-now/{product}', [CheckoutController::class, 'buyNow'])->name('buy-now');
     Route::get('/checkout/buy-now', [CheckoutController::class, 'buyNowCheckout'])->name('checkout.buy-now');
     Route::post('/checkout/buy-now/process', [CheckoutController::class, 'processBuyNow'])->name('checkout.buy-now.process');
 
-    // Orders
+    // Orders - Guest user cannot view orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
@@ -84,10 +59,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/orders/{order}/request-refund', [OrderController::class, 'requestRefund'])->name('orders.request-refund');
     Route::get('/orders/{order}/refund', [OrderController::class, 'viewRefund'])->name('orders.refund');
 
-    // Payment
+    // Payment - Guest user cannot access payment
     Route::post('/payment/{order}/snap-token', [PaymentController::class, 'createSnapToken'])->name('payment.snap-token');
     Route::get('/payment/{order}/finish', [PaymentController::class, 'finish'])->name('payment.finish');
     Route::get('/payment/{order}/status', [PaymentController::class, 'checkStatus'])->name('payment.status');
+
+    // Profile - Guest user should not access
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/picture', [ProfileController::class, 'updateProfilePicture'])->name('profile.picture.update');
+    Route::delete('/profile/picture', [ProfileController::class, 'deleteProfilePicture'])->name('profile.picture.delete');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Addresses - Guest user should not access
+    Route::get('/addresses', [AddressController::class, 'index'])->name('addresses.index');
+    Route::get('/addresses/create', [AddressController::class, 'create'])->name('addresses.create');
+    Route::post('/addresses', [AddressController::class, 'store'])->name('addresses.store');
+    Route::get('/addresses/{address}/edit', [AddressController::class, 'edit'])->name('addresses.edit');
+    Route::put('/addresses/{address}', [AddressController::class, 'update'])->name('addresses.update');
+    Route::patch('/addresses/{address}/set-default', [AddressController::class, 'setDefault'])->name('addresses.set-default');
+    Route::delete('/addresses/{address}', [AddressController::class, 'destroy'])->name('addresses.destroy');
 });
 
 // Midtrans Webhook (no auth required)

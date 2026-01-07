@@ -54,6 +54,11 @@ class OrderItem extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function review()
+    {
+        return $this->hasOne(ProductReview::class);
+    }
+
     // Helper Methods
     public function calculateSubtotal()
     {

@@ -17,7 +17,7 @@ We hope you're satisfied with your purchase! We would love to hear your feedback
 - **{{ $item->product_name }}** ({{ $item->quantity }}x)
 @endforeach
 
-<x-mail::button :url="route('products.index')">
+<x-mail::button :url="route('catalog.index')">
 Continue Shopping
 </x-mail::button>
 

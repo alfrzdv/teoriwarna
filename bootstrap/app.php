@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'admin' => \App\Http\Middleware\CheckAdmin::class,
+            'block.guest' => \App\Http\Middleware\BlockGuestUser::class,
         ]);
 
         // Add CheckBanned to web middleware group

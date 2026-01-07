@@ -100,7 +100,7 @@
                         </div>
                         <h3 class="text-2xl font-bold font-heading text-white mb-3">Belum Ada Pesanan</h3>
                         <p class="text-dark-400 mb-6">Anda belum membuat pesanan apapun. Mulai belanja sekarang!</p>
-                        <a href="{{ route('products.index') }}"
+                        <a href="{{ route('catalog.index') }}"
                             class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-500 hover:to-purple-500 text-white font-medium rounded-lg shadow-glow-sm hover:shadow-glow transition-all">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>

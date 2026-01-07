@@ -121,11 +121,17 @@
                                     <span class="text-xl font-bold text-primary-500" id="total-display">Rp 0</span>
                                 </div>
 
-                                <button type="submit" id="checkout-btn" class="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all mb-3">
-                                    Proceed to Checkout
-                                </button>
+                                @guest
+                                    <a href="{{ route('login') }}" class="block text-center w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all mb-3">
+                                        Login to Checkout
+                                    </a>
+                                @else
+                                    <button type="submit" id="checkout-btn" class="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all mb-3">
+                                        Proceed to Checkout
+                                    </button>
+                                @endguest
 
-                                <a href="{{ route('products.index') }}" class="block w-full px-6 py-3 text-center bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors mb-3">
+                                <a href="{{ route('catalog.index') }}" class="block w-full px-6 py-3 text-center bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors mb-3">
                                     Continue Shopping
                                 </a>
 
@@ -217,7 +223,7 @@
                         </div>
                         <h2 class="text-2xl font-bold font-heading text-white mb-3">Your cart is empty</h2>
                         <p class="text-gray-400 mb-6">Add some products to get started!</p>
-                        <a href="{{ route('products.index') }}" class="inline-block px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all">
+                        <a href="{{ route('catalog.index') }}" class="inline-block px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all">
                             Start Shopping
                         </a>
                     </div>

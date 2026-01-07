@@ -93,7 +93,7 @@
                         <div>
                             <h3 class="text-sm font-bold font-heading text-white mb-4 uppercase tracking-wide">Shop</h3>
                             <ul class="space-y-2">
-                                <li><a href="{{ route('products.index') }}" class="text-gray-400 hover:text-primary-500 transition-colors text-sm">All Products</a></li>
+                                <li><a href="{{ route('catalog.index') }}" class="text-gray-400 hover:text-primary-500 transition-colors text-sm">All Products</a></li>
                                 <li><a href="{{ route('cart.index') }}" class="text-gray-400 hover:text-primary-500 transition-colors text-sm">Shopping Cart</a></li>
                                 @auth
                                     <li><a href="{{ route('orders.index') }}" class="text-gray-400 hover:text-primary-500 transition-colors text-sm">My Orders</a></li>

@@ -84,8 +84,7 @@ class ProductCatalogController extends Controller
             'category',
             'product_images' => function($q) {
                 $q->orderByRaw('is_primary DESC, id ASC');
-            },
-            'reviews.user'
+            }
         ]);
 
         // Get related products from the same category

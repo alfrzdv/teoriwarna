@@ -34,6 +34,11 @@ class ProductReview extends Model
         return $this->belongsTo(OrderItem::class);
     }
 
+    public function images()
+    {
+        return $this->hasMany(ReviewImage::class);
+    }
+
     // Scopes
     public function scopeWithRating($query, $rating)
     {

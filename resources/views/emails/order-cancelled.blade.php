@@ -23,7 +23,7 @@ Your refund will be processed within 3-5 business days.
 
 If you have any questions, please contact our customer support.
 
-<x-mail::button :url="route('products.index')">
+<x-mail::button :url="route('catalog.index')">
 Continue Shopping
 </x-mail::button>
 

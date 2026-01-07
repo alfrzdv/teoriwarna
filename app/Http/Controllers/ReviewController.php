@@ -60,7 +60,7 @@ class ReviewController extends Controller
 
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'review' => 'required|string|min:10|max:1000',
+            'comment' => 'required|string|min:10|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -69,10 +69,7 @@ class ReviewController extends Controller
             'user_id' => Auth::id(),
             'order_item_id' => $orderItem->id,
             'rating' => $validated['rating'],
-            'review' => $validated['review'],
-            'is_verified_purchase' => true,
-            'is_approved' => false, // Needs admin approval
-            'helpful_count' => 0,
+            'comment' => $validated['comment'],
         ]);
 
         // Handle images
@@ -110,7 +107,7 @@ class ReviewController extends Controller
 
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'review' => 'required|string|min:10|max:1000',
+            'comment' => 'required|string|min:10|max:1000',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'delete_images' => 'nullable|array',
             'delete_images.*' => 'exists:review_images,id',
@@ -118,8 +115,7 @@ class ReviewController extends Controller
 
         $review->update([
             'rating' => $validated['rating'],
-            'review' => $validated['review'],
-            'is_approved' => false, // Needs re-approval after edit
+            'comment' => $validated['comment'],
         ]);
 
         // Delete selected images
