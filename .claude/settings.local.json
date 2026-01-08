@@ -63,7 +63,11 @@
       "Bash(ls:*)",
       "Bash(php artisan db:show:*)",
       "Bash(php artisan tinker:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(composer check:*)",
+      "Bash(php artisan db:seed:*)",
+      "Bash(mysql:*)",
+      "Bash(php check_categories.php:*)"
     ]
   }
 }

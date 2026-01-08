@@ -218,7 +218,7 @@ class CheckoutController extends Controller
             try {
                 Mail::to($order->user->email)->send(new OrderConfirmation($order));
 
-                $adminUsers = User::where('is_admin', true)->get();
+                $adminUsers = User::where('role', 'admin')->orWhere('role', 'super_admin')->get();
                 foreach ($adminUsers as $admin) {
                     Mail::to($admin->email)->send(new AdminNewOrder($order));
                 }
@@ -361,7 +361,7 @@ class CheckoutController extends Controller
             try {
                 Mail::to($order->user->email)->send(new OrderConfirmation($order));
 
-                $adminUsers = User::where('is_admin', true)->get();
+                $adminUsers = User::where('role', 'admin')->orWhere('role', 'super_admin')->get();
                 foreach ($adminUsers as $admin) {
                     Mail::to($admin->email)->send(new AdminNewOrder($order));
                 }

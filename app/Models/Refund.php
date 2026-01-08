@@ -134,4 +134,15 @@ class Refund extends Model
     {
         return $query->where('status', 'completed');
     }
+
+    // Alias methods for Filament actions compatibility
+    public function approve()
+    {
+        return $this->markAsApproved(auth()->id());
+    }
+
+    public function reject()
+    {
+        return $this->markAsRejected($this->admin_notes);
+    }
 }

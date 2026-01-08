@@ -105,17 +105,7 @@ php artisan serve
 - ✅ Navigation badge for low stock products
 
 **Stock Management:**
-```php
-// Create product dengan initial stock
-ProductResource::create([
-    'name' => 'Product Name',
-    'initial_stock' => 100, // Will auto-create stock record
-]);
-
-// Manual stock adjustment
-Product::find($id)->addStock(50, 'Restock from supplier');
-Product::find($id)->reduceStock(10, 'Manual adjustment');
-```
+Stock is managed directly through the product form and can be adjusted using the Add/Reduce Stock actions in the Filament admin panel.
 
 **Navigation:** Admin Panel → Toko → Produk
 
@@ -142,58 +132,7 @@ Product::find($id)->reduceStock(10, 'Manual adjustment');
 
 ---
 
-### 5. **CouponResource** 🎫
-**Location:** `app/Filament/Resources/CouponResource.php`
-
-**Features:**
-- ✅ Coupon code management
-- ✅ Type selection (Percentage/Fixed amount)
-- ✅ Usage limits (total & per user)
-- ✅ Validity period (from/until dates)
-- ✅ Min purchase requirement
-- ✅ Max discount cap for percentage type
-- ✅ Usage tracking with progress indicator
-- ✅ Toggle active/inactive
-- ✅ Bulk operations
-- ✅ Tabs (All, Active, Inactive)
-
-**Example:**
-```php
-Coupon::create([
-    'code' => 'WELCOME20',
-    'type' => 'percentage',
-    'value' => 20, // 20%
-    'min_purchase' => 100000,
-    'max_discount' => 50000,
-    'usage_limit' => 100,
-    'usage_limit_per_user' => 1,
-    'valid_from' => now(),
-    'valid_until' => now()->addDays(30),
-]);
-```
-
-**Navigation:** Admin Panel → Marketing → Coupons
-
----
-
-### 6. **ComplaintResource** 📞
-**Location:** `app/Filament/Resources/ComplaintResource.php`
-
-**Features:**
-- ✅ Customer complaint management
-- ✅ Status workflow (Pending → In Progress → Resolved → Closed)
-- ✅ Priority levels (Low, Medium, High)
-- ✅ Reply action for admin response
-- ✅ Update status & priority
-- ✅ Linked to orders
-- ✅ Response timestamp tracking
-- ✅ Badge notification for pending complaints
-
-**Navigation:** Admin Panel → Support → Complaints
-
----
-
-### 7. **RefundResource** ↩️
+### 5. **RefundResource** ↩️
 **Location:** `app/Filament/Resources/RefundResource.php`
 
 **Features:**
@@ -210,7 +149,7 @@ Coupon::create([
 
 ---
 
-### 8. **ReviewResource** ⭐
+### 6. **ReviewResource** ⭐
 **Location:** `app/Filament/Resources/ReviewResource.php`
 
 **Features:**
@@ -227,7 +166,7 @@ Coupon::create([
 
 ---
 
-### 9. **CategoryResource** 📂
+### 7. **CategoryResource** 📂
 **Location:** `app/Filament/Resources/CategoryResource.php`
 
 **Features:**
@@ -301,10 +240,8 @@ Admin Panel (/admin)
 │   ├── Pesanan (badge: pending count)
 │   ├── Pembayaran (badge: pending count)
 │   └── Refunds (badge: pending count)
-├── Marketing
-│   └── Coupons (badge: active count)
 ├── Support
-│   ├── Complaints (badge: pending count)
+│   ├── Refunds (badge: pending count)
 │   └── Reviews (badge: pending count)
 └── User Management
     └── Users (badge: total users)
@@ -350,8 +287,7 @@ $order->refund         // HasOne Refund
 ```php
 $product->category          // BelongsTo Category
 $product->product_images    // HasMany ProductImage
-$product->product_stocks    // HasMany ProductStock
-$product->getCurrentStock() // Helper method
+$product->stock             // Direct stock field (integer)
 ```
 
 ### User Model
@@ -366,21 +302,7 @@ $user->complaints       // HasMany Complaint
 ## 🎯 Key Features
 
 ### Stock Management
-```php
-// Get current stock
-$product->getCurrentStock(); // Returns integer
-
-// Add stock
-$product->addStock(100, 'Restock from supplier');
-
-// Reduce stock
-$product->reduceStock(10, 'Manual adjustment');
-
-// Check stock availability
-if ($product->isInStock()) {
-    // Product available
-}
-```
+Stock is managed directly on the product model with the `stock` field (integer). Admin can add or reduce stock using actions in the Filament admin panel.
 
 ### Order Status Flow
 ```

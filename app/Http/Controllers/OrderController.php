@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\Notification;
 use App\Models\Refund;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,13 +81,13 @@ class OrderController extends Controller
 
             $order->update(['status' => 'cancelled']);
 
-            // Update payment status
+            // Update payment status to failed (since cancelled is not valid enum)
             if ($order->payment) {
-                $order->payment->update(['status' => 'cancelled']);
+                $order->payment->update(['status' => 'failed']);
             }
 
-            // If payment was made, create refund request automatically
-            if ($order->payment && in_array($order->payment->status, ['paid', 'pending_verification'])) {
+            // If payment was made (success status), create refund request automatically
+            if ($order->payment && $order->payment->status === 'success') {
                 $refund = Refund::create([
                     'order_id' => $order->id,
                     'user_id' => $order->user_id,
@@ -99,18 +98,7 @@ class OrderController extends Controller
                     'reason' => $request->input('cancel_reason', 'User cancelled order'),
                 ]);
 
-                // Notify admin
-                Notification::create([
-                    'user_id' => null,
-                    'type' => 'refund_requested',
-                    'title' => 'Permintaan Refund Baru',
-                    'message' => "User {$order->user->name} membatalkan pesanan #{$order->order_number} dan meminta refund.",
-                    'data' => json_encode([
-                        'order_id' => $order->id,
-                        'refund_id' => $refund->id,
-                        'amount' => $order->total_amount,
-                    ])
-                ]);
+                // Admin will be notified via Filament badge notifications
             }
 
             DB::commit();
@@ -191,18 +179,7 @@ class OrderController extends Controller
                 'bank_details' => $bankDetails,
             ]);
 
-            // Notify admin
-            Notification::create([
-                'user_id' => null,
-                'type' => 'refund_requested',
-                'title' => 'Permintaan Refund/Return Baru',
-                'message' => "User {$order->user->name} mengajukan refund untuk pesanan #{$order->order_number}",
-                'data' => json_encode([
-                    'order_id' => $order->id,
-                    'refund_id' => $refund->id,
-                    'amount' => $order->total_amount,
-                ])
-            ]);
+            // Admin will be notified via Filament badge notifications
 
             DB::commit();
 

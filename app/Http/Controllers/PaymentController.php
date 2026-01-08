@@ -31,7 +31,7 @@ class PaymentController extends Controller
             }
 
             // Check if payment is already completed
-            if ($order->payment->status === 'paid' || $order->payment->status === 'success') {
+            if ($order->payment && ($order->payment->status === 'paid' || $order->payment->status === 'success')) {
                 return response()->json(['error' => 'Payment already completed'], 400);
             }
 
@@ -142,7 +142,8 @@ class PaymentController extends Controller
                     $payment->update(['status' => 'failed']);
                     $order->update(['status' => 'cancelled']);
                 } elseif ($transactionStatus == 'cancel') {
-                    $payment->update(['status' => 'cancelled']);
+                    // Update payment to failed (payments table enum: pending/success/failed)
+                    $payment->update(['status' => 'failed']);
                     $order->update(['status' => 'cancelled']);
                 }
 
@@ -190,7 +191,7 @@ class PaymentController extends Controller
             }
 
             return response()->json([
-                'payment_status' => $order->payment->status,
+                'payment_status' => $order->payment ? $order->payment->status : null,
                 'order_status' => $order->status,
             ]);
 

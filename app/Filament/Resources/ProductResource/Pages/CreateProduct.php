@@ -28,20 +28,8 @@ class CreateProduct extends CreateRecord
 
     protected function afterCreate(): void
     {
-        // Create initial stock movement record if stock > 0
-        if ($this->record->stock > 0) {
-            $this->record->addStock(
-                $this->record->stock,
-                'Initial stock when product created'
-            );
-
-            // Reset the stock movement to avoid duplicate
-            $this->record->stock_movements()
-                ->where('type', 'in')
-                ->where('quantity', $this->record->stock)
-                ->where('note', 'Initial stock when product created')
-                ->delete();
-        }
+        // Stock is already set in mutateFormDataBeforeCreate
+        // No additional stock movement tracking needed
     }
 
     protected function getCreatedNotification(): ?Notification
